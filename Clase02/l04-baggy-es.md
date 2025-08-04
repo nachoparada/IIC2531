@@ -17,6 +17,13 @@ style: |
   img[alt~="align-right"] {
     margin-left: 400px;
   }
+
+  img[alt~="align-center"] {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 200px;
+  }
   
   /* Right-align terminal commands */
   .terminal-commands {
@@ -41,6 +48,12 @@ style: |
   ul ul, ol ol {
     opacity: 0.8;
   }
+
+---
+
+# Manejo de Memoria
+  ![width:600px align-center](program_layout_in_memory.png) 
+
 ---
 
 # Defendiendo desbordamientos de búfer
@@ -92,22 +105,23 @@ style: |
   * El compilador genera código que empuja un valor "canario" en el stack al
     entrar a la función, hace pop y verifica el valor antes del retorno.
   * El canario se sienta entre variables y dirección de retorno, ej.:
+  ```
                          |                  |
                          +------------------+
-        entry %esp ----> |  dirección de retorno  |    ^
+        entry %esp ----> |  return address  |    ^
                          +------------------+    |
-        new %ebp ------> |    %rbp guardado    |    |
+        new %ebp ------> |    saved %rbp    |    |
                          +------------------+    |
-                         |     CANARIO       |    | El desbordamiento va
-                         +------------------+    | en esta dirección.
+                         |     CANARY       |    | Overflow goes
+                         +------------------+    | this way.
                          |     buf[127]     |    |
                          |       ...        |    |
                          |      buf[0]      |    |
                          +------------------+
                          |                  |
+  ```
   * P: ¿qué valor deberíamos usar para el canario?
-  * R: tal vez un número aleatorio, elegido al inicio del programa,
-     almacenado en algún lugar.
+    * R: tal vez un número aleatorio, elegido al inicio del programa, almacenado en algún lugar.
 
 ---
 
@@ -231,9 +245,10 @@ style: |
   * Directo aunque no muy práctico.
   * Cada puntero contiene inicio y fin del objeto de memoria original,
     * así como el valor actual del puntero:
-    * +--------------+------------+-------------+
-    * | inicio 32-bit | fin 32-bit | actual 32-bit |
-    * +--------------+------------+-------------+
+    +--------------+------------+-------------+
+    | 32-bit start | 32-bit end | 32-bit curr |
+    +--------------+------------+-------------+
+
   * Modificar compilador para generar código que:
     * Establece p.start y p.end en malloc() y p = &x.
     * Durante la desreferencia, verifica start <= curr < end,
@@ -382,6 +397,191 @@ style: |
   * Los defensores habitualmente cometen un tipo específico de error.
   * Los atacantes encuentran una forma de explotar ese error.
   * Los defensores construyen una herramienta para detectar/arreglar el error.
+
+---
+
+# Ejemplo: desbordamientos de búfer.
+
+  * Una clase importante de problemas de seguridad,
+    para los cuales se conocen muchos ataques y defensas.
+  * Este es el tema del Laboratorio 1.
+  * Suponga que su servidor web tiene un error en el parsing de entrada HTTP.
+    * En ciertas entradas, se cuelga.
+  * ¿Debería preocuparse?
+  * Echemos un vistazo a un ejemplo simplificado.
+
+---
+
+# Ejemplo: desbordamientos de búfer.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+char *
+gets(char *buf) {
+  int c;
+  while((c = getchar()) != EOF && c != '\n')
+    *buf++ = c;
+  *buf = '\0';
+  return buf;
+}
+
+int
+read_req(void) {
+  char buf[128];
+  int i;
+  gets(buf);
+  i = atoi(buf);
+  return i;
+}
+
+int
+main() {
+  int x = read_req();
+  printf("x = %d\n", x);
+}
+```
+
+    % gcc -g -static -fno-stack-protector -fcf-protection=none readreq.c -o readreq
+    % ./readreq
+    1234
+    % ./readreq
+    AAAAAAAAAAAA....AAAA
+
+---
+
+# Ejemplo: desbordamientos de búfer. (cont.)
+
+  * ¿Por qué se colgó?
+  * Deberíamos pensar "este es un error; ¿podría un atacante explotarlo?"
+  * Vamos a averiguar qué está pasando exactamente.
+    * Necesita conocer detalles de x86-64.
+
+    % gdb ./readreq
+    b read_req
+    r
+    disas $rip
+    info reg
+
+  * ¿Dónde está buf[]?
+
+    print &buf[0]
+    print $rsp
+    print &i
+
+  * Ajá, buf[] está en el stack, seguido por i.
+  * El sub $0x90, %rsp asigna espacio para buf[] e i.
+
+  * Dibujemos una imagen de lo que está en el stack.
+                         +------------------+
+                         |  frame de main()  |
+                         |                  |
+                         |                  |
+                         +------------------+
+                         |  dirección de retorno  |
+                         +------------------+
+            %rbp ------> |    %rbp guardado    |
+                         +------------------+
+                         |        i         |
+                         +------------------+
+                         |       ...        |
+                         +------------------+
+                         |     buf[127]     |
+                         |       ...        |
+            %rsp ------> |      buf[0]      |
+                         +------------------+
+
+---
+
+# Ejemplo: desbordamientos de búfer. (cont.)
+
+  * El stack x86 crece hacia abajo en direcciones.
+  * push == decrementar %rsp, luego escribir a *%rsp
+
+  * %rbp es "frame pointer" -- stack ptr guardado al entrar a la función.
+
+    x/g $rbp
+    x/g $rbp+8
+
+  * Veamos a qué se refiere la dirección de retorno guardada %rip:
+
+    disas 0x00401863
+
+  * Es la instrucción en main() después de la llamada a read_req()
+  * OK, de vuelta a read_req, justo antes de gets()
+
+    disas $rip
+    next
+    AAAAAAA...AAA (190 veces)
+
+  * ¿Qué hizo gets() al stack?
+
+    print &buf[0]
+
+  * Hmm, 190 es más que 128!
+  * ¿Cómo puede ser?
+
+    x/g $rbp
+    x/g $rbp+8
+
+  * ¡El frame pointer guardado y return eip son 0x41414141!
+  * ¿Qué es 0x41?
+
+    next
+    disas
+    stepi
+    stepi
+    disas
+
+  * Ahora a punto de ejecutar la instrucción de retorno de read_req().
+
+    x/g $rsp
+    note rip será 0x41414141
+    stepi -- crash, este es nuestro seg fault
+
+---
+
+# Ejemplo: desbordamientos de búfer. (cont.)
+
+  * ¿Es este un problema serio?
+    * Es decir, si nuestro código del servidor web tuviera este error,
+      ¿podría un atacante explotarlo para entrar en nuestra computadora?
+
+  * ¿Está el atacante limitado a saltar a algún lugar aleatorio?
+    * No: ataque de "inyección de código".
+    * ¿Cómo sabe el adversario la dirección del búfer?
+    * Simular ataque:
+      handle SIGSEGV nopass
+      set{long}$rsp=<dirección del lea antes de la llamada a printf en main>.
+
+  * ¿Qué puede hacer el adversario una vez que están ejecutando código inyectado?
+    * Si el proceso está ejecutándose como root o Administrator, puede hacer cualquier cosa.
+    * Incluso si no, aún puede enviar spam, leer archivos (servidor web, base de datos), ..
+    * Puede cargar un programa más grande desde algún lugar de la red.
+
+  * ¿Qué pasa si el stack crece hacia arriba, en lugar de hacia abajo?
+    * El frame del stack para read_req() tiene buf[] en la dirección más alta,
+      así que no se desbordará sobre el return %rip de read_req().
+    * ¿Puede un atacante aún explotar este error?
+
+---
+
+# ¿Cómo defenderse contra desbordamientos de búfer?
+  * Use un lenguaje que verifique automáticamente los límites de array.
+  * Para C:
+    * No llame gets().
+    * Intel le permite marcar el stack como no ejecutable.
+      * ¿Es esta una solución 100% para C?
+    * Aleatorizar layout, canarios, etc.
+    * Estructurar la aplicación para limitar el daño de errores (Laboratorio 2).
+    * Buenas noticias: desbordamientos simples de búfer como este ya no funcionan.
+
+Lecciones de desbordamiento de búfer:
+  * Los errores son un problema en todas las partes del código, no solo en el mecanismo de seguridad.
+  * La política puede ser irrelevante si la implementación tiene errores.
+  * Pero manténgase atento; hay esperanza para la defensa. 
+
 
 ---
 

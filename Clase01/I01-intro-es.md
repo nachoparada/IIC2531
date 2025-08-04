@@ -17,6 +17,12 @@ style: |
   img[alt~="align-right"] {
     margin-left: 400px;
   }
+
+  img[alt~="align-center"] {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
   
   /* Right-align terminal commands */
   .terminal-commands {
@@ -47,14 +53,13 @@ style: |
 ---
 
 # Estructura del curso
-  * Las clases serán Martes y Jueves a las 8:20am, en [SALA].
-    * Un paper por clase.
-      * Horario tentativo en la web.
+  * Las clases serán Martes y Jueves a las 8:20am, en la B25.
+    * Planificación tentativa en Banner (en cuanto me den acceso).
       * Pueden cambiar las clases dependiendo de si nos atrasamos o por capricho del profesor.
-    * Lean el paper antes de la clase
-      * Algunos papers sobre sistemas de producción, otros sobre ideas de investigación
-      * Incluso si el sistema general descrito en el artículo no funcionó, muchas de
-        las ideas y técnicas en el artículo son importantes y útiles.
+    * Un paper por clase.
+      * Lean el paper antes de la clase
+      * Algunos papers sobre sistemas de producción, otros sobre ideas de investigación.
+      * Incluso si el sistema general descrito en el artículo no funcionó, muchas de las ideas y técnicas en el artículo son importantes y útiles.
     * Interrumpan, hagan preguntas, señalen errores.
 
 ---
