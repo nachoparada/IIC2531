@@ -49,7 +49,22 @@ style: |
   }
 
 
-  
+---
+
+# ¿Qué es IIC2531?
+  * Curso general sobre Seguridad Computacional.
+    * No buscamos profundidad, buscamos amplitud.
+  * Contenido:
+    * Threat Models
+    * Arquitectura Enfocada en Seguridad
+    * Separación de Privilegios
+    * Aislación de Componentes
+    * Seguridad en Dispositivos Móviles
+    * Seguridad en Redes
+    * Etc.
+  * Un montón de invitados.
+
+
 ---
 
 # Estructura del curso
@@ -74,7 +89,7 @@ style: |
     * Presentaciones al final del semestre.
     * Piensen en proyectos en los que le gustaría trabajar mientras leen artículos.
     * Son posibles proyectos orientados tanto al ataque como a la defensa.
-    * Discutan ideas de proyecto ayudante y profesores durante el curso.
+    * Discutan ideas de proyecto ayudante y profesores durante el curso. 
 
 ---
 
@@ -123,7 +138,7 @@ style: |
   * Ejemplo: notas de IIC2531, almacenado en un servidor.
     * Política: solo los ayudantes deberían poder leer y escribir el archivo de con las notas.
   * Fácil de implementar el aspecto *positivo* de la política:
-    * Solo tiene que haber una ruta de código que permita a un ayudante acceder al archivo.
+    * Solo tiene que haber una URL que permita a un ayudante acceder al archivo.
   * Pero la seguridad es un objetivo *negativo*:
     * Queremos que no haya forma complicada de que un no-ayudante acceda al archivo.
   * ¡Hay un gran número de ataques potenciales a considerar!
@@ -397,7 +412,7 @@ Las políticas típicamente salen mal en casos de "gestión" o "mantenimiento".
 
 # Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
 
-  * Ejemplo: la mayoría de usuarios no están pensando en seguridad.
+  * Ejemplo: la mayoría de usuarios está pensando en seguridad.
     * El usuario recibe un email diciendo "haga clic aquí para renovar su cuenta",
         luego una página que parece plausible pide su contraseña.
     * O aparece un cuadro de diálogo con "¿Realmente quiere instalar este programa?"
@@ -433,7 +448,7 @@ Las políticas típicamente salen mal en casos de "gestión" o "mantenimiento".
         * El costo es muy bajo (fracción de un centavo por CAPTCHA resuelto).
     * [ Ref: https://www.cs.uic.edu/pub/Kanich/Publications/re.captchas.pdf ]
 
----
+<!-- ---
 
 # Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
 
@@ -441,7 +456,7 @@ Las políticas típicamente salen mal en casos de "gestión" o "mantenimiento".
     * En los 80, el ejército de Estados Unidos animó la investigación en OSes seguros.
         * Sorpresa: ataques exitosos al obtener acceso a sistemas de desarrollo
         * Error: confianza implícita en el compilador, desarrolladores, distribución, etc.
-
+-->
 ---
 
 # Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
@@ -490,19 +505,23 @@ Ejemplo: asumir que su hardware es confiable.
   * Si la NSA es su adversario, resulta que no es una buena suposición.
   * [ Ref: https://www.schneier.com/blog/archives/2013/12/more_about_the.html ]
 
+-->
 ---
 # Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
 
-Ejemplo: asumir que los usuarios pueden entender inequívocamente la UI.
+* Ejemplo: asumir que los usuarios pueden entender inequívocamente la UI.
   * [ Ref: https://en.wikipedia.org/wiki/IDN_homograph_attack ]
   * [ Ref: https://www.trojansource.codes/trojan-source.pdf ]
 
-Ejemplo: discos decomisionados.
+* Ejemplo: discos decomisionados.
   * Muchas laptops, desktops, servidores se tiran sin borrar datos sensibles.
   * Un estudio reporta grandes cantidades de datos confidenciales en discos comprados via ebay, etc.
   * [ Ref: https://simson.net/page/Real_Data_Corpus ]
 
-Ejemplo: actualizaciones de software.
+---
+# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
+
+* Ejemplo: actualizaciones de software.
   * Actualizaciones de software de iPhone de Apple vs FBI.
     * [ Ref: https://www.apple.com/customer-letter/ ]
   * Extensiones de Chrome compradas por vendedores de malware/adware.
@@ -510,9 +529,9 @@ Ejemplo: actualizaciones de software.
   * Biblioteca de Node.js actualizada para incluir código que roba claves de Bitcoin.
     * [ Ref: https://www.theregister.co.uk/2018/11/26/npm_repo_bitcoin_stealer/ ]
 
-Ejemplo: ¿las máquinas desconectadas de Internet son seguras?
+* Ejemplo: ¿las máquinas desconectadas de Internet son seguras?
   * El gusano Stuxnet se propagó via archivos especialmente construidos en unidades USB.
--->
+
 ---
 
 # ¿Qué hacer sobre problemas del modelo de amenaza?
