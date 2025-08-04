@@ -93,16 +93,29 @@ style: |
 ---
 
 # Estructura del curso - Fernando Smith
-  * Profesor: Ignacio Parada
-    * yo@ignacioparada.com
-  * Ayudantes: Fernando Smith y Alister MacCormack
-
+  * Ex delegado académico y VP del capítulo de computación.
+  * Creamos grupo estudiantiles como el club de ciberseguridad.
+    * https://security.ing.puc.cl/
+  * Trabajé como ingeniero de software en Platanus software factory y SAWA.
+  * Actualmente emprendiendo en eliminar trámites de salud con AI.
+    * https://getgokei.com
+  * Suelo estar en el HAPLAB en el DCC (primera pecera).
+    * Siéntanse libres de hablarme si me ven :)
+  * Contáctenme usando mi email también. Añadan [curso ciberseguridad] al subject para darles prioridad
+    * fdsmith@uc.cl
 ---
 
 # Estructura del curso - Alister MacCormack
-  * Profesor: Ignacio Parada
-    * yo@ignacioparada.com
-  * Ayudantes: Fernando Smith y Alister MacCormack
+  * Cofundé el [Security UC Club](https://security.ing.puc.cl/) con Fernando.
+  * Trabajé como Ingeniero de Software en Examedi y Ruuf
+  * Trabajé como Pentester en [Nivel4](https://nivel4.com)
+  * He [reportado vulnerabilidades al Gobierno](https://csirt.gob.cl/incidentes/muro-de-la-fama/2024/) 
+    * (aparezco en en el #182 y Fernando en el #192)
+  * Actualmente trabajo como Ingeniero de Software en
+    * https://shinkansen.finance
+    * Escribí un blogpost sobre [un test de phishing que hice hace un tiempo](https://blog.shinkansen.finance/5-ingredientes-de-la-seguridad-en-shinkansen-parte-1-auto-phishing/)
+  * Mi correo es amaccormack@uc.cl 
+    * Añadan [curso ciberseguridad] al subject para darles prioridad
 
 ---
 
