@@ -88,10 +88,16 @@ style: |
 ---
 
 # Estructura del curso - Fernando Smith
-  * Profesor: Ignacio Parada
-    * yo@ignacioparada.com
-  * Ayudantes: Fernando Smith y Alister MacCormack
-
+  * Ex delegado académico y VP del capítulo de computación.
+  * Creamos grupo estudiantiles como el club de ciberseguridad.
+    * https://security.ing.puc.cl/
+  * Trabajé como ingeniero de software en Platanus software factory y SAWA.
+  * Actualmente emprendiendo en eliminar trámites de salud con AI.
+    * https://getgokei.com
+  * Suelo estar en el HAPLAB en el DCC (primera pecera).
+    * Siéntanse libres de hablarme si me ven :)
+  * Contáctenme usando mi email también. Añadan [curso ciberseguridad] al subject para darles prioridad
+    * fdsmith@uc.cl
 ---
 
 # Estructura del curso - Alister MacCormack
