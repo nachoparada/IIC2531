@@ -52,8 +52,6 @@ style: |
       * Horario tentativo en la web.
       * Pueden cambiar las clases dependiendo de si nos atrasamos o por capricho del profesor.
     * Lean el paper antes de la clase
-      * Respuesta a una pregunta corta de tarea 
-      * Su propia pregunta sobre el artículo (intentaré responder en la clase).
       * Algunos papers sobre sistemas de producción, otros sobre ideas de investigación
       * Incluso si el sistema general descrito en el artículo no funcionó, muchas de
         las ideas y técnicas en el artículo son importantes y útiles.
@@ -71,11 +69,32 @@ style: |
     * Presentaciones al final del semestre.
     * Piensen en proyectos en los que le gustaría trabajar mientras leen artículos.
     * Son posibles proyectos orientados tanto al ataque como a la defensa.
-    * Discutan ideas de proyecto con el personal del curso con anticipación.
+    * Discutan ideas de proyecto ayudante y profesores durante el curso.
 
 ---
 
-# Estructura del curso (cont.)
+# Estructura del curso - Ignacio Parada
+  * Ingeniero Civil en Computación.
+    * Hace muchos muchos años.
+  * Me dediqué emprender fundando Magnet.
+  * Profesor de **Ingeniería de Software** y **Estructuras de Datos y Algoritmos**.
+  * Master en Engineering & Management en MIT.
+    * Research Assistant en Cybersecurity at MIT Sloan.
+  * Actualmente Engineering Manager en Zerofox.
+  * No tengo oficina en el DCC, pero me pueden contactar en:
+    * ignacio@magnet.cl
+    * yo@ignacioparada.com
+
+---
+
+# Estructura del curso - Fernando Smith
+  * Profesor: Ignacio Parada
+    * yo@ignacioparada.com
+  * Ayudantes: Fernando Smith y Alister MacCormack
+
+---
+
+# Estructura del curso - Alister MacCormack
   * Profesor: Ignacio Parada
     * yo@ignacioparada.com
   * Ayudantes: Fernando Smith y Alister MacCormack
@@ -542,7 +561,7 @@ Ejemplo: ¿las máquinas desconectadas de Internet son seguras?
 
 # Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
 
-Ejemplo: mala aleatoriedad para criptografía.
+* Ejemplo: mala aleatoriedad para criptografía.
   * Necesita aleatoriedad de alta calidad para generar las claves que no se pueden adivinar.
   * Debian accidentalmente "deshabilitó" la aleatoriedad en la biblioteca OpenSSL.
     * [ Ref: https://www.debian.org/security/2008/dsa-1571 ]
@@ -554,6 +573,12 @@ Ejemplo: mala aleatoriedad para criptografía.
       * ¡Así que la semilla mejor que sea aleatoria!
     * La API aún retornaba números "aleatorios" pero eran adivinables.
     * El adversario puede adivinar claves, impersonar servidores, usuarios, etc.
+
+---
+
+# Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
+
+* Ejemplo: mala aleatoriedad para criptografía.
   * La debilidad de Java SecureRandom de Android lleva al robo de Bitcoin.
     * [ Ref: https://bitcoin.org/en/alert/2013-08-11-android ]
     * [ Ref: https://www.nilsschneider.net/2013/01/28/recovering-bitcoin-private-keys.html ]
@@ -566,11 +591,12 @@ Ejemplo: mala aleatoriedad para criptografía.
     * Los adversarios buscaron claves adivinables, gastaron cualquier bitcoin correspondiente.
       * Realmente era el nonce en la firma ECDSA que no era aleatorio,
       * y nonce repetido permite deducir la clave privada.
-    * Lección: tenga cuidado.
+    * Lección: tengan cuidado.
 
+<!--
 ---
 
-# Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
+ # Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
 
   * Los dispositivos embebidos generan claves predecibles.
     * Problema: dispositivos embebidos, máquinas virtuales pueden no tener mucha aleatoriedad.
@@ -584,188 +610,5 @@ Ejemplo: Error de verificación de nombre de certificado SSL de Moxie
   * Los certificados usan strings codificados por longitud, pero el código C a menudo está terminado en null.
   * Las CAs otorgarían certificado para amazon.com\0.nickolai.org
   * Los navegadores vieron el \0 e interpretaron como un certificado para amazon.com
-  * Lección: el código de parsing es una enorme fuente de errores de seguridad.
+  * Lección: el código de parsing es una enorme fuente de errores de seguridad. -->
 
----
-
-# Ejemplo: desbordamientos de búfer.
-
-  * Una clase importante de problemas de seguridad,
-    para los cuales se conocen muchos ataques y defensas.
-  * Este es el tema del Laboratorio 1.
-  * Suponga que su servidor web tiene un error en el parsing de entrada HTTP.
-    * En ciertas entradas, se cuelga.
-  * ¿Debería preocuparse?
-  * Echemos un vistazo a un ejemplo simplificado.
-
----
-
-# Ejemplo: desbordamientos de búfer.
-
-```c
-#include <stdio.h>
-#include <stdlib.h>
-
-char *
-gets(char *buf) {
-  int c;
-  while((c = getchar()) != EOF && c != '\n')
-    *buf++ = c;
-  *buf = '\0';
-  return buf;
-}
-
-int
-read_req(void) {
-  char buf[128];
-  int i;
-  gets(buf);
-  i = atoi(buf);
-  return i;
-}
-
-int
-main() {
-  int x = read_req();
-  printf("x = %d\n", x);
-}
-```
-
-    % gcc -g -static -fno-stack-protector -fcf-protection=none readreq.c -o readreq
-    % ./readreq
-    1234
-    % ./readreq
-    AAAAAAAAAAAA....AAAA
-
----
-
-# Ejemplo: desbordamientos de búfer. (cont.)
-
-  * ¿Por qué se colgó?
-  * Deberíamos pensar "este es un error; ¿podría un atacante explotarlo?"
-  * Vamos a averiguar qué está pasando exactamente.
-    * Necesita conocer detalles de x86-64.
-
-    % gdb ./readreq
-    b read_req
-    r
-    disas $rip
-    info reg
-
-  * ¿Dónde está buf[]?
-
-    print &buf[0]
-    print $rsp
-    print &i
-
-  * Ajá, buf[] está en el stack, seguido por i.
-  * El sub $0x90, %rsp asigna espacio para buf[] e i.
-
-  * Dibujemos una imagen de lo que está en el stack.
-                         +------------------+
-                         |  frame de main()  |
-                         |                  |
-                         |                  |
-                         +------------------+
-                         |  dirección de retorno  |
-                         +------------------+
-            %rbp ------> |    %rbp guardado    |
-                         +------------------+
-                         |        i         |
-                         +------------------+
-                         |       ...        |
-                         +------------------+
-                         |     buf[127]     |
-                         |       ...        |
-            %rsp ------> |      buf[0]      |
-                         +------------------+
-
----
-
-# Ejemplo: desbordamientos de búfer. (cont.)
-
-  * El stack x86 crece hacia abajo en direcciones.
-  * push == decrementar %rsp, luego escribir a *%rsp
-
-  * %rbp es "frame pointer" -- stack ptr guardado al entrar a la función.
-
-    x/g $rbp
-    x/g $rbp+8
-
-  * Veamos a qué se refiere la dirección de retorno guardada %rip:
-
-    disas 0x00401863
-
-  * Es la instrucción en main() después de la llamada a read_req()
-  * OK, de vuelta a read_req, justo antes de gets()
-
-    disas $rip
-    next
-    AAAAAAA...AAA (190 veces)
-
-  * ¿Qué hizo gets() al stack?
-
-    print &buf[0]
-
-  * Hmm, 190 es más que 128!
-  * ¿Cómo puede ser?
-
-    x/g $rbp
-    x/g $rbp+8
-
-  * ¡El frame pointer guardado y return eip son 0x41414141!
-  * ¿Qué es 0x41?
-
-    next
-    disas
-    stepi
-    stepi
-    disas
-
-  * Ahora a punto de ejecutar la instrucción de retorno de read_req().
-
-    x/g $rsp
-    note rip será 0x41414141
-    stepi -- crash, este es nuestro seg fault
-
----
-
-# Ejemplo: desbordamientos de búfer. (cont.)
-
-  * ¿Es este un problema serio?
-    * Es decir, si nuestro código del servidor web tuviera este error,
-      ¿podría un atacante explotarlo para entrar en nuestra computadora?
-
-  * ¿Está el atacante limitado a saltar a algún lugar aleatorio?
-    * No: ataque de "inyección de código".
-    * ¿Cómo sabe el adversario la dirección del búfer?
-    * Simular ataque:
-      handle SIGSEGV nopass
-      set{long}$rsp=<dirección del lea antes de la llamada a printf en main>.
-
-  * ¿Qué puede hacer el adversario una vez que están ejecutando código inyectado?
-    * Si el proceso está ejecutándose como root o Administrator, puede hacer cualquier cosa.
-    * Incluso si no, aún puede enviar spam, leer archivos (servidor web, base de datos), ..
-    * Puede cargar un programa más grande desde algún lugar de la red.
-
-  * ¿Qué pasa si el stack crece hacia arriba, en lugar de hacia abajo?
-    * El frame del stack para read_req() tiene buf[] en la dirección más alta,
-      así que no se desbordará sobre el return %rip de read_req().
-    * ¿Puede un atacante aún explotar este error?
-
----
-
-# ¿Cómo defenderse contra desbordamientos de búfer?
-  * Use un lenguaje que verifique automáticamente los límites de array.
-  * Para C:
-    * No llame gets().
-    * Intel le permite marcar el stack como no ejecutable.
-      * ¿Es esta una solución 100% para C?
-    * Aleatorizar layout, canarios, etc.
-    * Estructurar la aplicación para limitar el daño de errores (Laboratorio 2).
-    * Buenas noticias: desbordamientos simples de búfer como este ya no funcionan.
-
-Lecciones de desbordamiento de búfer:
-  * Los errores son un problema en todas las partes del código, no solo en el mecanismo de seguridad.
-  * La política puede ser irrelevante si la implementación tiene errores.
-  * Pero manténgase atento; hay esperanza para la defensa. 
