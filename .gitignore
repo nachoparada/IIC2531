@@ -1,0 +1,20 @@
+# Ignore Inputs folder
+Inputs/
+
+# Ignore all HTML files
+*.html
+
+# Common system files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+*.o
+*.exe
+*.out

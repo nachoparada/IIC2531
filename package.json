@@ -1,0 +1,16 @@
+{
+  "name": "marp-presentations",
+  "version": "1.0.0",
+  "description": "Marp presentations for Seguridad Computacional",
+  "scripts": {
+    "start": "marp --server --watch .",
+    "build": "marp --html --pdf sample-presentation.md",
+    "build-html": "marp --html sample-presentation.md"
+  },
+  "devDependencies": {
+    "@marp-team/marp-cli": "^3.4.0"
+  },
+  "keywords": ["marp", "presentations", "markdown"],
+  "author": "",
+  "license": "MIT"
+} 
