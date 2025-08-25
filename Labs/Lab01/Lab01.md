@@ -1,7 +1,7 @@
 Introducción
 ------------
 
-Realizarás una secuencia de laboratorios en 6.858. Estos laboratorios te darán
+Realizarás una secuencia de laboratorios en IIC2531. Estos laboratorios te darán
 experiencia práctica con ataques comunes y contramedidas. Para hacer los
 problemas concretos, explorarás los ataques y contramedidas en el
 contexto de la aplicación web zoobar de las siguientes maneras:
@@ -26,7 +26,7 @@ la infraestructura `zoobar` y `zookws`.
 
 Cada laboratorio requiere que aprendas un nuevo lenguaje de programación u otra pieza
 de infraestructura. Por ejemplo, en este laboratorio debes familiarizarte íntimamente
-con ciertos aspectos del lenguaje C, lenguaje ensamblador x86, gdb,
+con ciertos aspectos del lenguaje C, assembly x86, gdb,
 etc. Se necesita familiaridad detallada con muchas piezas diferentes de infraestructura
 para entender ataques y defensas
 en situaciones realistas: las debilidades de seguridad a menudo aparecen en casos extremos, y
@@ -35,10 +35,10 @@ esos casos extremos. Estos dos factores (nueva infraestructura y detalles) puede
 que los laboratorios consuman mucho tiempo. Deberías comenzar temprano en los laboratorios y trabajar en ellos
 diariamente por un tiempo limitado (cada laboratorio tiene varios ejercicios), en lugar de tratar
 de hacer todos los ejercicios de una sola vez justo antes de la fecha límite. Tómate el tiempo para
-entender los detalles relevantes. Si te quedas atascado, publica una pregunta en Piazza.
+entender los detalles relevantes. Si te quedas atascado, publica una pregunta en Canvas.
 
 Varios laboratorios, incluyendo este, te piden que diseñes exploits. Estos exploits
-son lo suficientemente realistas como para que podrías usarlos para un ataque real, pero
+son lo suficientemente realistas como para que puedas usarlos para un ataque real, pero
 **no debes hacerlo**. El punto de diseñar exploits es enseñarte
 cómo defenderte contra ellos, no cómo usarlos---atacar sistemas informáticos
 es ilegal
@@ -59,22 +59,21 @@ Para comenzar a trabajar en esta tarea de laboratorio, necesitarás software que
 una máquina virtual. Para usuarios de Linux, recomendamos ejecutar la VM del curso en
 [KVM](https://www.linux-kvm.org/), que está integrado en el kernel de Linux.
 KVM debería estar disponible a través de tu distribución, y está preinstalado
-en computadoras del clúster Athena; en Debian o Ubuntu, prueba `apt-get install qemu-kvm`. KVM requiere
+en Debian o Ubuntu, prueba `apt-get install qemu-kvm`. KVM requiere
 soporte de virtualización por hardware en tu CPU, y debes habilitar este soporte en
 tu BIOS (que a menudo, pero no siempre, es el predeterminado). Si tienes otro
 monitor de máquina virtual instalado en tu máquina (por ejemplo, VMware), ese monitor de
 máquina virtual puede agarrar el soporte de virtualización por hardware exclusivamente y
 evitar que KVM funcione.
 
-En Windows, o Linux sin KVM, usa [VMware Workstation](https://ist.mit.edu/vmware/workstation) de IS&T. En una Mac, usa [VMware Fusion](https://ist.mit.edu/vmware-fusion/).
+En Windows, o Linux sin KVM, usa VMware Workstation. En una Mac, usa VMware Fusion. Ambos están gratis en la página de VMware, solo debes registrarte.
 
 Una vez que tengas software de máquina virtual instalado en tu máquina, deberías
-descargar la [imagen VM del curso](https://web.mit.edu/6.858/2022/6.858-x86_64-v22.zip), y descomprimirla en tu computadora. Esta máquina virtual contiene una
+descargar la [imagen VM del curso](https://drive.google.com/file/d/1aWBjqpDxctl7CejA5TCPyS6t1VcBE3No/view?usp=sharing), y descomprimirla en tu computador. Esta máquina virtual contiene una
 instalación de [Ubuntu](https://ubuntu.com/) 21.10 Linux.
 
 Para iniciar la VM del curso usando VMware, importa `6.858-x86\_64-v22.vmdk`.
-Ve a File > New, selecciona "create a custom virtual machine", elige Linux
-> Debian 9.x 64-bit, elige Legacy BIOS, y usa un disco virtual existente
+Ve a File > New, selecciona "create a custom virtual machine", elige Linux > Debian 9.x 64-bit, elige Legacy BIOS, y usa un disco virtual existente
 (y selecciona el archivo `6.858-x86\_64-v22.vmdk`, eligiendo la opción "Take this
 disk away"). Finalmente, haz clic en Finalizar para completar la configuración.
 
@@ -106,8 +105,8 @@ instalar nuevos paquetes de software usando
 
 Puedes iniciar sesión en la máquina virtual usando su consola, o usar ssh para
 iniciar sesión en la máquina virtual a través de la red (virtual). Esto último también te permite
-copiar fácilmente archivos dentro y fuera de la máquina virtual con scp o
-rsync. Cómo accedes a la máquina virtual a través de la red depende de
+copiar fácilmente archivos dentro y fuera de la máquina virtual con `scp` o
+`rsync`. Cómo accedes a la máquina virtual a través de la red depende de
 cómo la estés ejecutando. Si estás usando VMware, primero tendrás
 que encontrar la dirección IP de la máquina virtual. Para hacerlo, inicia sesión
 en la consola, ejecuta `ip addr show dev eth0`, y
@@ -135,13 +134,11 @@ Host 858vm
 Comenzando
 -----------
 
-Los archivos que necesitarás para este y laboratorios posteriores se distribuyen usando el sistema de control de versiones [Git](https://git-scm.com/). También puedes usar Git para hacer seguimiento de cualquier cambio que hagas al código fuente inicial. Aquí hay una [visión general
-de Git](https://missing.csail.mit.edu/2020/version-control/) y el [manual
-del usuario de Git](https://www.kernel.org/pub/software/scm/git/docs/user-manual.html), que puedes encontrar útil.
-El repositorio Git del curso está disponible en https://web.mit.edu/6858/2022/lab.git. Para obtener el código del laboratorio, inicia sesión en la VM usando la cuenta |student| y clona el código fuente para el lab 1 de la siguiente manera:
+Los archivos que necesitarás para este y laboratorios posteriores se distribuyen usando el sistema de control de versiones [Git](https://git-scm.com/). También puedes usar Git para hacer seguimiento de cualquier cambio que hagas al código fuente inicial. Aquí hay una [visión general de Git](https://missing.csail.mit.edu/2020/version-control/) y el [manual del usuario de Git](https://www.kernel.org/pub/software/scm/git/docs/user-manual.html), que puedes encontrar útil.
+El repositorio Git del curso está disponible en https://github.com/nachoparada/IIC2531-labs.git. Para obtener el código del laboratorio, inicia sesión en la VM usando la cuenta |student| y clona el código fuente para el lab 1 de la siguiente manera:
 
 ```bash
-student@6858-v22:~$ git clone https://web.mit.edu/6858/2022/lab.git
+student@6858-v22:~$ git clone https://github.com/nachoparada/IIC2531-labs.git
 Cloning into 'lab'...
 student@6858-v22:~$ cd lab
 student@6858-v22:~/lab$
@@ -202,8 +199,7 @@ student@6858-v22:~/lab$ ./clean-env.sh ./zookd 8080
 
 El comando `./clean-env.sh` inicia zookd en el puerto 8080.
 Para abrir la aplicación zoobar, abre tu navegador y apúntalo a la URL
-`http://DIRECCIONIP:8080/`, donde `DIRECCIONIP` es la dirección IP de la VM
-que encontramos [arriba](https://css.csail.mit.edu/6.858/2022/#ssh). Si algo no parece estar
+`http://DIRECCIONIP:8080/`, donde `DIRECCIONIP` es la dirección IP de la VM. Si algo no parece estar
 funcionando, intenta averiguar qué salió mal, o contacta al personal del curso, antes de
 proceder más lejos.
 
@@ -213,8 +209,7 @@ Parte 1: Encontrando Buffer overflows
 En la primera parte de esta tarea de laboratorio, encontrarás Buffer overflows
 en el servidor web proporcionado. Para hacer este laboratorio, necesitarás entender
 los conceptos básicos de Buffer overflows. Para ayudarte a comenzar con esto, deberías
-leer [Smashing
-the Stack in the 21st Century](https://thesquareplanet.com/blog/smashing-the-stack-21st-century/), que revisa los detalles de cómo funcionan los buffer
+leer [Smashing the Stack in the 21st Century](https://thesquareplanet.com/blog/smashing-the-stack-21st-century/), que revisa los detalles de cómo funcionan los buffer
 overflows, y cómo pueden ser explotados.
 
 >**Ejercicio 1.** Estudia el código C del servidor web (en
@@ -308,9 +303,7 @@ Para este y ejercicios posteriores, puedes necesitar encodear tu *payload* de at
 de diferentes maneras, dependiendo de qué vulnerabilidad estés
 explotando. En algunos casos, puedes necesitar asegurarte de que tu *payload* de ataque
 esté encodeada en URL; es decir, usa `+` en lugar de
-espacio y `%2b` en lugar de `+`. Aquí hay una [referencia de codificación
-URL](http://www.blooberry.com/indexdot/html/topics/urlencoding.htm) y una [herramienta de conversión
-útil](https://www.url-encode-decode.com/). También puedes usar funciones de citado en el módulo Python `urllib`
+espacio y `%2b` en lugar de `+`. Aquí hay una [referencia de codificación URL](http://www.blooberry.com/indexdot/html/topics/urlencoding.htm) y una [herramienta de conversión útil](https://www.url-encode-decode.com/). También puedes usar funciones de citado en el módulo Python `urllib`
 para codificar bytes en URL (en particular,
 [`urllib.parse.quote_from_bytes`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.quote_from_bytes),
 seguido de `.encode('ascii')` para obtener los bytes de la cadena).
@@ -528,7 +521,7 @@ En esta parte, explorarás cómo se puede evadir este mecanismo de protección.
 Ejecuta el servidor web configurado con binarios
 que tienen una pila no ejecutable, de la siguiente manera.
 
-```
+```bash
 student@6858-v22:~/lab$ ./clean-env.sh ./zookd-nxstack 8080
 ```
 
@@ -646,5 +639,4 @@ no modificada durante la calificación.
 
 ¡Has terminado!
 Entrega tus respuestas a la tarea de laboratorio ejecutando prepare-submit y subiendo el archivo resultante
-lab1-handin.tar.gz a
-[el sitio web de entrega](https://css.csail.mit.edu/6.858/2022/labs/handin.html).
+lab1-handin.tar.gz al buzón de la tarea.
