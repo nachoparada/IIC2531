@@ -138,7 +138,7 @@ Los archivos que necesitarás para este y laboratorios posteriores se distribuye
 El repositorio Git del curso está disponible en https://github.com/nachoparada/IIC2531-labs.git. Para obtener el código del laboratorio, inicia sesión en la VM usando la cuenta |student| y clona el código fuente para el lab 1 de la siguiente manera:
 
 ```bash
-student@6858-v22:~$ git clone https://github.com/nachoparada/IIC2531-labs.git
+student@6858-v22:~$ git clone https://github.com/nachoparada/IIC2531-labs.git lab
 Cloning into 'lab'...
 student@6858-v22:~$ cd lab
 student@6858-v22:~/lab$
