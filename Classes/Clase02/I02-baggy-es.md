@@ -250,6 +250,47 @@ main() {
   ```
 ---
 
+<style scoped>
+    pre {
+
+      width: 35%; /* Adjust this percentage or use a fixed pixel value like 700px */
+      margin-left: 100px;
+    }
+
+    img[alt~="align-right"] {
+      position: absolute;
+      top: 140px;
+      right: 80px;
+      margin-top:0px
+    }
+</style>
+
+# Ejemplo: buffer overflows (cont.)
+
+  * Dibujemos una imagen de lo que está en el stack.
+
+  ```
+                         +------------------+
+                         |  main()'s frame  |
+                         |                  |
+                         |                  |
+                         +------------------+
+                         |  return address  |
+                         +------------------+
+            %rbp ------> |    saved %rbp    |
+                         +------------------+
+                         |        i         |
+                         +------------------+
+                         |       ...        |
+                         +------------------+
+                         |     buf[127]     |
+                         |       ...        |
+            %rsp ------> |      buf[0]      |
+                         +------------------+
+  ```
+
+---
+
 # Ejemplo: buffer overflows (cont.)
   * ¿Dónde está buf[]?
 
@@ -302,6 +343,7 @@ main() {
                          +------------------+
   ```
 
+<!--
 ---
 
 # Ejemplo: buffer overflows (cont.)
@@ -320,7 +362,7 @@ main() {
     disas 0x00401863
   ```
   * Es la instrucción en main() después de la llamada a read_req()
-
+-->
 ---
 
 # Ejemplo: buffer overflows (cont.)
@@ -438,7 +480,9 @@ main() {
   * Ej. O/S establece el bit NX (No eXecute) de Intel en cada página del stack.
   * Esto previene la ejecución de instrucciones inyectadas en el stack.
   * P: ¿NX significa que no tenemos que preocuparnos por buffer overflows?
+    * No
   * P: ¿NX es una pérdida de tiempo si no es perfecto?
+    * Tampoco
 
 ---
 <style scoped>
@@ -523,15 +567,15 @@ pre {
             ^
 	    |   data
 	    |-- next
-		prev --|
+		      prev --|
 	    |-> ----   |
 	    |   data   |
 	    |-- next   |
-		prev --|-|
+		      prev --|-|
 	    |-> ---- <-| |
 	    |   data     |
 	    |-- next     |
-		prev <---     
+		    prev <---     
   ```
 
 ---
