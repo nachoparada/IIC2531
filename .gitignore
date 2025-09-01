@@ -1,6 +1,9 @@
 # Ignore Inputs folder
 Inputs/
 
+# Ignore Labs solutions folder
+Labs/Solutions/
+
 # Ignore all HTML files
 *.html
 
