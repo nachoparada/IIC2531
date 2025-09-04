@@ -286,6 +286,82 @@ style: |
 
 ---
 
+# Lab 2 usa contenedores Linux (lxc)
+
+  * No existían cuando el autor construyó OKWS
+  * Los contenedores proporcionan la ilusión de máquinas virtuales sin usar máquinas virtuales
+    * Los contenedores son más eficientes que las máquinas virtuales
+  * Un contenedor es un proceso Linux, pero fuertemente aislado:
+    * Acceso limitado a los espacios de nombres del kernel
+    * Acceso limitado a las llamadas al sistema
+    * Sin acceso al sistema de archivos
+
+---
+
+# Los contenedores se comportan como una máquina virtual
+
+  * Iniciados desde una imagen VM
+  * Tienen su propia dirección IP
+  * Tienen su propio sistema de archivos
+  * Lab 2 usa contenedores *no privilegiados*
+    * Estos contenedores ejecutan como procesos de usuario no-root
+    * Si el proceso dentro del contenedor ejecuta como root, aún privilegios limitados
+  * Más difícil salir del contenedor que proceso con chroot
+  * Lab2 también usa chroot/uid para separar procesos privilegiados en un contenedor (perfil)
+    * Pero esa es la excepción, lab 2 principalmente depende de contenedores
+
+---
+
+# Usando contenedores para separación de privilegios
+
+  * Plan: convertir aplicación de proceso único en aplicación virtual "distribuida"
+    * Crear un contenedor para diferentes servicios
+      * Copiar los archivos correctos al contenedor
+      * Asignar su propia dirección IP
+      * Usar RPC sobre TCP para comunicarse con otros contenedores
+    * Limitar comunicación entre contenedores
+      * Configurar reglas de firewall para limitar comunicación entre contenedores
+    * Lab 2 tiene zookld que hace esto; similar a okld
+  * El paper de arquitectura de Google usa máquinas físicas para dividir servicios
+    * Los contenedores soportan la misma idea usando una sola máquina física
+
+---
+
+# ¿Qué ha pasado desde 2004, cuando OKWS fue publicado?
+
+  * OKWS mismo aún (probablemente) usado en OK Cupid, pero no en otros lugares
+    * C++ no es popular para programación web
+    * Las herramientas de aislamiento a nivel de proceso UNIX son difíciles de usar
+    * La partición fina es difícil, tensión con desarrollo rápido y evolución
+    * La partición OKWS no muy útil si solo tienes un servicio importante
+    * La liberación open-source de OKWS ha sido deprecada por sus mantenedores
+
+---
+
+# La separación de privilegios comúnmente usada en la práctica
+
+  * Balanceador de carga, servicio de login, servicio de perfil, DB de contraseñas, DB de perfil
+  * El paper de arquitectura de Google es un buen ejemplo
+    * Incluso más granulado que OKWS: tickets por usuario
+  * Algunos sistemas con partición grano fino estilo OKWS:
+    * proceso ssh-agent para mantener claves crypto, vs ssh mismo
+    * Chrome ejecuta cada frame en un proceso aislado
+  * VMs, FreeBSD jail, contenedores Linux (Docker), Linux seccomp, etc.
+
+---
+
+# Resumen
+
+  * La separación de privilegios es una técnica fundamental de seguridad
+  * OKWS demuestra cómo dividir un servidor web monolítico en componentes aislados
+  * Cada componente tiene privilegios limitados y superficie de ataque reducida
+  * Los contenedores modernos proporcionan mejor aislamiento que procesos UNIX tradicionales
+  * La separación de privilegios sigue siendo relevante hoy en día
+
+---
+
+---
+
 # ¿Cómo podríamos orquestar permisos por usuario en OKWS?
 
   * dbproxy necesita saber qué usuarios puede consultar un servicio particular
@@ -397,84 +473,6 @@ style: |
     * Así los no-superusuarios no pueden reducir/limitar su propio privilegio
     * Incómodo ya que la seguridad sugiere NO ejecutar como superusuario
 
----
-
-# Lab 2 usa contenedores Linux (lxc)
-
-  * No existían cuando el autor construyó OKWS
-  * Los contenedores proporcionan la ilusión de máquinas virtuales sin usar máquinas virtuales
-    * Los contenedores son más eficientes que las máquinas virtuales
-  * Un contenedor es un proceso Linux, pero fuertemente aislado:
-    * Acceso limitado a los espacios de nombres del kernel
-    * Acceso limitado a las llamadas al sistema
-    * Sin acceso al sistema de archivos
-
----
-
-# Los contenedores se comportan como una máquina virtual
-
-  * Iniciados desde una imagen VM
-  * Tienen su propia dirección IP
-  * Tienen su propio sistema de archivos
-  * Lab 2 usa contenedores *no privilegiados*
-    * Estos contenedores ejecutan como procesos de usuario no-root
-    * Si el proceso dentro del contenedor ejecuta como root, aún privilegios limitados
-  * Más difícil salir del contenedor que proceso con chroot
-  * Lab2 también usa chroot/uid para separar procesos privilegiados en un contenedor (perfil)
-    * Pero esa es la excepción, lab 2 principalmente depende de contenedores
-
----
-
-# Usando contenedores para separación de privilegios
-
-  * Plan: convertir aplicación de proceso único en aplicación virtual "distribuida"
-    * Crear un contenedor para diferentes servicios
-      * Copiar los archivos correctos al contenedor
-      * Asignar su propia dirección IP
-      * Usar RPC sobre TCP para comunicarse con otros contenedores
-    * Limitar comunicación entre contenedores
-      * Configurar reglas de firewall para limitar comunicación entre contenedores
-    * Lab 2 tiene zookld que hace esto; similar a okld
-  * El paper de arquitectura de Google usa máquinas físicas para dividir servicios
-    * Los contenedores soportan la misma idea usando una sola máquina física
-
----
-
-# ¿Qué ha pasado desde 2004, cuando OKWS fue publicado?
-
-  * OKWS mismo aún (probablemente) usado en OK Cupid, pero no en otros lugares
-    * C++ no es popular para programación web
-    * Las herramientas de aislamiento a nivel de proceso UNIX son difíciles de usar
-    * La partición fina es difícil, tensión con desarrollo rápido y evolución
-    * La partición OKWS no muy útil si solo tienes un servicio importante
-    * La liberación open-source de OKWS ha sido deprecada por sus mantenedores
-
----
-
-# La separación de privilegios comúnmente usada en la práctica
-
-  * Balanceador de carga, servicio de login, servicio de perfil, DB de contraseñas, DB de perfil
-  * El paper de arquitectura de Google es un buen ejemplo
-    * Incluso más granulado que OKWS: tickets por usuario
-  * Algunos sistemas con partición grano fino estilo OKWS:
-    * proceso ssh-agent para mantener claves crypto, vs ssh mismo
-    * Chrome ejecuta cada frame en un proceso aislado
-
----
-
-# Muchas nuevas herramientas de aislamiento, mejores que procesos/chroot
-
-  * VMs, FreeBSD jail, contenedores Linux (Docker), Linux seccomp, etc.
-
----
-
-# Resumen
-
-  * La separación de privilegios es una técnica fundamental de seguridad
-  * OKWS demuestra cómo dividir un servidor web monolítico en componentes aislados
-  * Cada componente tiene privilegios limitados y superficie de ataque reducida
-  * Los contenedores modernos proporcionan mejor aislamiento que procesos UNIX tradicionales
-  * La separación de privilegios sigue siendo relevante hoy en día
 
 ---
 
