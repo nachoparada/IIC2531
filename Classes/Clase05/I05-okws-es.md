@@ -157,7 +157,7 @@ style: |
 # ¿Cómo particiona OKWS el servidor web?
 
   * ¿Cómo fluye una solicitud en este servidor web?
-    * okld inicia todos los otros procesos, desde un archivo de configuración
+    * `okld` inicia todos los otros procesos, desde un archivo de configuración
   * ¿Cómo se mapea este diseño en máquinas físicas?
     * Muchas máquinas front-end, cada una con okld, okd, pubd, oklogd, servicio*
     * Pocas máquinas DB, cada una con dbproxy, DB
@@ -257,7 +257,7 @@ style: |
     * El servicio suministra su token en RPC cuando habla con dbproxy
     * dbproxy tiene lista de consultas permitidas para cada token
   * ¿De dónde viene el token de 20 bytes?
-    * okld lee desde config, lo pasa al servicio
+    * `okld` lee desde config, lo pasa al servicio
 
 ---
 
@@ -394,19 +394,19 @@ style: |
       * así no pueden nombrar archivos fuera de dirname
     * ¿Qué es paso de FD?
       * Un proceso abre conexión de red y pasa el descriptor de archivo a otro proceso
-      * Por ejemplo, okld pasa descriptor de archivo para puerto 80 a okd
+      * Por ejemplo, `okld` pasa descriptor de archivo para puerto 80 a okd
 
 ---
 
 # ¿Cómo hace cumplir OKWS el aislamiento entre componentes en la Figura 1?
 
-  * okld ejecuta cada servicio con un UID separado
+  * `okld` ejecuta cada servicio con un UID separado
     * [En lab 2, ejecutarías cada servicio como un contenedor separado]
     * Así los servicios no pueden leer/escribir la memoria de cada uno
-  * okld usa chroot para prevenir que los procesos vean la mayoría de archivos
+  * `okld` usa chroot para prevenir que los procesos vean la mayoría de archivos
     * Tabla 1
     * pubd y oklog solo pueden acceder a sus propios archivos
-  * okld ejecuta como root (para setuid() y para asignar puerto TCP 80)
+  * `okld` ejecuta como root (para setuid() y para asignar puerto TCP 80)
     * ¡Así que queremos que haga lo menos posible!
 
 ---
@@ -415,7 +415,7 @@ style: |
 
   * Necesitamos una forma de enrutar solicitudes HTTP al servicio correcto
   * okd ve todas las solicitudes, así que no queremos hacer nada más en okd
-  * nota okd NO ejecuta como superusuario; okld le da puerto 80
+  * nota okd NO ejecuta como superusuario; `okld` le da puerto 80
   * ¿Por qué oklogd es un proceso separado?
     * No queremos que servicio corrupto elimine/sobrescriba archivos de log
   * ¿Por qué pubd es un proceso separado?
@@ -423,22 +423,22 @@ style: |
 
 ---
 
-# Tabla 1: ¿por qué todos los servicios y okld están en el mismo chroot?
+# Tabla 1: ¿por qué todos los servicios y `okld` están en el mismo chroot?
 
-  * Queremos hacer chroot a okld -- puede tener bugs también
-  * okld necesita relanzar okd + servicios
+  * Queremos hacer chroot a `okld` -- puede tener bugs también
+  * `okld` necesita relanzar okd + servicios
     * Así okd y servicios necesitan vivir en algún lugar en la cárcel chroot de okld
   * ¿Qué estamos exponiendo al tener okld, okd, y servicio compartir cárcel chroot?
     * Legible: bibliotecas compartidas conteniendo código de servicio
     * Escribible: cada servicio puede escribir a su propio /cores/<uid>
   * ¿Dónde está el archivo config?
-    * /etc/okws_config, tal vez okld lee al inicio antes de chroot
+    * /etc/okws_config, tal vez `okld` lee al inicio antes de chroot
 
 ---
 
 # oklogd & pubd tienen chroots separados porque usan archivos
 
-  * así okld debe iniciar oklogd y pubd antes de hacer chroot a sí mismo
+  * así `okld` debe iniciar oklogd y pubd antes de hacer chroot a sí mismo
   * ¿Por qué un UID separado para cada servicio?
     * kill, ptrace, archivos core
   * ¿Por qué un GID separado para cada servicio?
@@ -451,7 +451,7 @@ style: |
 
 # ¿Cómo interactúan los componentes OKWS?
 
-  * okld configura socketpairs (pipes bidireccionales) para cada servicio
+  * `okld` configura socketpairs (pipes bidireccionales) para cada servicio
     * RPCs de control
     * Logging
     * Conexiones HTTP, okd -> servicio
