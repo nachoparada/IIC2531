@@ -4,16 +4,16 @@ Introducción
 Realizarás una secuencia de laboratorios en IIC2531. Estos laboratorios te darán
 experiencia práctica con ataques comunes y contramedidas. Para hacer los
 problemas concretos, explorarás los ataques y contramedidas en el
-contexto de la aplicación web zoobar de las siguientes maneras:
+contexto de la aplicación web `zoobar` de las siguientes maneras:
 
 * Lab 1: explorarás la aplicación web zoobar,
 y usarás ataques de Buffer overflow para romper sus propiedades de seguridad.
-* Lab 2: mejorarás la aplicación web zoobar usando separación de privilegios,
+* Lab 2: mejorarás la aplicación web `zoobar` usando separación de privilegios,
 de modo que si un componente es comprometido, el adversario no obtenga
 control sobre toda la aplicación web.
 * Lab 3: construirás una herramienta de análisis de programas basada en ejecución simbólica
 para encontrar errores en código Python como la aplicación web zoobar.
-* Lab 4: mejorarás la aplicación zoobar contra ataques del navegador.
+* Lab 4: mejorarás la aplicación `zoobar` contra ataques del navegador.
 
 El Lab 1 te introducirá a las vulnerabilidades de Buffer overflow, en el contexto de un
 servidor web llamado `zookws`. El servidor web `zookws` ejecuta una
@@ -190,7 +190,7 @@ El comando make check siempre usará tanto
 `clean-env.sh` como `bin.tar.gz` para verificar tu entrega.
 
 Ahora, asegúrate de que puedes ejecutar el servidor web zookws
-y acceder a la aplicación web zoobar desde un navegador
+y acceder a la aplicación web `zoobar` desde un navegador
 ejecutándose en tu máquina, de la siguiente manera:
 
 ```bash
