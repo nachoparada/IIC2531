@@ -199,7 +199,6 @@ style: |
 
 # Enfoque más pesado: VMs
   * Ejecutar Linux en una VM guest
-    * Muy similar a la VM usada para ejecutar código de laboratorio para 6.858
   * ¿Por qué esto es mejor que Linux?
     * Superficie de ataque más pequeña: no hay syscalls complejos, solo x86 + dispositivos virtuales
     * Menos errores / vulnerabilidades: errores de escape de VM descubiertos menos de una vez al año
