@@ -279,13 +279,14 @@ style: |
     * En el peor caso, golpeará page fault si el acceso es a memoria más allá del tamaño asignado
 
 ---
-
+<!--
 # Pequeño trade-off con verificación de límites basada en VM
   * Ya no es completamente determinista
   * Dependiendo del runtime, el programa podría o no parar en store fuera de límites,
     * si el store está ligeramente fuera de límites
 
 ---
+-->
 
 # No hay seguridad de memoria dentro de un módulo
   * Es completamente posible que un programa C compilado a WebAssembly tenga buffer overflow
