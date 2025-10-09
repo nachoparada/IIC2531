@@ -60,7 +60,7 @@ style: |
 
 ---
 
-# Este paper representa un gran esfuerzo: ¿por qué podría importarle a Apple?
+# Este diseño representa un gran esfuerzo: ¿por qué podría importarle a Apple?
   * Clientes que deben mantener secretos (médicos, gubernamentales, reporteros, etc)
   * Clientes ordinarios nerviosos sobre ej. contraseña bancaria
   * Ventaja competitiva vs ej. Android
@@ -109,17 +109,10 @@ style: |
 
 # Arquitectura de hardware iOS (cont.)
 
-```
+
                      
-                       ECID
-                      Boot ROM   
-  Touch ID           Apple pub key
-   Ktouch   	        Ktouch
-     |             [ Enclave processor |
-     |             |      +            |
-     |             |     UID           |
-[Main CPU + RAM ]----    AES DMA       ----- [ Flash ] 
-```
+![width:450px align-center](arch.png)
+
 
 ---
 
