@@ -222,6 +222,38 @@ style: |
 ---
 
 # Valores "tainted" (cont.) - Estructuras
+
+<style scoped>
+    pre {
+    width: 70%;
+    margin: 0 auto;
+}
+</style>
+
+```
+tainted<int> t_width  = sandbox_invoke(jpeg_sbx, get_width);
+tainted<int> t_height = sandbox_invoke(jpeg_sbx, get_height);
+
+// You cannot use t_width or t_height as normal ints:
+int width = t_width;   // ❌ compile error
+int height = t_height; // ❌ compile error
+
+// Instead, you must validate them first:
+int safe_width  = t_width.copy_and_verify([](int w) {
+    return (w > 0 && w < 10000) ? w : 0;
+});
+int safe_height = t_height.copy_and_verify([](int h) {
+    return (h > 0 && h < 10000) ? h : 0;
+});
+
+resize_canvas(safe_width, safe_height); // ✅ safe to use
+
+```
+
+
+---
+
+# Valores "tainted" (cont.) - Estructuras
   * En principio el recorrido de struct también rastrea taint
     * struct foo { int x; int y; }
     * Podemos tomar un tainted<struct foo> y acceder al campo x
