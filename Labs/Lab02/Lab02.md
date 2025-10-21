@@ -770,5 +770,5 @@ comunicarse con `auth`.
 ¡Ya terminaste con el sandbox básico!
 
 ¡Terminaste!
-Ejecuta `make handin.zip` y sube el archivo
+Ejecuta `make submit` y sube el archivo
 `handin.zip` resultante 
