@@ -244,7 +244,7 @@ style: |
     * El sistema pregunta al usuario sobre permisos peligrosos
   * Firma:
     * Solo puede ser usado por apps firmadas por el mismo desarrollador
-    * Ej., app de configuración de red es especial, otras apps no pueden pedir perm
+    * Ej., app de configuración de red es especial, otras apps no pueden pedir permiso
 
 ---
 
@@ -350,7 +350,7 @@ style: |
   * Permitir permisos de firma si está firmada por el mismo desarrollador
 
 ---
-
+<!--
 # ¿Cómo dar a otra app permisos temporales?
   * Delegación de URI
     * Ej. App1 puede leer contenido, envía URI a App2 con flag
@@ -368,6 +368,7 @@ style: |
   * No es un modelo MAC puro: el manifiesto no tiene la historia de seguridad completa
 
 ---
+-->
 
 # Otro ejemplo de política MAC: Seguridad empresarial
   * El usuario puede definir múltiples perfiles en el mismo teléfono
