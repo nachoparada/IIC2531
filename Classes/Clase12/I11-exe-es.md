@@ -67,6 +67,10 @@ style: |
   * bugs ~ exploit
     * Tal vez difícil, pero debemos asumir que es posible
     * Ej., no todo buffer overrun es un exploit, pero podría ser posible explotar
+
+---
+
+# Potencial Solución
   * Alentar a investigadores/practicantes de seguridad/entusiastas a encontrar exploits
   * Protocolo para divulgar exploits
     * Contactar al vendedor
@@ -78,7 +82,7 @@ style: |
 
 ---
 
-# Paper de hoy: un enfoque novedoso para encontrar bugs en aplicaciones
+# Clase de hoy: un enfoque novedoso para encontrar bugs en aplicaciones
   * La aplicación tiene entradas, que el atacante puede proveer (ej. solicitudes web)
   * Agregamos verificaciones (ej. aserciones) para situaciones malas que podrían surgir
     * Las verificaciones podrían ser muy caras para usar en el sistema real
@@ -348,10 +352,6 @@ if (10 * x == z)
     * Estamos preocupados por usuario malicioso suministrando filtro que engañe al kernel
   * EXE detectó bugs críticos a pesar de que el código ya había sido revisado varias veces
 
----
-
-# EXE genera un árbol de procesos correspondiente al árbol de ejecución
-  * Haciendo fork() en cada "if"
 
 ---
 
@@ -415,7 +415,7 @@ if (10 * x == z)
   * udhcpd vs paquetes maliciosos
   * pcre (expresiones regulares compatibles con perl) vs expresiones regulares maliciosas
   * Sistema de archivos del kernel vs imágenes de disco de sistema de archivos corruptas
-  * Impresionante -- ¡programas C reales, bugs reales!
+  * ¡programas C reales, bugs reales!
 
 ---
 

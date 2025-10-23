@@ -77,11 +77,10 @@ style: |
 
 # ¿Qué podría salir mal si los navegadores web no fueran cuidadosos?
   * (Estos generalmente no funcionan ahora, pero a menudo solían hacerlo)
-  * (Asume que estoy viendo un sitio web malicioso en mi navegador)
   * ¿Leer mis datos privados de sitios web, ej. email?
   * ¿Publicar cosas como yo?
   * ¿Actuar como yo en el sitio web de mi banco?
-  * ¿Mirar sitios web dentro del firewall del MIT?
+  * ¿Mirar sitios web dentro del firewall de la universidad?
   * ¿Mirar datos en otras ventanas del navegador?
   * ¿Cambiar información mostrada en otras ventanas del navegador?
 
@@ -115,7 +114,7 @@ style: |
 # Modelo de amenaza / suposiciones
   * (-) El atacante controla un sitio web, attacker.com
   * (-) Visitas el sitio web del atacante
-    * Ej. attacker.com == cute-kitten-photos.com
+    * Ej. attacker.com == dog-photos.com
   * (-) Estás usando el navegador para otras cosas (email, banco, etc)
   * (+) El navegador es confiable, así que podemos diseñarlo para contener ataques
   * (+) El navegador no tiene errores de implementación (ej., buffer overflows)
@@ -146,17 +145,6 @@ style: |
 
 ---
 
-# Una vista simple del SOP
-
-```
-  Web:      |  gmail.com  |  attacker.com
-                ... Internet ...
-  Browser:  |  gmail      |  attacker
-            |  windows    |  windows
-```
-
----
-
 # Ejemplo: XMLHttpRequest()
   * XMLHttpRequest(url) es una llamada JavaScript
   * Obtiene URL y permite a JavaScript ver el resultado
@@ -172,13 +160,11 @@ style: |
     * Así que es importante que corte ordenadamente el límite entre
     * "siempre OK" y "nunca OK"
   * Previene que JS de attacker.com hable con gmail o mi banco,
-    * o sitios web internos del MIT
+    * o sitios web internos de mi red
     * Es decir, con XMLHttpRequest()
-  * Previene que JS del atacante mire mis otras ventanas, o
-    * las cambie
+  * Previene que JS del atacante mire mis otras ventanas, o las cambie
   * El atacante probablemente puede engañarme para hacer clic en gmail.com
-    * Pero entonces el navegador está ejecutando HTML/JS de gmail,
-    * no del atacante
+    * Pero entonces el navegador está ejecutando HTML/JS de gmail, no del atacante
 
 ---
 
@@ -186,7 +172,7 @@ style: |
   * ¿Cómo sabe la página que los datos de red son realmente de gmail.com?
     * ¿Y no del servidor del atacante?
     * Respuesta: TLS + certificado con nombre DNS
-    * Profundizaremos en estos temas en clases después del break de primavera
+    * Profundizaremos en estos temas en próximas clases 
   * ¿Cómo sabe gmail.com que el comando es realmente de tu navegador?
     * ¿Y no de la máquina del atacante con navegador hackeado?
     * Respuesta: cookies
@@ -199,7 +185,7 @@ style: |
   * Los sitios web pueden decir al navegador que establezca cookies
     * Set-Cookie: key=value
   * El navegador envía las cookies de un servidor de vuelta en cada solicitud
-  * El sitio web puede especificar un dominio, ej. mit.edu
+  * El sitio web puede especificar un dominio, ej. uc.cl
     * El dominio tiene que ser un sufijo (tal vez completo) del nombre DNS del sitio
     * El navegador envía cookies coincidentes en todas las solicitudes
     * Ej. una cookie con domain=google.com coincide con servidor mail.google.com
@@ -264,13 +250,13 @@ style: |
 ---
 
 # Excepción SOP: IMG
-  * La página attacker.com puede contener <IMG SRC="https://foo.com/x.gif">
+  * La página attacker.com puede contener \<IMG SRC="https://foo.com/x.gif">
   * El navegador obtendrá y mostrará la imagen, a pesar de diferentes orígenes
   * ¿Por qué esta excepción?
     * Evitar muchas copias de imágenes comúnmente usadas
     * Permitir incorporación fácil de contenido de imagen
   * ¿Puede una página attacker.com robar contenido de esta manera?
-    * Ej. usar fetch IMG e inspeccionar páginas web dentro del firewall del MIT?
+    * Ej. usar fetch IMG e inspeccionar páginas web dentro del firewall de mi red?
     * No: el navegador impone SOP a los píxeles recuperados
     * El usuario ve la imagen, pero no la página attack.com
   * PERO el navegador enviará cookies para foo.com
@@ -281,19 +267,17 @@ style: |
 
 # Falsificación de Solicitud Cross-Site (CSRF)
   * Supongamos que una página de attacker.com contiene
-    * <IMG SRC="https://bank.com/xfer?amount=500&to=attacker">
+    * \<IMG SRC="https://bank.com/xfer?amount=500&to=attacker">
   * El usuario no ve nada especial, tal vez una pequeña imagen rota
   * ¿Qué pasa si el usuario está logueado en bank.com?
   * ¡bank.com ve una solicitud de transferencia con una cookie de sesión válida!
   * CSRF ha sido una gran fuente de ataques reales
     * Una falla subyacente es la excepción al SOP
     * Otra falla es el envío automático de cookies
-      * Ejemplo de "autoridad ambiente"
   * Término general es "confused deputy"
     * El navegador envía una solicitud a bank.com
     * El navegador *debería* decir que está reenviando una solicitud de attacker.com
-    * Pero en realidad envía mi cookie, implicando que la solicitud
-      * es en nombre de mí o de una página web del banco
+    * Pero en realidad envía mi cookie, implicando que la solicitud es en nombre de mí o de una página web del banco
 
 ---
 
@@ -375,7 +359,7 @@ style: |
 # ¿Cómo defenderse contra ataques XSS?
   * Cookies HTTP-Only -- oculta cookie de todo JS
     * No es un arreglo completo, ya que el JS del atacante aún puede hacer otras cosas
-    * como origen de la página, ej. enviar solicitudes al servidor como yo
+      * como origen de la página, ej. enviar solicitudes al servidor como yo
   * El servidor podría quitar todo HTML de comentarios
     * Pero a los usuarios les gusta incluir formato, enlaces, etc
   * El servidor podría parsear cuidadosamente comentarios para prohibir ciertas etiquetas
@@ -396,6 +380,10 @@ style: |
   * Las pistas principales para la comprensión del usuario son visuales
     * Así que es vital que el layout de página haga claras las consecuencias del clic
   * Tristemente, HTML no siempre es útil asegurando pistas visuales claras
+
+---
+
+# Ataque de Clickjacking
   * Ejemplo:
     * La página attacker.com incluye IFRAME mostrando página amazon.com
       * Con un botón de pedido One-Click
@@ -404,8 +392,7 @@ style: |
     * attacker.com puede pintar en cualquier lugar de la página, incluyendo sobre IFRAME
       * Ej. "¡Haz clic aquí para un iPad gratis!"
     * Un clic compra el artículo en amazon; sin iPad gratis
-    * El frame de amazon invisible, así que el usuario no puede ver que algo raro pasó
-    * A menudo usado para aumentar Likes en Facebook
+    * El frame de amazon es invisible, así que el usuario no puede ver que algo raro pasó
 
 ---
 
@@ -414,25 +401,6 @@ style: |
     * Header X-Frame-Options: DENY -- prohibe página en IFRAME
     * Content-Security-Policy: frame-ancestors 'none'
 
----
-
-# Mejoras desde The Tangled Web:
-  * https://infosec.mozilla.org/guidelines/web_security
-
-  * Ejemplos notables:
-    * Cookies Same-Site, ahora por defecto (https://www.chromium.org/updates/same-site/)
-    * https://en.wikipedia.org/wiki/Content_Security_Policy
-    * https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
-    * https://en.wikipedia.org/wiki/Strict_Transport_Security
-    * https://www.w3.org/TR/SRI/
-    * Atributo sandbox de iframe HTML5
-      * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
-
----
-
-# El aislamiento web (SOP) es usado para aislamiento de privilegios por apps web
-  * Ej., Facebook (https://ysamm.com/?p=763)
-  * Ej., googleusercontent.com de Google
 
 ---
 
@@ -474,3 +442,22 @@ style: |
 # Referencias
   * https://lchsk.com/stay-paranoid-and-trust-no-one-overview-of-common-security-vulnerabilities-in-web-applications.html
 
+---
+
+# Mejoras desde The Tangled Web:
+  * https://infosec.mozilla.org/guidelines/web_security
+
+  * Ejemplos notables:
+    * Cookies Same-Site, ahora por defecto (https://www.chromium.org/updates/same-site/)
+    * https://en.wikipedia.org/wiki/Content_Security_Policy
+    * https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
+    * https://en.wikipedia.org/wiki/Strict_Transport_Security
+    * https://www.w3.org/TR/SRI/
+    * Atributo sandbox de iframe HTML5
+      * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
+
+---
+
+# El aislamiento web (SOP) es usado para aislamiento de privilegios por apps web
+  * Ej., Facebook (https://ysamm.com/?p=763)
+  * Ej., googleusercontent.com de Google
