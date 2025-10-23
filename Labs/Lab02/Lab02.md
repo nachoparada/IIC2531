@@ -23,8 +23,8 @@ privilegios, [contenedores Linux](https://linuxcontainers.org/).
 (El diseño original de OKWS usaba IDs de usuario y chroot, porque los contenedores
 Linux y namespaces no existían en ese momento.)
 
- También extenderás la aplicación web Zoobar para soportar
-*perfiles ejecutables*, que permiten a los usuarios usar código Python como
+También extenderás la aplicación web Zoobar para soportar
+_perfiles ejecutables_, que permiten a los usuarios usar código Python como
 sus perfiles. Para hacer un perfil, un usuario guarda un programa Python
 en su perfil en su página principal de Zoobar. (Para indicar que el
 perfil contiene código Python, la primera línea debe ser `#!python`.)
@@ -33,9 +33,9 @@ ejecutará el código Python en el perfil de ese usuario para generar la
 salida del perfil resultante. Esto permitirá a los usuarios implementar una variedad de características
 en sus perfiles, como:
 
-* Un perfil que saluda a los visitantes por su nombre de usuario.
-* Un perfil que lleva registro de los últimos varios visitantes a ese perfil.
-* Un perfil que da un `zoobar` a cada visitante (límite 1 por minuto).
+- Un perfil que saluda a los visitantes por su nombre de usuario.
+- Un perfil que lleva registro de los últimos varios visitantes a ese perfil.
+- Un perfil que da un `zoobar` a cada visitante (límite 1 por minuto).
 
 Soportar esto de manera segura requiere hacer sandbox del código del perfil en el servidor,
 para que no pueda realizar operaciones arbitrarias o acceder a archivos arbitrarios.
@@ -91,7 +91,7 @@ Para entender la aplicación `zoobar` en sí, primero examinaremos
 el código de la aplicación web zoobar.
 
 Una de las características clave de la aplicación `zoobar` es la capacidad de
-transferir créditos entre usuarios. Esta característica está implementada por el 
+transferir créditos entre usuarios. Esta característica está implementada por el
 script `transfer.py`.
 
 Para tener una idea de lo que hace transfer, inicia el sitio web zoobar. Para
@@ -122,7 +122,7 @@ echo: Copying files
 echo: Running zooksvc.py
 echo: zooksvc.py: running ['.//zoobar/echo-server.py', '8081']
 echo: Running on port 8081
-student@6566-v24:~/lab$ 
+student@6566-v24:~/lab$
 
 ```
 
@@ -141,18 +141,18 @@ y/o reiniciar tu VM.
 
 Puedes manipular los contenedores con los siguientes comandos:
 
-* `zookld.py`: inicia contenedores listados en zook.conf
-* `zookps.py`: lista el estado de los contenedores listados
- en zook.conf y los procesos ejecutándose en ellos.
-* `zookstop.py`: detiene los contenedores listados en zook.conf
-* `zookclean.py`: elimina todos los contenedores de `~/.local/share/lxc`, por si quieres empezar desde
- cero de nuevo.
+- `zookld.py`: inicia contenedores listados en zook.conf
+- `zookps.py`: lista el estado de los contenedores listados
+  en zook.conf y los procesos ejecutándose en ellos.
+- `zookstop.py`: detiene los contenedores listados en zook.conf
+- `zookclean.py`: elimina todos los contenedores de `~/.local/share/lxc`, por si quieres empezar desde
+  cero de nuevo.
 
-Cada uno de estos comandos también puede tomar el nombre de un contenedor individual (e.g., `main`) 
+Cada uno de estos comandos también puede tomar el nombre de un contenedor individual (e.g., `main`)
 y aplicar la operación solo a ese contenedor.
 
 Todos estos comandos son wrappers alrededor de
-la [API Python de LXC](https://linuxcontainers.org/lxc/documentation/#python). 
+la [API Python de LXC](https://linuxcontainers.org/lxc/documentation/#python).
 También puedes ejecutar muchos de los comandos LXC desde [línea de comandos](https://linuxcontainers.org/lxc/manpages/);
 en particular, `lxc-attach -n name` te dará un
 shell root en el contenedor name, que podrías encontrar útil para debugging.
@@ -179,7 +179,6 @@ abrir tu navegador e ir a `http://192.168.24.128:8888/zoobar/index.cgi/`,
 o, si estás usando KVM, a `http://localhost:8888/zoobar/index.cgi/`.
 Deberías ver el sitio web `zoobar`.
 
-
 Nota el puerto diferente, `8888` en lugar de `8080`, en las URLs de arriba.
 Esto es porque en realidad queremos conectarnos al contenedor
 `main`, pero está en una red virtual interna que solo es accesible
@@ -192,23 +191,23 @@ Si tienes problemas viendo el sitio web, una posible causa
 es que las correcciones que hiciste en el Lab 1 para arreglar los bugs de buffer overflow
 pueden ser demasiado estrictas. Si es así, por favor corrígelo antes de continuar.
 
->**Ejercicio 1.**
-En tu navegador, conéctate al sitio web `zoobar`, y crea dos cuentas de
-usuario. Inicia sesión como uno de los usuarios, y transfiere zoobars de un usuario a
-otro haciendo clic en el enlace de transfer y llenando el formulario. Juega
-con las otras características también para tener una idea de lo que permite a los usuarios
-hacer. En resumen, un usuario registrado puede actualizar su perfil, transferir
-"zoobars" (créditos) a otro usuario, y buscar el balance de zoobar, perfil,
-y transacciones de otros usuarios en el sistema.
+> **Ejercicio 1.**
+> En tu navegador, conéctate al sitio web `zoobar`, y crea dos cuentas de
+> usuario. Inicia sesión como uno de los usuarios, y transfiere zoobars de un usuario a
+> otro haciendo clic en el enlace de transfer y llenando el formulario. Juega
+> con las otras características también para tener una idea de lo que permite a los usuarios
+> hacer. En resumen, un usuario registrado puede actualizar su perfil, transferir
+> "zoobars" (créditos) a otro usuario, y buscar el balance de zoobar, perfil,
+> y transacciones de otros usuarios en el sistema.
 >
->Lee el código de `zoobar` y ve cómo transfer.py
-se invoca cuando un usuario envía una transfer en la página de transfer. Un buen lugar para
-empezar para esta parte del laboratorio es `templates/transfer.html`,
-`__init__.py`, `transfer.py`, y `bank.py` en el directorio zoobar.
+> Lee el código de `zoobar` y ve cómo transfer.py
+> se invoca cuando un usuario envía una transfer en la página de transfer. Un buen lugar para
+> empezar para esta parte del laboratorio es `templates/transfer.html`,
+> `__init__.py`, `transfer.py`, y `bank.py` en el directorio zoobar.
 >
->**Nota:** No necesitas entregar nada para este ejercicio, pero asegúrate
-de que entiendes la estructura de la aplicación `zoobar`--¡te ahorrará
-tiempo en el futuro!
+> **Nota:** No necesitas entregar nada para este ejercicio, pero asegúrate
+> de que entiendes la estructura de la aplicación `zoobar`--¡te ahorrará
+> tiempo en el futuro!
 
 ## Separación de privilegios
 
@@ -218,7 +217,7 @@ zoobar para que los bugs en la infraestructura no permitan a un
 adversario, por ejemplo, transferir zoobars a la cuenta del adversario.
 
 El servidor web para este laboratorio usa contenedores para diferentes partes del servidor
-web. Los contenedores están definidos en `zook.conf`. 
+web. Los contenedores están definidos en `zook.conf`.
 `zookld.py` usa `zookconf.py` para leer `zook.conf`
 (vía `readconf.py`) y configurar los contenedores. Como parte de este laboratorio
 definirás nuevos contenedores y modificarás cómo se configuran los contenedores. Para ese
@@ -282,7 +281,7 @@ virtuales: se inician desde una imagen de maquina virtual, tienen su propia dire
 propio sistema de archivos, etc. Les asignas direcciones IP, copias los archivos correctos
 en ellos, y arreglas llamadas a procedimientos remotos entre ellos.
 
-Usaremos contenedores *sin privilegios*, que se ejecutan como un proceso de usuario
+Usaremos contenedores _sin privilegios_, que se ejecutan como un proceso de usuario
 sin privilegios (i.e., no root). Incluso si el proceso ejecutándose dentro del
 contenedor se ejecuta con privilegios de root, el contenedor mismo se ejecuta como un
 usuario sin privilegios.
@@ -327,7 +326,7 @@ paquetes de la dirección IP de otro contenedor. Por otro lado, los contenedores
 en diferentes redes virtuales deben pasar por el kernel Linux del host para enrutar
 paquetes, y el kernel Linux asegura que los paquetes que vienen de una red virtual
 no falsifiquen una dirección de origen de una red virtual diferente (habilitado
-por la opción del kernel [rp\_filter](https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt)).
+por la opción del kernel [rp_filter](https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt)).
 
 Por defecto, cada contenedor permite paquetes entrantes de cualquier otro
 contenedor. Restringirás esto más tarde en el laboratorio, y el uso de
@@ -383,36 +382,36 @@ y `transfer.db`. Una mejor organización es dividir `zookfs`
 en dos servicios, uno para archivos estáticos y el otro para scripts de Python,
 ejecutándose como usuarios diferentes.
 
->**Ejercicio 2.**
->Modifica zook.conf para reemplazar `zookfs` con
-dos servicios separados, `dynamic` y `static`.
-Ambos deberían usar `cmd = zookfs`.
+> **Ejercicio 2.**
+> Modifica zook.conf para reemplazar `zookfs` con
+> dos servicios separados, `dynamic` y `static`.
+> Ambos deberían usar `cmd = zookfs`.
 >
->`dynamic` debería ejecutar solo `/zoobar/index.cgi`
-(que ejecuta todos los scripts de Python), pero no debería servir ningún archivo
-estático.
-static debería servir archivos estáticos pero no ejecutar nada.
+> `dynamic` debería ejecutar solo `/zoobar/index.cgi`
+> (que ejecuta todos los scripts de Python), pero no debería servir ningún archivo
+> estático.
+> static debería servir archivos estáticos pero no ejecutar nada.
 >
->Para eliminar el contenedor `zookfs` para que `zookld.py`
-no lo inicie, ejecuta ./zookclean.py zookfs.
+> Para eliminar el contenedor `zookfs` para que `zookld.py`
+> no lo inicie, ejecuta ./zookclean.py zookfs.
 >
->Ejecuta los servicios dynamic y static en diferentes redes virtuales.
+> Ejecuta los servicios dynamic y static en diferentes redes virtuales.
 >
->Esta separación requiere que zookd determine cuál
-servicio debería manejar una solicitud particular.
-Puedes usar el filtrado de URL de `zookws` para hacer esto,
-sin modificar la aplicación o las URLs que usa.
-Los filtros de URL están especificados en zook.conf,
-y soportan expresiones regulares.
-Por ejemplo, `url = .*` coincide con todas las solicitudes, mientras que
-`url = /zoobar/(abc|def)\.html` coincide con solicitudes
-a `/zoobar/abc.html` y `/zoobar/def.html`.
+> Esta separación requiere que zookd determine cuál
+> servicio debería manejar una solicitud particular.
+> Puedes usar el filtrado de URL de `zookws` para hacer esto,
+> sin modificar la aplicación o las URLs que usa.
+> Los filtros de URL están especificados en zook.conf,
+> y soportan expresiones regulares.
+> Por ejemplo, `url = .*` coincide con todas las solicitudes, mientras que
+> `url = /zoobar/(abc|def)\.html` coincide con solicitudes
+> a `/zoobar/abc.html` y `/zoobar/def.html`.
 >
->Para este ejercicio, solo deberías modificar zook.conf; no modifiques código C o
-Python.
+> Para este ejercicio, solo deberías modificar zook.conf; no modifiques código C o
+> Python.
 >
->Ejecuta make check para verificar que
-tu configuración modificada pase nuestras pruebas.
+> Ejecuta make check para verificar que
+> tu configuración modificada pase nuestras pruebas.
 
 Nos gustaría controlar con quién dynamic y static pueden comunicarse. Por
 ejemplo, incluso si static fuera comprometido, queremos que el atacante sea
@@ -427,15 +426,15 @@ Similarmente, dynamic debería solo aceptar paquetes de main,
 y no de static. Configurar reglas de seguridad como estas es
 a menudo referido como segregación de red.
 
->**Ejercicio 3.**
->Escribe entradas fwrule apropiadas
-para main, static, y dynamic para limitar la
-comunicación como se especifica arriba.
+> **Ejercicio 3.**
+> Escribe entradas fwrule apropiadas
+> para main, static, y dynamic para limitar la
+> comunicación como se especifica arriba.
 >
->Si obtienes los filtros incorrectos, podrías ser incapaz de conectarte con cualquier
-contenedor. Puedes resetear el firewall para permitir toda
-comunicación deteniendo e iniciando los contenedores de nuevo,
-usando `zookstop.py` seguido de `zookld.py`.
+> Si obtienes los filtros incorrectos, podrías ser incapaz de conectarte con cualquier
+> contenedor. Puedes resetear el firewall para permitir toda
+> comunicación deteniendo e iniciando los contenedores de nuevo,
+> usando `zookstop.py` seguido de `zookld.py`.
 
 ## Interludio: Librería RPC
 
@@ -519,53 +518,53 @@ correctamente.
 
 Específicamente, tu trabajo será el siguiente:
 
-* Decide qué interfaz debería proporcionar tu servicio de autenticación
- (i.e., qué funciones ejecutará para clientes). Mira el
- código en `login.py` y `auth.py`, y decide qué
- necesita ejecutarse en el servicio de autenticación, y qué puede ejecutarse en
- el cliente (i.e., ser parte del resto del código zoobar). Ten
- en mente que tu objetivo es proteger tanto contraseñas como tokens.
- Hemos proporcionado stubs RPC iniciales para el cliente en el archivo
- `zoobar/auth_client.py`.
-* Crea un nuevo servicio auth para autenticación de usuario, siguiendo las líneas de
- `echo-server.py`. Hemos proporcionado un archivo inicial para
- ti, `zoobar/auth-server.py`, que deberías modificar para
- este propósito. La implementación de este servicio debería usar las
- funciones existentes en `auth.py`.
-* Modifica `zook.conf` para iniciar el `auth-server`
- apropiadamente (en un contenedor en una red virtual diferente).
-* Divide las credenciales de usuario (i.e., contraseñas y tokens) de
- la base de datos Person en una base de datos Cred
- separada, almacenada en /zoobar/db/cred. No mantengas ninguna
- contraseña o token en la base de datos Person antigua.
-* Modifica el código de login en `login.py` para invocar tu
- servicio auth en lugar de llamar a `auth.py` directamente.
+- Decide qué interfaz debería proporcionar tu servicio de autenticación
+  (i.e., qué funciones ejecutará para clientes). Mira el
+  código en `login.py` y `auth.py`, y decide qué
+  necesita ejecutarse en el servicio de autenticación, y qué puede ejecutarse en
+  el cliente (i.e., ser parte del resto del código zoobar). Ten
+  en mente que tu objetivo es proteger tanto contraseñas como tokens.
+  Hemos proporcionado stubs RPC iniciales para el cliente en el archivo
+  `zoobar/auth_client.py`.
+- Crea un nuevo servicio auth para autenticación de usuario, siguiendo las líneas de
+  `echo-server.py`. Hemos proporcionado un archivo inicial para
+  ti, `zoobar/auth-server.py`, que deberías modificar para
+  este propósito. La implementación de este servicio debería usar las
+  funciones existentes en `auth.py`.
+- Modifica `zook.conf` para iniciar el `auth-server`
+  apropiadamente (en un contenedor en una red virtual diferente).
+- Divide las credenciales de usuario (i.e., contraseñas y tokens) de
+  la base de datos Person en una base de datos Cred
+  separada, almacenada en /zoobar/db/cred. No mantengas ninguna
+  contraseña o token en la base de datos Person antigua.
+- Modifica el código de login en `login.py` para invocar tu
+  servicio auth en lugar de llamar a `auth.py` directamente.
 
->**Ejercicio 4.**
->Implementa separación de privilegios para autenticación de usuario, como se describe arriba.
+> **Ejercicio 4.**
+> Implementa separación de privilegios para autenticación de usuario, como se describe arriba.
 >
->Un buen punto de partida sería primero dividir las credenciales
-originalmente almacenadas en la base de datos Person en una base de datos
-Cred separada, pero aún hacer todo en el servicio
-dynamic. No olvides crear una entrada regular de base de datos Person
-para usuarios recién registrados.
+> Un buen punto de partida sería primero dividir las credenciales
+> originalmente almacenadas en la base de datos Person en una base de datos
+> Cred separada, pero aún hacer todo en el servicio
+> dynamic. No olvides crear una entrada regular de base de datos Person
+> para usuarios recién registrados.
 >
->Una vez que eso funcione, agrega llamadas de función explícitas entre el código que
-esperas que aún viva en el servicio dynamic (que no
-toca Cred) y las funciones que eventualmente moverás
-al auth-server (que sí toca Cred). Asegúrate
-de que esto funcione solo con funciones primero, sin mover realmente el código
-a un auth-server separado.
+> Una vez que eso funcione, agrega llamadas de función explícitas entre el código que
+> esperas que aún viva en el servicio dynamic (que no
+> toca Cred) y las funciones que eventualmente moverás
+> al auth-server (que sí toca Cred). Asegúrate
+> de que esto funcione solo con funciones primero, sin mover realmente el código
+> a un auth-server separado.
 >
->Finalmente, configura auth-server.py para ejecutar el código manejando la
-base de datos Cred, y convierte las llamadas de función del paso
-anterior en RPCs reales al auth-server.
+> Finalmente, configura auth-server.py para ejecutar el código manejando la
+> base de datos Cred, y convierte las llamadas de función del paso
+> anterior en RPCs reales al auth-server.
 >
->Ejecuta make check para verificar que
-tu servicio de autenticación con separación de privilegios pase nuestras pruebas.
+> Ejecuta make check para verificar que
+> tu servicio de autenticación con separación de privilegios pase nuestras pruebas.
 
->Ejercicio 5.
-Especifica las entradas fwrule apropiadas para auth.
+> Ejercicio 5.
+> Especifica las entradas fwrule apropiadas para auth.
 
 Ahora, mejoraremos aún más la seguridad de las contraseñas, usando
 hashing y salting. El código de autenticación actual almacena una copia
@@ -590,7 +589,7 @@ posibles. Entonces, si un adversario obtiene la contraseña con hash de alguien,
 el adversario puede simplemente buscarla en su tabla gigante, y obtener la
 contraseña original.
 
-Para derrotar el ataque de rainbow table, la mayoría de sistemas usan *salting*.
+Para derrotar el ataque de rainbow table, la mayoría de sistemas usan _salting_.
 Con salting, en lugar de almacenar un hash de la contraseña, el servidor
 almacena un hash de la contraseña concatenada con una cadena
 generada aleatoriamente (llamada salt). Para verificar si la contraseña es correcta, el servidor
@@ -606,40 +605,40 @@ Una consideración final es la elección de la función hash. La mayoría de fun
 hash, como MD5 y SHA1, están diseñadas para ser rápidas. Esto significa que
 un adversario puede probar muchas contraseñas en un período corto de tiempo, ¡lo que
 no es lo que queremos! En su lugar, deberías usar una función tipo hash especial
-que esté explícitamente diseñada para ser *lenta*. Un buen ejemplo de tal
+que esté explícitamente diseñada para ser _lenta_. Un buen ejemplo de tal
 función hash es [PBKDF2](https://en.wikipedia.org/wiki/PBKDF2),
 que significa Password-Based Key Derivation Function (versión 2).
 
->Ejercicio 6.
->Implementa hashing y salting de contraseñas en tu servicio de autenticación.
-En particular, necesitarás extender tu tabla Cred para incluir
-una columna salt; modifica el código de registro para elegir un salt
-aleatorio, y para almacenar un hash de la contraseña junto con el salt, en lugar
-de la contraseña misma; y modifica el código de login para hacer hash de la contraseña
-proporcionada junto con el salt almacenado, y compararla con el hash
-almacenado. No elimines la columna password de la tabla Cred
-(la verificación para el ejercicio 5 requiere que esté presente); puedes almacenar
-la contraseña con hash en la columna password existente.
+> Ejercicio 6.
+> Implementa hashing y salting de contraseñas en tu servicio de autenticación.
+> En particular, necesitarás extender tu tabla Cred para incluir
+> una columna salt; modifica el código de registro para elegir un salt
+> aleatorio, y para almacenar un hash de la contraseña junto con el salt, en lugar
+> de la contraseña misma; y modifica el código de login para hacer hash de la contraseña
+> proporcionada junto con el salt almacenado, y compararla con el hash
+> almacenado. No elimines la columna password de la tabla Cred
+> (la verificación para el ejercicio 5 requiere que esté presente); puedes almacenar
+> la contraseña con hash en la columna password existente.
 >
->Para implementar hashing PBKDF2, puedes usar el
-[módulo Python PBKDF2](https://www.dlitz.net/software/python-pbkdf2/). 
-Aproximadamente, deberías importar `pbkdf2`, y luego hacer hash de
-una contraseña usando `pbkdf2.PBKDF2(password, salt).hexread(32)`.
-Hemos proporcionado una copia de `pbkdf2.py` en el directorio
-zoobar. No uses la función `random.random` para generar un salt
-ya que [la documentación del módulo random](https://docs.python.org/3/library/random.html)
-establece que no es criptográficamente seguro. Una alternativa segura es
-la función `os.urandom`.
+> Para implementar hashing PBKDF2, puedes usar el
+> [módulo Python PBKDF2](https://www.dlitz.net/software/python-pbkdf2/).
+> Aproximadamente, deberías importar `pbkdf2`, y luego hacer hash de
+> una contraseña usando `pbkdf2.PBKDF2(password, salt).hexread(32)`.
+> Hemos proporcionado una copia de `pbkdf2.py` en el directorio
+> zoobar. No uses la función `random.random` para generar un salt
+> ya que [la documentación del módulo random](https://docs.python.org/3/library/random.html)
+> establece que no es criptográficamente seguro. Una alternativa segura es
+> la función `os.urandom`.
 >
->Ejecuta make check para verificar que tu
-código de hashing y salting pase nuestras pruebas. Ten en mente que nuestras pruebas
-no son exhaustivas.
+> Ejecuta make check para verificar que tu
+> código de hashing y salting pase nuestras pruebas. Ten en mente que nuestras pruebas
+> no son exhaustivas.
 
 Un efecto secundario sorprendente de usar una función hash muy computacionalmente costosa
 como PBKDF2 es que un adversario ahora puede usar esto
 para lanzar ataques de denegación de servicio (DoS) en la CPU del servidor.
 Por ejemplo, el popular framework web Django publicó un
-[aviso de seguridad](https://www.djangoproject.com/weblog/2013/sep/15/security/) 
+[aviso de seguridad](https://www.djangoproject.com/weblog/2013/sep/15/security/)
 sobre esto, señalando que si un adversario trata de iniciar
 sesión en alguna cuenta proporcionando una contraseña muy grande (1MB de tamaño),
 el servidor pasaría un minuto entero tratando de calcular PBKDF2 en esa
@@ -664,32 +663,32 @@ y Transfer, los bugs en el resto de la aplicación Zoobar
 no deberían dar a un adversario la capacidad de modificar balances de zoobar, y
 asegurará que todas las transferencias se registren correctamente para futuras auditorías.
 
->**Ejercicio 7.**
->Separa privilegios de la lógica bancaria en un servicio bancario separado, siguiendo las
-líneas del servicio de autenticación. Tu servicio debería implementar
-las funciones transfer y balance, que actualmente están
-implementadas por `bank.py` y llamadas desde varios lugares en el
-resto del código de la aplicación.
+> **Ejercicio 7.**
+> Separa privilegios de la lógica bancaria en un servicio bancario separado, siguiendo las
+> líneas del servicio de autenticación. Tu servicio debería implementar
+> las funciones transfer y balance, que actualmente están
+> implementadas por `bank.py` y llamadas desde varios lugares en el
+> resto del código de la aplicación.
 >
->Deberías dividir la información de balance de `zoobar` en
-una base de datos Bank separada (en `zoodb.py`);
-implementar el servidor bancario modificando `bank-server.py`;
-agregar el servicio bancario a `zook.conf`;
-crear stubs RPC del cliente para invocar el servicio bancario;
-y modificar el resto del código de la aplicación para invocar los stubs
-RPC en lugar de llamar a las funciones de `bank.py` directamente.
+> Deberías dividir la información de balance de `zoobar` en
+> una base de datos Bank separada (en `zoodb.py`);
+> implementar el servidor bancario modificando `bank-server.py`;
+> agregar el servicio bancario a `zook.conf`;
+> crear stubs RPC del cliente para invocar el servicio bancario;
+> y modificar el resto del código de la aplicación para invocar los stubs
+> RPC en lugar de llamar a las funciones de `bank.py` directamente.
 >
->No olvides manejar el caso de creación de cuenta, cuando el nuevo usuario
-necesita obtener 10 zoobars iniciales. Esto puede requerir que cambies la
-interfaz del servicio bancario.
+> No olvides manejar el caso de creación de cuenta, cuando el nuevo usuario
+> necesita obtener 10 zoobars iniciales. Esto puede requerir que cambies la
+> interfaz del servicio bancario.
 >
->Ejecuta make check para verificar que
-tu servicio bancario con separación de privilegios pase nuestras pruebas.
+> Ejecuta make check para verificar que
+> tu servicio bancario con separación de privilegios pase nuestras pruebas.
 
 Finalmente, necesitamos arreglar un problema más con el servicio bancario.
 En particular, un adversario que puede acceder al servicio bancario (i.e.,
 puede enviarle solicitudes RPC) puede realizar transferencias desde la cuenta de
-*cualquiera* a la suya propia. Por ejemplo, puede robar 1 `zoobar` de cualquier víctima
+_cualquiera_ a la suya propia. Por ejemplo, puede robar 1 `zoobar` de cualquier víctima
 simplemente emitiendo una solicitud RPC transfer(victim, adversary, 1).
 El problema es que el servicio bancario no tiene idea de quién está invocando la
 operación de transferencia. Algunas librerías RPC proporcionan autenticación,
@@ -700,14 +699,14 @@ requeriremos que el llamador proporcione un argumento token extra,
 que debería ser un token válido para el remitente. El servicio bancario debería
 rechazar transferencias si el token es inválido.
 
->**Ejercicio 8.**
->Agrega autenticación al RPC de transferencia en el servicio bancario.
-El token del usuario actual es accesible como `g.user.token`.
-¿Cómo debería el banco validar el token proporcionado?
+> **Ejercicio 8.**
+> Agrega autenticación al RPC de transferencia en el servicio bancario.
+> El token del usuario actual es accesible como `g.user.token`.
+> ¿Cómo debería el banco validar el token proporcionado?
 
->**Ejercicio 9.**
-Especifica las entradas `fwrule` apropiadas para el servicio
-bancario.
+> **Ejercicio 9.**
+> Especifica las entradas `fwrule` apropiadas para el servicio
+> bancario.
 
 ## Parte 4: Sandboxing del lado del servidor para perfiles ejecutables
 
@@ -717,25 +716,24 @@ Utilizaremos dos métodos para la separación de privilegios. Usaremos un conten
 
 Debes familiarizarte con los siguientes componentes nuevos relacionados con perfiles ejecutables:
 
-
 - Primero, el directorio `profiles/` contiene varios perfiles ejecutables, que usarás como ejemplos:
-    - `profiles/hello-user.py` es un perfil simple que imprime de vuelta el nombre del visitante cuando se ejecuta el código del perfil, junto con la hora actual.
-    - `profiles/visit-tracker.py` lleva un registro de la última vez que cada visitante vio el perfil, e imprime la hora de la última visita (si la hay).
-    - `profiles/last-visits.py` registra los últimos tres visitantes del perfil, y los imprime.
-    - `profiles/xfer-tracker.py` imprime la última transferencia de zoobar entre el propietario del perfil y el visitante.
-    - `profiles/granter.py` le da al visitante un zoobar. Para asegurar que los visitantes no puedan robar rápidamente todos los zoobars de un usuario, este perfil otorga un zoobar solo si el propietario del perfil tiene algunos zoobars restantes, el visitante tiene menos de 20 zoobars, y ha pasado al menos un minuto desde la última vez que ese visitante obtuvo un zoobar de este perfil.
+  - `profiles/hello-user.py` es un perfil simple que imprime de vuelta el nombre del visitante cuando se ejecuta el código del perfil, junto con la hora actual.
+  - `profiles/visit-tracker.py` lleva un registro de la última vez que cada visitante vio el perfil, e imprime la hora de la última visita (si la hay).
+  - `profiles/last-visits.py` registra los últimos tres visitantes del perfil, y los imprime.
+  - `profiles/xfer-tracker.py` imprime la última transferencia de zoobar entre el propietario del perfil y el visitante.
+  - `profiles/granter.py` le da al visitante un zoobar. Para asegurar que los visitantes no puedan robar rápidamente todos los zoobars de un usuario, este perfil otorga un zoobar solo si el propietario del perfil tiene algunos zoobars restantes, el visitante tiene menos de 20 zoobars, y ha pasado al menos un minuto desde la última vez que ese visitante obtuvo un zoobar de este perfil.
 
 - Segundo, `zoobar/sandboxlib.py` es un módulo Python que implementa sandboxing para código de perfil Python no confiable; ver la clase Sandbox, y el método `run()` que ejecuta una función especificada en el sandbox. El método run funciona haciendo fork de un proceso separado y llamando `setresuid` en el proceso hijo antes de ejecutar el código no confiable, para que el código no confiable no tenga ningún privilegio. El proceso padre lee la salida del proceso hijo (es decir, el código no confiable) y devuelve esta salida al llamador de `run()`. Si el hijo no sale después de un timeout corto (5 segundos por defecto), el proceso padre mata al hijo.
-`Sandbox.run()` usa `chroot` para restringir el código no confiable a un directorio específico, pasado como argumento al constructor de Sandbox. Esto permite que el código de perfil no confiable realice algún acceso limitado al sistema de archivos, pero el creador de Sandbox decide qué directorio es accesible para el código del perfil.
+  `Sandbox.run()` usa `chroot` para restringir el código no confiable a un directorio específico, pasado como argumento al constructor de Sandbox. Esto permite que el código de perfil no confiable realice algún acceso limitado al sistema de archivos, pero el creador de Sandbox decide qué directorio es accesible para el código del perfil.
 
 Sandbox usa solo un ID de usuario para ejecutar perfiles no confiables. Esto significa que es importante que como máximo un perfil se esté ejecutando en el sandbox a la vez. De lo contrario, un proceso en sandbox podría interferir con otro proceso en sandbox, ¡ya que ambos tienen el mismo ID de usuario! Para hacer cumplir esta garantía, Sandbox usa un archivo de bloqueo; cada vez que intenta ejecutar un sandbox, primero bloquea el archivo de bloqueo, y lo libera solo después de que el proceso en sandbox haya salido. Si dos procesos intentan ejecutar algún código en sandbox al mismo tiempo, solo uno obtendrá el archivo de bloqueo a la vez. Es importante que todos los usuarios de Sandbox especifiquen el mismo nombre de archivo de bloqueo si usan el mismo UID.
 
 ¿Cómo sabe Sandbox que algún código en sandbox ha salido completamente y es seguro reutilizar el ID de usuario para ejecutar el perfil de un usuario diferente? Después de todo, el código no confiable podría haber hecho fork de otro proceso, y está esperando que algún otro perfil comience a ejecutarse con el mismo ID de usuario. Para prevenir esto, Sandbox usa los límites de recursos de Unix: usa setrlimit para limitar el número de procesos con un ID de usuario dado, para que el código en sandbox simplemente no pueda hacer fork. Esto significa que, después de que el proceso padre mata al proceso hijo (o nota que ha salido), puede concluir con seguridad que no hay procesos restantes con ese ID de usuario.
 
 - La pieza final de código es `zoobar/profile-server.py`: un servidor RPC que acepta solicitudes para ejecutar el código de perfil de algún usuario, y devuelve la salida de ejecutar ese código.
-Este servidor usa `sandboxlib.py` para crear un Sandbox y ejecutar el código del perfil en él (vía la función run_profile). `profile-server.py` también configura un servidor RPC que permite que el código del perfil obtenga acceso a cosas fuera del sandbox, como los balances de zoobar de diferentes usuarios. El `ProfileAPIServer` implementa esta interfaz; `profile-server.py` hace fork de un proceso separado para ejecutar el `ProfileAPIServer`, y también pasa un cliente RPC conectado a este servidor al código de perfil en sandbox.
+  Este servidor usa `sandboxlib.py` para crear un Sandbox y ejecutar el código del perfil en él (vía la función run_profile). `profile-server.py` también configura un servidor RPC que permite que el código del perfil obtenga acceso a cosas fuera del sandbox, como los balances de zoobar de diferentes usuarios. El `ProfileAPIServer` implementa esta interfaz; `profile-server.py` hace fork de un proceso separado para ejecutar el `ProfileAPIServer`, y también pasa un cliente RPC conectado a este servidor al código de perfil en sandbox.
 
-Debido a que `profile-server.py` usa `sandboxlib.py`, que a su vez necesita llamar `setresuid` para hacer sandbox de algún proceso, el proceso principal de `profile-server.py` necesita ejecutarse como *root*. Como nota al margen, esta es una limitación algo irónica de los mecanismos Unix: si quieres mejorar tu seguridad ejecutando código no confiable con un ID de usuario diferente, te ves obligado a ejecutar alguna parte de tu código como *root*, lo cual es algo peligroso desde una perspectiva de seguridad.
+Debido a que `profile-server.py` usa `sandboxlib.py`, que a su vez necesita llamar `setresuid` para hacer sandbox de algún proceso, el proceso principal de `profile-server.py` necesita ejecutarse como _root_. Como nota al margen, esta es una limitación algo irónica de los mecanismos Unix: si quieres mejorar tu seguridad ejecutando código no confiable con un ID de usuario diferente, te ves obligado a ejecutar alguna parte de tu código como _root_, lo cual es algo peligroso desde una perspectiva de seguridad.
 
 Un desafío es que el servicio de perfil realiza rpc_xfer desde la cuenta del propietario del perfil, lo cual requiere un token para el propietario. No puedes simplemente agregar un RPC al servicio de autenticación para obtener un token para el propietario del perfil, porque entonces cualquier servicio podría pedirlo; queremos que solo el servicio de perfil pueda hacer esta transferencia. De manera similar, no podemos agregar un RPC al servicio bancario para hacer una transferencia desde la cuenta de cualquiera sin un token.
 
@@ -743,32 +741,32 @@ Queremos hacer la transferencia desde la cuenta del propietario del perfil solo 
 
 Para comenzar, necesitarás agregar el servicio de perfil a tu zook.conf. Ejecuta el servicio en su propio contenedor y en su propio enlace de red.
 
->**Ejercicio 10.** Agrega `profile-server.py` a tu servidor web.
+> **Ejercicio 10.** Agrega `profile-server.py` a tu servidor web.
 >
->Asegúrate de que tu sitio Zoobar pueda soportar todos los cinco perfiles.
+> Asegúrate de que tu sitio Zoobar pueda soportar todos los cinco perfiles.
 >
->Ejecuta `make check` para verificar que tu configuración modificada pase nuestras pruebas. El caso de prueba crea algunas cuentas de usuario, almacena uno de los perfiles de Python en el perfil de un usuario, hace que otro usuario vea ese perfil, y verifica que el otro usuario vea la salida correcta.
+> Ejecuta `make check` para verificar que tu configuración modificada pase nuestras pruebas. El caso de prueba crea algunas cuentas de usuario, almacena uno de los perfiles de Python en el perfil de un usuario, hace que otro usuario vea ese perfil, y verifica que el otro usuario vea la salida correcta.
 >
->Si encuentras problemas con las pruebas de `make check`, siempre puedes revisar `/tmp/html.out` para la salida html de los perfiles.
+> Si encuentras problemas con las pruebas de `make check`, siempre puedes revisar `/tmp/html.out` para la salida html de los perfiles.
 
 El diseño de arriba tiene dos problemas de seguridad. Primero, el sandbox se ejecuta con los mismos privilegios que el servidor de perfiles y puede acceder a cualquier archivo en el sistema de archivos del contenedor de perfiles, así como comunicarse en la red para emitir RPCs directamente al banco. Segundo, los perfiles de diferentes usuarios crean archivos en el mismo directorio `/tmp`. El siguiente ejercicio resuelve ambos problemas haciendo sandbox del código del perfil usando mecanismos Unix para la separación de privilegios.
 
->**Ejercicio 11.**
->Modifica `rpc_run` en `profile-server.py` para que el sandbox se ejecute con un UID no-root (por ejemplo, 6858 en lugar de 0). Además, asegúrate de que cada perfil de usuario tenga acceso a sus propios archivos, y no pueda manipular los archivos de otros perfiles de usuario (por ejemplo, crea un directorio único para cada usuario, y usa `chown` y `chmod` para controlar la propiedad y el acceso a ese directorio).
+> **Ejercicio 11.**
+> Modifica `rpc_run` en `profile-server.py` para que el sandbox se ejecute con un UID no-root (por ejemplo, 6858 en lugar de 0). Además, asegúrate de que cada perfil de usuario tenga acceso a sus propios archivos, y no pueda manipular los archivos de otros perfiles de usuario (por ejemplo, crea un directorio único para cada usuario, y usa `chown` y `chmod` para controlar la propiedad y el acceso a ese directorio).
 >
->Consulta las páginas de manual para `chown` y `chmod` para ver qué hacen. Pasa tu UID y `userdir` a `Sandbox.run()`. El código en `Sandbox.run()` llama `setresuid` y `chroot` por ti, y también llama `unshare(CLONE_NEWNET)` para prevenir que el código en sandbox se comunique directamente a través de la red. Mira las páginas de manual para aprender más sobre qué están haciendo esas operaciones.
+> Consulta las páginas de manual para `chown` y `chmod` para ver qué hacen. Pasa tu UID y `userdir` a `Sandbox.run()`. El código en `Sandbox.run()` llama `setresuid` y `chroot` por ti, y también llama `unshare(CLONE_NEWNET)` para prevenir que el código en sandbox se comunique directamente a través de la red. Mira las páginas de manual para aprender más sobre qué están haciendo esas operaciones.
 >
->Recuerda considerar la posibilidad de nombres de usuario con caracteres especiales.
+> Recuerda considerar la posibilidad de nombres de usuario con caracteres especiales.
 >
->Ejecuta `make check` para ver si tu implementación pasa nuestros casos de prueba.
+> Ejecuta `make check` para ver si tu implementación pasa nuestros casos de prueba.
 
->**Ejercicio 12.**
->Especifica las entradas `fwrule` apropiadas para `profile`
-y otros servicios. Por ejemplo, `profile` no debería poder
-comunicarse con `auth`.
+> **Ejercicio 12.**
+> Especifica las entradas `fwrule` apropiadas para `profile`
+> y otros servicios. Por ejemplo, `profile` no debería poder
+> comunicarse con `auth`.
 
 ¡Ya terminaste con el sandbox básico!
 
 ¡Terminaste!
-Ejecuta `make handin.zip` y sube el archivo
-`handin.zip` resultante 
+Ejecuta `make prepare-submit` y sube el archivo
+`lab2-handin.tar.gz` resultante
