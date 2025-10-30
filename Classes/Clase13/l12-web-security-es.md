@@ -150,13 +150,12 @@ style: |
   * Obtiene URL y permite a JavaScript ver el resultado
   * A menudo usado para acceder a "web APIs", para obtener datos para JS
   * ¿Podría attacker.com usarlo para robar datos de gmail?
-    * No: el navegador impone SOP, así que solo puede obtener del
-      * mismo servidor del que vino el JavaScript
+    * No: el navegador impone SOP, así que solo puede obtener del mismo servidor del que vino el JavaScript
 
 ---
 
 # ¿El SOP hace lo que queremos?
-  * Es mayormente impuesto automáticamente, sin elección (tiene sabor MAC)
+  * Es mayormente impuesto automáticamente, sin elección 
     * Así que es importante que corte ordenadamente el límite entre
     * "siempre OK" y "nunca OK"
   * Previene que JS de attacker.com hable con gmail o mi banco,
@@ -323,8 +322,7 @@ style: |
 # Excepción SOP: Cross Origin Resource Sharing (CORS)
   * Un servidor puede decir al navegador permitir XMLHttpRequest(url) cross-origin
   * Si el navegador ve que la solicitud de una página es cross-origin, pregunta al servidor
-    * primero, le dice al servidor el origen solicitante, el servidor puede decir
-    * sí o no
+    * primero, le dice al servidor el origen solicitante, el servidor puede decir sí o no
   * ¿Por qué esta excepción?
     * Algunos datos de API web son públicos
     * Algunos mash-ups específicos son intencionalmente autorizados
@@ -405,8 +403,8 @@ style: |
 ---
 
 # ¿Por qué no rediseñar el modelo de seguridad desde cero?
-  * R1: ¡Compatibilidad hacia atrás! Hay una gran cantidad de
-    * infraestructura web preexistente en la que la gente confía
+  * R1: ¡Compatibilidad hacia atrás! 
+    * Hay una gran cantidad de infraestructura web preexistente en la que la gente confía
   * R2: ¿Cómo sabemos que un nuevo modelo de seguridad sería suficientemente expresivo?
     * Los usuarios no cambiarán mucha conveniencia por seguridad
   * R3: Cualquier modelo de seguridad debe evolucionar
