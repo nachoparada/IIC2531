@@ -257,23 +257,19 @@ style: |
 ---
 
 # Handshake SSL 3.0 (simplificado)
-  * 1. C -> S: Hello: versión del cliente, randomC, session_id, cifrados
-  * 2. S -> C: Hello: versión del servidor, randomS, session_id, cifrados
-  * 3. S -> C: ServerCertificate: lista de certificados
-  * 4. S -> C: HelloDone
-  * [[ el cliente elige pre_master_secret aleatorio ]]
-  * 5. C -> S: ClientKeyExchange: cifrar (pre_master_secret, PK_S)
-  * 6. C -> S: ChangeCipherSpec
-  * 7. C -> S: finished, MAC({master_secret ++ msg 1,2,3,4,5}, C_mac_key) (y cifrado)
-
----
-
-# Handshake SSL 3.0 (cont.)
-  * 8. S -> C: change cipher spec
-  * 9. S -> C: finished, MAC({master_secret ++ msg 1,2,3,4,5,7}, S_mac_key) (y cifrado)
-  * 10. C -> S: cifrar({data, MAC(data, C_mac_key)}, C_enc_key)
-  * master_secret <- PRF(pre_master_secret, "master secret", randomC+randomS)
-  * (C_mac_key, C_enc_key) <- PRF(master_secret, "key expansion", randomS+randomC)
+1. C -> S: Hello: versión del cliente, randomC, session_id, cifrados
+2. S -> C: Hello: versión del servidor, randomS, session_id, cifrados
+3. S -> C: ServerCertificate: lista de certificados
+4. S -> C: HelloDone
+      * [[ el cliente elige pre_master_secret aleatorio ]]
+5. C -> S: ClientKeyExchange: cifrar (pre_master_secret, PK_S)
+6. C -> S: ChangeCipherSpec
+7. C -> S: finished, MAC({master_secret ++ msg 1,2,3,4,5}, C_mac_key) (y cifrado)
+8. S -> C: change cipher spec
+9. S -> C: finished, MAC({master_secret ++ msg 1,2,3,4,5,7}, S_mac_key) (y cifrado)
+10. C -> S: cifrar({data, MAC(data, C_mac_key)}, C_enc_key)
+   master_secret <- PRF(pre_master_secret, "master secret", randomC+randomS)
+   (C_mac_key, C_enc_key) <- PRF(master_secret, "key expansion", randomS+randomC)
 
 ---
 
