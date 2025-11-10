@@ -375,7 +375,7 @@ style: |
 # Alternativas más costosas
   * Difusión (broadcast) a todos los participantes
   * Mixnets que procesan lotes grandes de mensajes
-  * Mayor latencia y complejidad operativa
+  * Ambas tienen mayor latencia y complejidad operativa
 
 ---
 
@@ -383,5 +383,4 @@ style: |
   * La seguridad en mensajería combina criptografía y diseño de sistemas
   * No hay solución única que cumpla todos los objetivos
   * Las decisiones implican trade-offs entre seguridad y usabilidad
-  * Revise la tabla del paper para comparar enfoques y propiedades
 
