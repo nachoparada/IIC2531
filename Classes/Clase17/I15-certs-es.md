@@ -58,7 +58,6 @@ style: |
   * Plan básico
   * Problemas que aparecieron
   * Evolución para arreglar fallas de seguridad
-  * Basado en "SoK: SSL and HTTPS..." (Clark y van Oorschot, 2013)
 
 ---
 
