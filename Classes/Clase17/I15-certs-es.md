@@ -268,17 +268,17 @@ style: |
     * ¿Qué pasa si el sitio cambia legítimamente de clave?
   * Pinning gestionado por el servidor (HPKP) mediante cabecera HTTP
     * Potente pero peligroso si se configura mal
-  * Pinning vía DNS (DANE) almacena la clave o CA permitida en DNSSEC
-    * DNSSEC aún no está ampliamente desplegado ni soportado
+
 
 ---
-
+<!--
 # Registros CAA
   * El dueño del dominio le indica a la CA qué reglas seguir al emitir
   * No ayuda contra CAs corruptas, pero sí evita errores
   * Puede limitar qué CAs pueden emitir para un dominio
 
 ---
+-->
 
 # Certificate Transparency (CT)
   * Registro público de todos los certificados emitidos
