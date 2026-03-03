@@ -56,19 +56,18 @@ style: |
     * No buscamos profundidad, buscamos amplitud.
   * Contenido:
     * Threat Models
-    * Arquitectura Enfocada en Seguridad
     * Separación de Privilegios
     * Aislación de Componentes
-    * Seguridad en Dispositivos Móviles
+    * Como Manejar Código Malicioso (Defectuoso)
     * Seguridad en Redes
-    * Etc.
+  * Todos los puntos anteriores se mezclan constantemente
   * Varios invitados (espero).
 
 
 ---
 
 # Estructura del curso
-  * Las clases serán Lunes y Miércoles a las 8:20am, en la [].
+  * Las clases serán Lunes y Miércoles a las 8:20am, en la sala A4.
     * [Planificación tentativa](https://docs.google.com/spreadsheets/d/1sYUm6cKj_XGOEkRSr8PQgfkNPqWXm_4iK3EZXzTO6PM/edit?usp=sharing) en Canvas.
     * Un paper por clase.
       * Lean el paper antes de la clase
