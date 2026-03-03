@@ -62,7 +62,7 @@ style: |
     * Seguridad en Dispositivos Móviles
     * Seguridad en Redes
     * Etc.
-  * Un montón de invitados.
+  * Varios invitados (espero).
 
 
 ---
@@ -80,7 +80,7 @@ style: |
 
 # Estructura del curso (cont.)
   * Dos Ies y un examen final.
-  * Tareas: 4 laboratorios.
+  * Tareas: 5 laboratorios.
     * Defensas y/o ataques a sistemas bastante reales.
     * No mucho código, pero mucho pensamiento no estándar.
     * Ayudantías son para ayudar tareas o responder preguntas antes de una I.
@@ -101,7 +101,6 @@ style: |
     * Research Assistant en Cybersecurity at MIT Sloan.
   * Actualmente Engineering Manager en Zerofox.
   * No tengo oficina en el DCC, pero me pueden contactar en:
-    * ignacio@magnet.cl
     * yo@ignacioparada.com
 
 ---
@@ -112,7 +111,7 @@ style: |
   * Fácil de implementar el aspecto *positivo* de la política:
     * Solo tiene que haber una URL que permita a un ayudante acceder al archivo.
   * Pero la seguridad es un objetivo *negativo*:
-    * Queremos que no haya forma complicada de que un no-ayudante acceda al archivo.
+    * Queremos que no haya forma sencilla de que un no-ayudante acceda al archivo.
   * ¡Hay un gran número de ataques potenciales a considerar!
     * Explotar un error en el código del servidor.
     * Adivinar la contraseña de un ayudante.
@@ -179,7 +178,7 @@ style: |
   * Fácil de implementar el aspecto *positivo* de la política:
     * Solo tiene que haber una ruta de código que permita a un ayudante acceder al archivo.
   * Pero la seguridad es un objetivo *negativo*:
-    * Queremos que no haya forma complicada de que un no-ayudante acceda al archivo.
+    * Queremos que no haya forma sencilla de que un no-ayudante acceda al archivo.
   * ¡Hay un gran número de ataques potenciales a considerar!
     * Explotar un error en el código del servidor.
     * Adivinar la contraseña de un ayudante.
@@ -223,6 +222,9 @@ style: |
 ---
 
 # ¿Cuál es el punto si no podemos lograr seguridad perfecta? (cont.)
+  * Tampoco hay seguridad física perfecta.
+    * Pero está bien: costo, disuasión.
+    * Una gran diferencia en la seguridad informática: los ataques son baratos.
   * Encontrar técnicas que tengan gran recompensa de seguridad (es decir, no solo parchar agujeros).
     * Veremos técnicas que cortan clases enteras de ataques.
     * Exitoso: los ataques populares de hace 10 años ya no son muy fructíferos.
@@ -230,9 +232,7 @@ style: |
     * Las VPNs pueden dar a los empleados más flexibilidad para trabajar en casa.
     * El sandboxing (JavaScript, Native Client) puede darme más confianza
       para ejecutar software que no entiendo completamente.
-  * Tampoco hay seguridad física perfecta.
-    * Pero está bien: costo, disuasión.
-    * Una gran diferencia en la seguridad informática: los ataques son baratos.
+
 
 ---
 
@@ -339,44 +339,7 @@ style: |
     * No hay forma de hacer cumplir "Solo si el usuario olvida la contraseña, entonces ..."
   * Por lo tanto, el usuario debe asegurar que la contraseña *y* las preguntas de seguridad sean
     ambas difíciles de adivinar.
-<!-- ---
 
-# Lo que sale mal #1: problemas con la política. (cont.)
-
-Ejemplo: Verificar la propiedad del dominio para certificados TLS.
-  * El navegador verifica el certificado del servidor para asegurar que está hablando con el servidor correcto.
-  * El certificado contiene el nombre del host del servidor y la clave criptográfica,
-    firmado por alguna autoridad certificadora (CA) de confianza.
-  * El navegador tiene la clave pública de la CA integrada para verificar certificados.
-  * La CA está a cargo de asegurar que el certificado se emita solo al
-    propietario legítimo del dominio (nombre de host).
-  * Enfoque típico: enviar email a la dirección de contacto de un dominio.
-  * Algunos TLDs (como .eu) no revelan la dirección de contacto en texto ASCII.
-    * Muy probablemente para prevenir spam a los propietarios de dominios.
-  * En su lugar, revelan una imagen ASCII de la dirección de email.
-  * Una CA (Comodo) decidió automatizar esto haciendo OCR de la imagen ASCII.
-  * Resulta que ¡algunas imágenes ASCII son ambiguas!
-    * Ej., foo@a1telekom.at fue mal-OCR como foo@altelekom.at
-    * El adversario puede registrar el nombre de dominio mal analizado, obtener certificado para
-      el dominio de otra persona.
-  * [ Ref: https://www.mail-archive.com/dev-security-policy@lists.mozilla.org/msg04654.html ]
-
-
-
-
----
-
-
-# Lo que sale mal #1: problemas con la política. (cont.)
-
-Las políticas típicamente salen mal en casos de "gestión" o "mantenimiento".
-  * ¿Quién puede cambiar permisos o contraseñas?
-  * ¿Quién puede acceder a los logs de auditoría?
-  * ¿Quién puede acceder a las copias de seguridad?
-  * ¿Quién puede actualizar el software o cambiar la configuración?
-  * ¿Quién puede gestionar los servidores?
-  * ¿Quién revoca privilegios de ex-administradores / usuarios / ...?
--->
 ---
 
 # Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones.
@@ -384,8 +347,6 @@ Las políticas típicamente salen mal en casos de "gestión" o "mantenimiento".
 
   * Ejemplo: asumir que el diseño/implementación es secreto
     * "Seguridad a través de la oscuridad"
-    * Chip Clipper
-        * [ Ref: https://en.wikipedia.org/wiki/Clipper_chip ]
     * Funciones criptográficas secretas rotas
 
 ---
@@ -428,15 +389,6 @@ Las políticas típicamente salen mal en casos de "gestión" o "mantenimiento".
         * El costo es muy bajo (fracción de un centavo por CAPTCHA resuelto).
     * [ Ref: https://www.cs.uic.edu/pub/Kanich/Publications/re.captchas.pdf ]
 
-<!-- ---
-
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
-
-  * Ejemplo: asumir que está ejecutando el software esperado.
-    * En los 80, el ejército de Estados Unidos animó la investigación en OSes seguros.
-        * Sorpresa: ataques exitosos al obtener acceso a sistemas de desarrollo
-        * Error: confianza implícita en el compilador, desarrolladores, distribución, etc.
--->
 ---
 
 # Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
@@ -471,30 +423,6 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
   * Hoy en día es fácil encontrar información sobre alguien en línea (ej., Facebook, LinkedIn).
   * Las preguntas de seguridad ya no son tan seguras como antes.
 
-<!-- ---
-
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
-
-Ejemplo: todas las CAs de TLS son completamente confiables.
-  * Si el atacante compromete una CA, puede generar un certificado falso
-    para cualquier nombre de servidor.
-  * Originalmente solo había unas pocas CAs; parecía poco probable que
-    el atacante pudiera comprometer una CA.
-  * ¡Pero ahora los navegadores confían completamente en cientos de CAs!
-  * En 2011, dos CAs fueron comprometidas, emitieron certificados falsos para muchos dominios
-    (google, yahoo, tor, ...), aparentemente usados en Irán (?).
-    * [ Ref: https://en.wikipedia.org/wiki/DigiNotar ]
-    * [ Ref: https://en.wikipedia.org/wiki/Comodo_Group ]
-  * En 2012, una CA inadvertidamente emitió un certificado raíz válido para cualquier dominio.
-    * [ Ref: http://www.h-online.com/security/news/item/Trustwave-issued-a-man-in-the-middle-certificate-1429982.html ]
-  * Varios otros incidentes de alto perfil desde entonces también.
-  * Error: tal vez sea razonable confiar en una CA, pero no en cientos.
-
-Ejemplo: asumir que su hardware es confiable.
-  * Si la NSA es su adversario, resulta que no es una buena suposición.
-  * [ Ref: https://www.schneier.com/blog/archives/2013/12/more_about_the.html ]
-
--->
 ---
 # Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
 
@@ -635,19 +563,6 @@ Ejemplo: asumir que su hardware es confiable.
 
 # Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
 
-* Ejemplo: codificación/decodificación ambigua.
-  * [ Ref: https://andrewlock.net/understanding-the-worst-dotnet-vulnerability-request-smuggling-and-cve-2025-55315/ ]
-  * El proxy HTTP parseaba las solicitudes de una forma, el servidor backend de otra forma.
-  * Fuente de diferencia de parsing: ¿qué hacer si hay múltiples headers Content-Length?
-    * El proxy podría tomar el primero, el servidor backend podría tomar el segundo.
-  * El proxy HTTP trataba de hacer cumplir políticas de seguridad (autenticación, control de acceso, filtrado).
-  * ¡El proxy HTTP piensa que hay una solicitud HTTP, pero el backend piensa que recibió dos!
-  * El cliente que emite solicitudes puede evadir las reglas del proxy.
-
----
-
-# Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
-
 * Ejemplo: codificación/decodificación ambigua, parte 2.
   * [ Ref: https://www.usenix.org/system/files/usenixsecurity25-you.pdf ]
   * Los archivos ZIP tienen información redundante sobre qué archivos están presentes.
@@ -682,25 +597,6 @@ Ejemplo: asumir que su hardware es confiable.
   * Las CAs otorgarían certificado para amazon.com\0.nickolai.org
   * Los navegadores vieron el \0 e interpretaron como un certificado para amazon.com
   * Lección: el código de parsing es una enorme fuente de errores de seguridad.
-
-<!--
----
-
- # Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
-
-  * Los dispositivos embebidos generan claves predecibles.
-    * Problema: dispositivos embebidos, máquinas virtuales pueden no tener mucha aleatoriedad.
-    * Como resultado, muchas claves son similares o susceptibles a ataques de adivinación.
-    * [ Ref: https://factorable.net/weakkeys12.extended.pdf ]
-  * Máquinas tragamonedas de casino.
-    * [ Ref: https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/ ]
-
-Ejemplo: Error de verificación de nombre de certificado SSL de Moxie
-  * [ Ref: https://www.wired.com/2009/07/kaminsky/ ]
-  * Los certificados usan strings codificados por longitud, pero el código C a menudo está terminado en null.
-  * Las CAs otorgarían certificado para amazon.com\0.nickolai.org
-  * Los navegadores vieron el \0 e interpretaron como un certificado para amazon.com
-  * Lección: el código de parsing es una enorme fuente de errores de seguridad. -->
 
 ---
 
