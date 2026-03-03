@@ -68,9 +68,8 @@ style: |
 ---
 
 # Estructura del curso
-  * Las clases serán Martes y Jueves a las 8:20am, en la B25.
+  * Las clases serán Lunes y Miércoles a las 8:20am, en la [].
     * Planificación tentativa en Banner (en cuanto me den acceso).
-      * Pueden cambiar las clases dependiendo de si nos atrasamos o por capricho del profesor.
     * Un paper por clase.
       * Lean el paper antes de la clase
       * Algunos papers sobre sistemas de producción, otros sobre ideas de investigación.
@@ -81,7 +80,7 @@ style: |
 
 # Estructura del curso (cont.)
   * Dos Ies y un examen final.
-  * Tareas: Cinco laboratorios.
+  * Tareas: 4 laboratorios.
     * Defensas y/o ataques a sistemas bastante reales.
     * No mucho código, pero mucho pensamiento no estándar.
     * Ayudantías son para ayudar tareas o responder preguntas antes de una I.
@@ -104,33 +103,6 @@ style: |
   * No tengo oficina en el DCC, pero me pueden contactar en:
     * ignacio@magnet.cl
     * yo@ignacioparada.com
-
----
-
-# Estructura del curso - Fernando Smith
-  * Ex delegado académico y VP del capítulo de computación.
-  * Creamos grupo estudiantiles como el club de ciberseguridad.
-    * https://security.ing.puc.cl/
-  * Trabajé como ingeniero de software en Platanus software factory y SAWA.
-  * Actualmente emprendiendo en eliminar trámites de salud con AI.
-    * https://getgokei.com
-  * Suelo estar en el HAPLAB en el DCC (primera pecera).
-    * Siéntanse libres de hablarme si me ven :)
-  * Contáctenme usando mi email también. Añadan [curso ciberseguridad] al subject para darles prioridad
-    * fdsmith@uc.cl
----
-
-# Estructura del curso - Alister MacCormack
-  * Cofundé el [Security UC Club](https://security.ing.puc.cl/) con Fernando.
-  * Trabajé como Ingeniero de Software en Examedi y Ruuf
-  * Trabajé como Pentester en [Nivel4](https://nivel4.com)
-  * He [reportado vulnerabilidades al Gobierno](https://csirt.gob.cl/incidentes/muro-de-la-fama/2024/) 
-    * (aparezco en en el #182 y Fernando en el #192)
-  * Actualmente trabajo como Ingeniero de Software en
-    * https://shinkansen.finance
-    * Escribí un blogpost sobre [un test de phishing que hice hace un tiempo](https://blog.shinkansen.finance/5-ingredientes-de-la-seguridad-en-shinkansen-parte-1-auto-phishing/)
-  * Mi correo es amaccormack@uc.cl 
-    * Añadan [curso ciberseguridad] al subject para darles prioridad
 
 ---
 
@@ -338,6 +310,14 @@ style: |
 
 ---
 # Lo que sale mal #1: problemas con la política. (cont.)
+
+* Ejemplo: Tiempo de vida de las cuentas.
+  * Las direcciones de email pueden ser reutilizadas.
+  * Otros sistemas asumen que la cuenta aún pertenece al mismo propietario de la dirección de email.
+  * [ Ref: https://www.gruss.cc/files/uafmail.pdf ]
+
+---
+# Lo que sale mal #1: problemas con la política. (cont.)
   * Ejemplo: Valores predeterminados inseguros.
     * Contraseñas predeterminadas bien conocidas en routers.
     * Permisos predeterminados públicos en servicios en la nube (ej., objetos en bucket AWS S3).
@@ -481,6 +461,15 @@ Ejemplo: las suposiciones computacionales cambian con el tiempo.
   * Ya no es razonable: ahora cuesta alrededor de $100.
     * [ Ref: https://www.cloudcracker.com/dictionaries.html ]
 
+---
+
+# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
+
+Ejemplo: la disponibilidad de información cambia con el tiempo.
+  * Solía ser difícil obtener información personal sobre un individuo.
+    * Por lo tanto, las "preguntas de seguridad" para restablecer contraseñas eran razonables.
+  * Hoy en día es fácil encontrar información sobre alguien en línea (ej., Facebook, LinkedIn).
+  * Las preguntas de seguridad ya no son tan seguras como antes.
 
 <!-- ---
 
@@ -630,6 +619,70 @@ Ejemplo: asumir que su hardware es confiable.
       * y nonce repetido permite deducir la clave privada.
     * Lección: tengan cuidado.
 
+---
+
+# Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
+
+* Ejemplo: eliminación de datos.
+  * [ Ref: https://www.da.vidbuchanan.co.uk/blog/exploiting-acropalypse.html ]
+  * El editor de capturas de pantalla de Android soportaba recorte.
+  * Pero olvidó truncar el archivo de imagen al sobrescribirlo.
+    * Pasó modo de apertura "w" (O_RDWR) y no "wt" (O_RDWR | O_TRUNC).
+  * Bytes sobrantes si la imagen recortada es más pequeña que los datos de imagen originales.
+  * El archivo PNG sigue siendo válido, difícil notar que hay información extra.
+
+---
+
+# Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
+
+* Ejemplo: codificación/decodificación ambigua.
+  * [ Ref: https://andrewlock.net/understanding-the-worst-dotnet-vulnerability-request-smuggling-and-cve-2025-55315/ ]
+  * El proxy HTTP parseaba las solicitudes de una forma, el servidor backend de otra forma.
+  * Fuente de diferencia de parsing: ¿qué hacer si hay múltiples headers Content-Length?
+    * El proxy podría tomar el primero, el servidor backend podría tomar el segundo.
+  * El proxy HTTP trataba de hacer cumplir políticas de seguridad (autenticación, control de acceso, filtrado).
+  * ¡El proxy HTTP piensa que hay una solicitud HTTP, pero el backend piensa que recibió dos!
+  * El cliente que emite solicitudes puede evadir las reglas del proxy.
+
+---
+
+# Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
+
+* Ejemplo: codificación/decodificación ambigua, parte 2.
+  * [ Ref: https://www.usenix.org/system/files/usenixsecurity25-you.pdf ]
+  * Los archivos ZIP tienen información redundante sobre qué archivos están presentes.
+    * Nombre de archivo junto a cada registro de archivo.
+    * Directorio de nombres de archivo en un directorio central al final del archivo ZIP.
+  * Vulnerabilidad de Android.
+    * La actualización de la app debe estar firmada por la clave privada del desarrollador.
+    * La app es realmente un archivo ZIP (llamado APK) conteniendo los archivos de la app y archivo de firma.
+    * El código para verificar la firma itera sobre los archivos ZIP de una forma (directorio).
+    * El código para desempacar el archivo ZIP itera de otra forma (registros de archivo).
+    * ¡El adversario puede construir un archivo ZIP que verifica correctamente pero extrae archivos diferentes!
+
+---
+
+# Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
+
+* Ejemplo: mala aleatoriedad para criptografía (cont.)
+  * Los dispositivos embebidos generan claves predecibles.
+    * Problema: dispositivos embebidos, máquinas virtuales pueden no tener mucha aleatoriedad.
+    * Como resultado, muchas claves son similares o susceptibles a ataques de adivinación.
+    * [ Ref: https://factorable.net/weakkeys12.extended.pdf ]
+  * Máquinas tragamonedas de casino.
+    * [ Ref: https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/ ]
+
+---
+
+# Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
+
+* Ejemplo: Error de verificación de nombre de certificado SSL de Moxie.
+  * [ Ref: https://www.wired.com/2009/07/kaminsky/ ]
+  * Los certificados usan strings codificados por longitud, pero el código C a menudo usa terminación null.
+  * Las CAs otorgarían certificado para amazon.com\0.nickolai.org
+  * Los navegadores vieron el \0 e interpretaron como un certificado para amazon.com
+  * Lección: el código de parsing es una enorme fuente de errores de seguridad.
+
 <!--
 ---
 
@@ -648,4 +701,103 @@ Ejemplo: Error de verificación de nombre de certificado SSL de Moxie
   * Las CAs otorgarían certificado para amazon.com\0.nickolai.org
   * Los navegadores vieron el \0 e interpretaron como un certificado para amazon.com
   * Lección: el código de parsing es una enorme fuente de errores de seguridad. -->
+
+---
+
+# Lo que sale mal #4: combinación de problemas en todo lo anterior.
+  * Los ataques sofisticados a menudo combinan muchas debilidades.
+  * Ej., un adversario obtuvo la clave criptográfica de Microsoft para autenticación de usuarios.
+    * Múltiples pasos salieron mal para permitir al adversario acceso a esta clave.
+    * [ Ref: https://msrc.microsoft.com/blog/2023/09/results-of-major-technical-investigations-for-storm-0558-key-acquisition/ ]
+  * De manera similar, muchos errores a menudo se encadenan en ataques serios.
+    * [ Ref: https://googleprojectzero.blogspot.com/2023/09/analyzing-modern-in-wild-android-exploit.html ]
+    * [ Ref: https://googleprojectzero.blogspot.com/2023/10/an-analysis-of-an-in-the-wild-ios-safari-sandbox-escape.html ]
+
+---
+
+# ¿Cómo construir sistemas seguros?
+  * Muchos problemas de ejemplo arriba.
+  * Cambio de tema: ¿qué hacer al respecto?
+  * Esquema general del resto de este curso.
+
+---
+
+# Aislamiento: el punto de partida para la seguridad
+  * El objetivo: por defecto, la actividad X no puede afectar a la actividad Y
+    * incluso si X es maliciosa
+    * incluso si Y tiene errores
+  * Sin aislamiento, no hay esperanza para la seguridad
+  * Con aislamiento, podemos permitir interacción (si se desea) y controlarla
+
+---
+
+# Muchos tipos de aislamiento
+  * Aislamiento de hardware: procesos, contenedores, máquinas virtuales.
+  * Aislamiento de software: Javascript, WebAssembly.
+  * Aislamiento físico: llaves de seguridad USB, etc.
+  * Cada plan de aislamiento depende de algún host para aislar de forma segura.
+    * Kernel del OS, runtime del lenguaje, física.
+  * Las próximas clases cubrirán aislamiento.
+
+---
+
+# Compartir controlado: interacción entre dominios aislados
+  * 100% aislamiento usualmente no es lo que queremos.
+  * Necesitamos compartir/interacción controlada también.
+  * Aquí hay un modelo para compartir:
+
+```
+                      +-----------------------+
+                      |   Política            |
+                      |      |                |
+              request |      V                |
+  principal ----------|--> GUARD --> recurso  |
+                      |      |                |
+                      | +-----------+         |
+                      | |    |      |         |
+                      | |    V      |         |
+                      | | Log audit |         |
+                      | +-----------+         |
+                      +-----------------------+
+                      HOST haciendo cumplir aislamiento
+```
+
+---
+
+# Compartir controlado: interacción entre dominios aislados (cont.)
+  * Este modelo ha sido muy influyente.
+  * Principales (principals): persona, dispositivo, programa, servicio.
+  * Recursos: archivos, servicios, las cuentas mismas, ...
+
+  * ¿Qué hace el guard?
+    * Autenticar: principal.
+    * Autorizar: principal, recurso -> derechos.
+    * Auditar.
+
+---
+
+# Separación de privilegios: limitar daño de componentes individuales
+  * Idea poderosa para lidiar con software con errores o malicioso.
+  * Desafío: ¿cómo arquitecturar un sistema útil desde componentes aislados?
+    * Necesita que la aplicación general funcione.
+    * Necesita garantías de seguridad si alguna parte se rompe.
+    * Necesita buen rendimiento.
+  * Segundo módulo de clases examina casos de estudio de arquitecturas de seguridad.
+
+---
+
+# Seguridad de software
+  * ¿Cómo asegurar que está ejecutando código confiable en sus servicios aislados?
+  * Lidiar con errores: defensas en tiempo de ejecución, testing, búsqueda de errores, verificación.
+  * Cadena de suministro: dependencias precisas, builds determinísticos, etc.
+  * Puertas traseras: revisión de código, aprobaciones, auditorías de seguridad.
+  * Despliegue: plan sistemático para asegurar que todo lo anterior se siga.
+  * Tercer módulo de clases hablará sobre algunas de estas ideas.
+
+---
+
+# Sistemas distribuidos
+  * Operar sobre la red, y sobre Internet, introduce nuevas amenazas.
+  * Grandes ideas: criptografía, certificados, confianza.
+  * Cuarto módulo cubrirá muchos temas de seguridad de red / sistemas distribuidos.
 
