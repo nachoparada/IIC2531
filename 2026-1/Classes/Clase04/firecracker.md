@@ -178,24 +178,6 @@ style: |
     * Pero aún podría no ser suficiente para seguridad (mucho código/errores en syscalls comunes)
 
 ---
-<!--
-# Mecanismos de seguridad adicionales: control de acceso obligatorio
-  * Ej., Linux tiene LSM (https://en.wikipedia.org/wiki/Linux_Security_Modules)
-    * Muchas variantes: AppArmor, SELinux, etc
-  * El administrador especifica política sobre qué operaciones están permitidas
-    * Típicamente basado en qué usuario está ejecutando el proceso, o qué binario se está ejecutando
-    * Puede especificar reglas amplias (ej., sin acceso de escritura a ningún archivo)
-
----
-
-# ¿Por qué no runtimes de lenguaje para Lambda?
-  * Queremos soportar binarios Linux arbitrarios
-  * Veremos en más detalle los runtimes de lenguaje la próxima semana
-  * Los runtimes de lenguaje son atractivos para cargas de trabajo tipo Lambda: overheads bajos
-    * [[ Ref: https://developers.cloudflare.com/workers/learning/security-model ]]
-
----
--->
 
 # Enfoque más pesado: VMs
   * Ejecutar Linux en una VM guest
