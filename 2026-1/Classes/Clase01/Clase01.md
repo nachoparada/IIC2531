@@ -69,7 +69,7 @@ style: |
 
 # Estructura del curso
   * Las clases serán Lunes y Miércoles a las 8:20am, en la [].
-    * Planificación tentativa en Banner (en cuanto me den acceso).
+    * [Planificación tentativa](https://docs.google.com/spreadsheets/d/1sYUm6cKj_XGOEkRSr8PQgfkNPqWXm_4iK3EZXzTO6PM/edit?usp=sharing) en Canvas.
     * Un paper por clase.
       * Lean el paper antes de la clase
       * Algunos papers sobre sistemas de producción, otros sobre ideas de investigación.
