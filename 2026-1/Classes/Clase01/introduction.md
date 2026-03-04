@@ -627,7 +627,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
   * Necesitamos compartir/interacción controlada también.
   * Aquí hay un modelo para compartir:
 
-![width:450px align-center](access_control_diagram.svg)
+![width:550px align-center](access_control_diagram.svg)
 
 ---
 
