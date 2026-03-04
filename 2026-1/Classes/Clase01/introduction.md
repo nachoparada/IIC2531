@@ -78,6 +78,19 @@ style: |
 
 ---
 
+# Estructura del curso - Ignacio Parada
+  * Ingeniero Civil en Computación.
+    * Hace muchos muchos años.
+  * Me dediqué emprender fundando Magnet.
+  * Profesor de **Ingeniería de Software** y **Estructuras de Datos y Algoritmos**.
+  * Master en Engineering & Management en MIT.
+    * Research Assistant en Cybersecurity at MIT Sloan.
+  * Actualmente Engineering Manager en Zerofox.
+  * No tengo oficina en el DCC, pero me pueden contactar en:
+    * yo@ignacioparada.com
+
+---
+
 # Estructura del curso (cont.)
   * Dos Ies y un examen final.
   * Tareas: 5 laboratorios.
@@ -92,16 +105,27 @@ style: |
 
 ---
 
-# Estructura del curso - Ignacio Parada
-  * Ingeniero Civil en Computación.
-    * Hace muchos muchos años.
-  * Me dediqué emprender fundando Magnet.
-  * Profesor de **Ingeniería de Software** y **Estructuras de Datos y Algoritmos**.
-  * Master en Engineering & Management en MIT.
-    * Research Assistant en Cybersecurity at MIT Sloan.
-  * Actualmente Engineering Manager en Zerofox.
-  * No tengo oficina en el DCC, pero me pueden contactar en:
-    * yo@ignacioparada.com
+# Estructura del curso — Evaluación
+
+<br>
+
+$$\large NotaFinal = 0.4 \cdot Evaluaciones + 0.4 \cdot Laboratorios + 0.2 \cdot Proyecto$$
+
+<br>
+
+**Donde:**
+
+$$Evaluaciones = 0.3 \cdot I_1 + 0.3 \cdot I_2 + 0.4 \cdot Examen$$
+
+$$Laboratorios = 0.1 \cdot L_1 + 0.2 \cdot L_2 + 0.3 \cdot L_3 + 0.3 \cdot L_4 + 0.1 \cdot L_5$$
+
+<br>
+
+**Requisitos de aprobación:**
+
+$$\text{Si } Evaluaciones < 4 \Rightarrow NF = Evaluaciones$$
+$$\text{Si } Examen < 4 \Rightarrow NF = Examen$$
+$$\text{Si } Proyecto < 4 \Rightarrow NF = Proyecto$$
 
 ---
 
