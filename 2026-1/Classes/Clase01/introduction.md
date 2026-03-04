@@ -69,7 +69,8 @@ style: |
 # Estructura del curso
   * Las clases serán Lunes y Miércoles a las 8:20am, en la sala A4.
     * [Planificación tentativa](https://docs.google.com/spreadsheets/d/1sYUm6cKj_XGOEkRSr8PQgfkNPqWXm_4iK3EZXzTO6PM/edit?usp=sharing) en Canvas.
-    * Un paper por clase.
+    * [Repo del curso](https://github.com/nachoparada/IIC2531).
+    * Un lectura/paper por clase.
       * Lean el paper antes de la clase
       * Algunos papers sobre sistemas de producción, otros sobre ideas de investigación.
       * Incluso si el sistema general descrito en el artículo no funcionó, muchas de las ideas y técnicas en el artículo son importantes y útiles.
@@ -106,18 +107,12 @@ style: |
 
 # Construir sistemas seguros es difícil -- ¿por qué?
   * Ejemplo: notas de IIC2531, almacenado en un servidor.
-    * Política: solo los ayudantes deberían poder leer y escribir el archivo de con las notas.
+    * Solo los ayudantes deberían poder leer y escribir el archivo de con las notas.
   * Fácil de implementar el aspecto *positivo* de la política:
     * Solo tiene que haber una URL que permita a un ayudante acceder al archivo.
   * Pero la seguridad es un objetivo *negativo*:
     * Queremos que no haya forma sencilla de que un no-ayudante acceda al archivo.
-  * ¡Hay un gran número de ataques potenciales a considerar!
-    * Explotar un error en el código del servidor.
-    * Adivinar la contraseña de un ayudante.
-    * Robar el laptop de un ayudante, tal vez tenga una copia local del archivo con las notas.
-    * Interceptar las notas cuando se envían internet.
-    * Romper el esquema criptográfico usado para encriptar las notas por internet.
-    * Conseguir un trabajo en el DCC, o como ayudante de IIC2531.
+
 
 ---
 
@@ -156,7 +151,7 @@ style: |
       * ej. cuentas de usuario, contraseñas, permisos de archivo, encriptación.
       * la política puede incluir componentes humanos (ej., no compartir contraseñas)
         que está fuera del alcance de los mecanismos de seguridad
-      * A menudo en capas: el mecanismo de una capa es la política del siguiente nivel.
+    * A menudo en capas: el mecanismo de una capa es la política del siguiente nivel.
 
 ---
 
@@ -173,7 +168,7 @@ style: |
 
 # Construir sistemas seguros es difícil -- ¿por qué?
   * Ejemplo: notas de IIC2531, almacenado en un servidor.
-    * Política: solo los ayudantes deberían poder leer y escribir el archivo de con las notas.
+    * Solo los ayudantes deberían poder leer y escribir el archivo de con las notas.
   * Fácil de implementar el aspecto *positivo* de la política:
     * Solo tiene que haber una ruta de código que permita a un ayudante acceder al archivo.
   * Pero la seguridad es un objetivo *negativo*:
@@ -182,7 +177,7 @@ style: |
     * Explotar un error en el código del servidor.
     * Adivinar la contraseña de un ayudante.
     * Robar el laptop de un ayudante, tal vez tenga una copia local del archivo con las notas.
-    * Interceptar las notas cuando se envían internet.
+    * Interceptar las notas cuando se envían por internet.
     * Romper el esquema criptográfico usado para encriptar las notas por internet.
     * Conseguir un trabajo en el DCC, o como ayudante de IIC2531.
 
@@ -235,113 +230,7 @@ style: |
 
 ---
 
-# Lo que sale mal #1: problemas con la política.
-  * Es decir, el sistema hace cumplir correctamente la política -- pero la política es inadecuada.
-
-  * Ejemplo: Tarifa aérea de clase ejecutiva.
-    * Las aerolíneas permiten que los boletos de clase ejecutiva se cambien en cualquier momento, sin tarifas. **¿Es esta una buena política?**
-    * Resulta que, en algunos sistemas, el boleto podría haberse cambiado incluso **después** del embarque.
-     - El adversario puede seguir abordando el avión, cambiando el boleto al siguiente vuelo, ad infinitum.
-    * Política revisada: el boleto no puede cambiarse una vez que el pasajero ha abordado el vuelo.
-      * A veces requiere cambios en la arquitectura del sistema.
-
----
-
-# Lo que sale mal #1: problemas con la política. (cont.)
-
-  * Ejemplo: Sistema escolar del condado de Fairfax, VA.
-    * [ Ref: https://catless.ncl.ac.uk/Risks/26.02.html#subj7.1 ]
-    * Políticas
-        * El estudiante puede acceder solo a sus propios archivos en el sistema escolar.
-        * El superintendente tiene acceso a los archivos de todos.
-        * Los maestros pueden agregar nuevos estudiantes a su clase.
-        * Los maestros pueden cambiar la contraseña de los estudiantes en su clase.
-    * ¿Qué es lo peor que podría pasar si un estudiante obtiene la contraseña del maestro?
-        * El estudiante agrega al superintendente a la clase del maestro comprometido.
-        * Cambia la contraseña del superintendente, ya que son un estudiante en la clase.
-        * Inicia sesión como superintendente y obtiene acceso a todos los archivos.
-    * La política equivale a: los maestros pueden hacer cualquier cosa.
-
----
-
-# Lo que sale mal #1: problemas con la política. (cont.)
-
-* Ejemplo: Cuentas de Mat Honan en Amazon, Apple, Google, etc.
-    * [ Ref: https://www.wired.com/gadgetlab/2012/08/apple-amazon-mat-honan-hacking/all/ ]
-    * Honan es editor en wired.com; alguien quería entrar en su cuenta de gmail.
-    * Restablecimiento de contraseña de Gmail: enviar un enlace de verificación a una dirección de email de respaldo.
-        * Google amablemente imprime parte de la dirección de email de respaldo.
-        * La dirección de respaldo de Mat Honan era su cuenta Apple @me.com.
-    * Restablecimiento de contraseña de Apple: necesita dirección de facturación, últimos 4 dígitos de tarjeta de crédito.
-        * La dirección es fácil, pero ¿cómo obtener los 4 dígitos?
-
-
----
-
-# Lo que sale mal #1: problemas con la política. (cont.)
-
-* Ejemplo: Cuentas de Mat Honan en Amazon, Apple, Google, etc.
-    * Comprar por Amazon y pedir agregar una tarjeta de crédito a una cuenta.
-        * No se requiere autenticación,
-        * Presumiblemente porque esto no parecía una operación sensible.
-    * Llamar al soporte técnico de Amazon nuevamente, y pedir cambiar la dirección de email en una cuenta.
-        * ¡Se requiere autenticación!
-        * El soporte técnico acepta el número completo de cualquier tarjeta de crédito registrada con la cuenta.
-            * Puede usar la tarjeta de crédito que acaba de agregar a la cuenta.
-    * Ahora tengo acceso al número de tarjeta de crédito.
-      * Ir al sitio web de Amazon y solicitar un restablecimiento de contraseña.
-    * Enlace de restablecimiento enviado a la nueva dirección de email.
-
-<!--![width:180px align-right](gmailExample.png)  Setting width to 200px -->
-
----
-
-# Lo que sale mal #1: problemas con la política. (cont.)
-
-  * Ahora iniciar sesión en la cuenta de Amazon, ver tarjetas de crédito guardadas.
-    * Amazon no muestra el número completo, pero SÍ muestra los últimos 4 dígitos de todas las tarjetas.
-    * ¡Incluyendo las tarjetas originales del propietario de la cuenta!
-  * Finalmente el atacante puede restablecer la contraseña de Apple, leer el email de restablecimiento de gmail,
-    restablecer la contraseña de gmail.
-  * Lección: los ataques a menudo juntan partes aparentemente no relacionadas.
-  * Lección: políticas individuales OK, pero la combinación no lo es.
-    * Apple ve los últimos 4 como un secreto, pero muchos otros sitios no.
-
----
-# Lo que sale mal #1: problemas con la política. (cont.)
-
-* Ejemplo: Tiempo de vida de las cuentas.
-  * Las direcciones de email pueden ser reutilizadas.
-  * Otros sistemas asumen que la cuenta aún pertenece al mismo propietario de la dirección de email.
-  * [ Ref: https://www.gruss.cc/files/uafmail.pdf ]
-
----
-# Lo que sale mal #1: problemas con la política. (cont.)
-  * Ejemplo: Valores predeterminados inseguros.
-    * Contraseñas predeterminadas bien conocidas en routers.
-    * Permisos predeterminados públicos en servicios en la nube (ej., objetos en bucket AWS S3).
-    * Los valores predeterminados seguros son cruciales debido al aspecto de "objetivo negativo".
-        * Los sistemas grandes son complicados, muchos componentes.
-        * El operador podría olvidar configurar algún componente en su sistema general.
-        * Importante que los componentes sean seguros si el operador olvida configurarlos.
-
----
-# Lo que sale mal #1: problemas con la política. (cont.)
-
-* Ejemplo: Cuenta de email de Sarah Palin.
-  * [ Ref: https://en.wikipedia.org/wiki/Sarah_Palin_email_hack ]
-  * Las cuentas de email de Yahoo tienen un nombre de usuario, contraseña y preguntas de seguridad.
-  * El usuario puede iniciar sesión proporcionando nombre de usuario y contraseña.
-  * Si el usuario olvida la contraseña, puede restablecerla respondiendo las preguntas de seguridad.
-  * Algún adversario adivinó la escuela secundaria, cumpleaños, etc. de Sarah Palin.
-  * La política equivale a: puede iniciar sesión con contraseña *o* preguntas de seguridad.
-    * No hay forma de hacer cumplir "Solo si el usuario olvida la contraseña, entonces ..."
-  * Por lo tanto, el usuario debe asegurar que la contraseña *y* las preguntas de seguridad sean
-    ambas difíciles de adivinar.
-
----
-
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones.
+# Lo que sale mal #1: problemas con el modelo de amenaza / suposiciones.
   * Es decir, el diseñador asumió que un ataque no era factible (o no pensó en el ataque).
 
   * Ejemplo: asumir que el diseño/implementación es secreto
@@ -350,7 +239,7 @@ style: |
 
 ---
 
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
+# Lo que sale mal #1: problemas con el modelo de amenaza / suposiciones. (cont.)
 
   * Ejemplo: la mayoría de usuarios está pensando en seguridad.
     * El usuario recibe un email diciendo "haga clic aquí para renovar su cuenta",
@@ -360,7 +249,7 @@ style: |
 
 ---
 
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
+# Lo que sale mal #1: problemas con el modelo de amenaza / suposiciones. (cont.)
   * Ejemplo: los usuarios no darán sus códigos de autenticación de dos factores al adversario.
     * La autenticación de dos factores defiende contra compromisos de contraseña.
         * Ej., aplicación autenticadora (TOTP), código enviado por SMS o email, token de hardware, ..
@@ -373,7 +262,7 @@ style: |
 
 ---
 
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
+# Lo que sale mal #1: problemas con el modelo de amenaza / suposiciones. (cont.)
 
   * Ejemplo: asumir un tipo particular de solución al problema.
     * Muchos servicios usan CAPTCHAs para verificar si un humano se está registrando para una cuenta.
@@ -390,21 +279,7 @@ style: |
 
 ---
 
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
-
-  * Ejemplo: asumir que está ejecutando el software esperado.
-    * Las herramientas de desarrollo de Apple para aplicaciones de iPhone (Xcode) son grandes.
-        * Descargarlas desde China requería ir a los servidores de Apple fuera de China.
-            * Toma mucho tiempo.
-        * Espejos no oficiales de herramientas Xcode dentro de China.
-        * Algunos de estos espejos contenían una versión modificada de Xcode que inyectaba malware en las aplicaciones iOS resultantes.
-        * ¡Encontrado en varias aplicaciones iOS populares de alto perfil! [ Ref: https://en.wikipedia.org/wiki/XcodeGhost ]
-    * Otro ejemplo es compra de extensiones
-    * Artículo clásico: Reflections on Trusting Trust.
-
----
-
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
+# Lo que sale mal #1: problemas con el modelo de amenaza / suposiciones. (cont.)
 
 Ejemplo: las suposiciones computacionales cambian con el tiempo.
   * El sistema Kerberos del MIT usó claves DES de 56 bits, desde mediados de los 80.
@@ -414,7 +289,7 @@ Ejemplo: las suposiciones computacionales cambian con el tiempo.
 
 ---
 
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
+# Lo que sale mal #1: problemas con el modelo de amenaza / suposiciones. (cont.)
 
 Ejemplo: la disponibilidad de información cambia con el tiempo.
   * Solía ser difícil obtener información personal sobre un individuo.
@@ -423,7 +298,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
   * Las preguntas de seguridad ya no son tan seguras como antes.
 
 ---
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
+# Lo que sale mal #1: problemas con el modelo de amenaza / suposiciones. (cont.)
 
 * Ejemplo: asumir que los usuarios pueden entender inequívocamente la UI.
   * [ Ref: https://en.wikipedia.org/wiki/IDN_homograph_attack ]
@@ -435,7 +310,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
   * [ Ref: https://simson.net/page/Real_Data_Corpus ]
 
 ---
-# Lo que sale mal #2: problemas con el modelo de amenaza / suposiciones. (cont.)
+# Lo que sale mal #1: problemas con el modelo de amenaza / suposiciones. (cont.)
 
 * Ejemplo: actualizaciones de software.
   * Actualizaciones de software de iPhone de Apple vs FBI.
@@ -471,6 +346,118 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
       * Idealmente el sistema de auditoría tiene un modelo de amenaza más simple, más general.
     * Ej., hacer cumplir aislamiento de grano grueso entre departamentos en la empresa,
       incluso si los permisos de grano fino son mal configurados por administradores.
+
+---
+
+# Lo que sale mal #2: problemas con la política.
+  * Es decir, el sistema hace cumplir correctamente la política -- pero la política es inadecuada.
+
+  * Ejemplo: Tarifa aérea de clase ejecutiva.
+    * Las aerolíneas permiten que los boletos de clase ejecutiva se cambien en cualquier momento, sin tarifas. **¿Es esta una buena política?**
+    * Resulta que, en algunos sistemas, el boleto podría haberse cambiado incluso **después** del embarque.
+     - El adversario puede seguir abordando el avión, cambiando el boleto al siguiente vuelo, ad infinitum.
+    * Política revisada: el boleto no puede cambiarse una vez que el pasajero ha abordado el vuelo.
+      * A veces requiere cambios en la arquitectura del sistema.
+
+---
+
+# Lo que sale mal #2: problemas con la política. (cont.)
+
+  * Ejemplo: Sistema escolar del condado de Fairfax, VA.
+    * [ Ref: https://catless.ncl.ac.uk/Risks/26.02.html#subj7.1 ]
+    * Políticas
+        * El estudiante puede acceder solo a sus propios archivos en el sistema escolar.
+        * El superintendente tiene acceso a los archivos de todos.
+        * Los maestros pueden agregar nuevos estudiantes a su clase.
+        * Los maestros pueden cambiar la contraseña de los estudiantes en su clase.
+    * ¿Qué es lo peor que podría pasar si un estudiante obtiene la contraseña del maestro?
+        * El estudiante agrega al superintendente a la clase del maestro comprometido.
+        * Cambia la contraseña del superintendente, ya que son un estudiante en la clase.
+        * Inicia sesión como superintendente y obtiene acceso a todos los archivos.
+    * La política equivale a: los maestros pueden hacer cualquier cosa.
+
+---
+
+# Lo que sale mal #2: problemas con la política. (cont.)
+
+* Ejemplo: Cuentas de Mat Honan en Amazon, Apple, Google, etc.
+    * [ Ref: https://www.wired.com/gadgetlab/2012/08/apple-amazon-mat-honan-hacking/all/ ]
+    * Honan es editor en wired.com; alguien quería entrar en su cuenta de gmail.
+    * Restablecimiento de contraseña de Gmail: enviar un enlace de verificación a una dirección de email de respaldo.
+        * Google amablemente imprime parte de la dirección de email de respaldo.
+        * La dirección de respaldo de Mat Honan era su cuenta Apple @me.com.
+    * Restablecimiento de contraseña de Apple: necesita dirección de facturación, últimos 4 dígitos de tarjeta de crédito.
+        * La dirección es fácil, pero ¿cómo obtener los 4 dígitos?
+
+
+---
+
+# Lo que sale mal #2: problemas con la política. (cont.)
+
+* Ejemplo: Cuentas de Mat Honan en Amazon, Apple, Google, etc.
+    * Comprar por Amazon y pedir agregar una tarjeta de crédito a una cuenta.
+        * No se requiere autenticación,
+        * Presumiblemente porque esto no parecía una operación sensible.
+    * Llamar al soporte técnico de Amazon nuevamente, y pedir cambiar la dirección de email en una cuenta.
+        * ¡Se requiere autenticación!
+        * El soporte técnico acepta el número completo de cualquier tarjeta de crédito registrada con la cuenta.
+            * Puede usar la tarjeta de crédito que acaba de agregar a la cuenta.
+    * Ahora tengo acceso al número de tarjeta de crédito.
+      * Ir al sitio web de Amazon y solicitar un restablecimiento de contraseña.
+    * Enlace de restablecimiento enviado a la nueva dirección de email.
+
+---
+
+# Lo que sale mal #2: problemas con la política. (cont.)
+
+  * Ahora iniciar sesión en la cuenta de Amazon, ver tarjetas de crédito guardadas.
+    * Amazon no muestra el número completo, pero SÍ muestra los últimos 4 dígitos de todas las tarjetas.
+    * ¡Incluyendo las tarjetas originales del propietario de la cuenta!
+  * Finalmente el atacante puede restablecer la contraseña de Apple, leer el email de restablecimiento de gmail,
+    restablecer la contraseña de gmail.
+  * Lección: los ataques a menudo juntan partes aparentemente no relacionadas.
+  * Lección: políticas individuales OK, pero la combinación no lo es.
+    * Apple ve los últimos 4 como un secreto, pero muchos otros sitios no.
+
+---
+# Lo que sale mal #2: problemas con la política. (cont.)
+
+* Ejemplo: Tiempo de vida de las cuentas.
+  * Las direcciones de email pueden ser reutilizadas.
+  * Otros sistemas asumen que la cuenta aún pertenece al mismo propietario de la dirección de email.
+  * [ Ref: https://www.gruss.cc/files/uafmail.pdf ]
+
+---
+# Lo que sale mal #2: problemas con la política. (cont.)
+  * Ejemplo: Valores predeterminados inseguros.
+    * Contraseñas predeterminadas bien conocidas en routers.
+    * Permisos predeterminados públicos en servicios en la nube (ej., objetos en bucket AWS S3).
+    * Los valores predeterminados seguros son cruciales debido al aspecto de "objetivo negativo".
+        * Los sistemas grandes son complicados, muchos componentes.
+        * El operador podría olvidar configurar algún componente en su sistema general.
+        * Importante que los componentes sean seguros si el operador olvida configurarlos.
+
+---
+# Lo que sale mal #2: problemas con la política. (cont.)
+
+* Ejemplo: Cuenta de email de Sarah Palin.
+  * [ Ref: https://en.wikipedia.org/wiki/Sarah_Palin_email_hack ]
+  * Las cuentas de email de Yahoo tienen un nombre de usuario, contraseña y preguntas de seguridad.
+  * El usuario puede iniciar sesión proporcionando nombre de usuario y contraseña.
+  * Si el usuario olvida la contraseña, puede restablecerla respondiendo las preguntas de seguridad.
+  * Algún adversario adivinó la escuela secundaria, cumpleaños, etc. de Sarah Palin.
+  * La política equivale a: puede iniciar sesión con contraseña *o* preguntas de seguridad.
+    * No hay forma de hacer cumplir "Solo si el usuario olvida la contraseña, entonces ..."
+  * Por lo tanto, el usuario debe asegurar que la contraseña *y* las preguntas de seguridad sean
+    ambas difíciles de adivinar.
+
+---
+
+# ¿Qué hacer sobre problemas de la política?
+  * Iterar sobre políticas
+  * Analizar casos borde
+  * Intentar romper sistemas antes de liberarlos
+  * Seguir procesos de desarrollo seguro
 
 ---
 
@@ -544,7 +531,6 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
     * Los adversarios buscaron claves adivinables, gastaron cualquier bitcoin correspondiente.
       * Realmente era el nonce en la firma ECDSA que no era aleatorio,
       * y nonce repetido permite deducir la clave privada.
-    * Lección: tengan cuidado.
 
 ---
 
@@ -562,7 +548,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 
 # Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
 
-* Ejemplo: codificación/decodificación ambigua, parte 2.
+* Ejemplo: codificación/decodificación ambigua, Android Master Key.
   * [ Ref: https://www.usenix.org/system/files/usenixsecurity25-you.pdf ]
   * Los archivos ZIP tienen información redundante sobre qué archivos están presentes.
     * Nombre de archivo junto a cada registro de archivo.
@@ -641,21 +627,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
   * Necesitamos compartir/interacción controlada también.
   * Aquí hay un modelo para compartir:
 
-```
-                      +-----------------------+
-                      |   Política            |
-                      |      |                |
-              request |      V                |
-  principal ----------|--> GUARD --> recurso  |
-                      |      |                |
-                      | +-----------+         |
-                      | |    |      |         |
-                      | |    V      |         |
-                      | | Log audit |         |
-                      | +-----------+         |
-                      +-----------------------+
-                      HOST haciendo cumplir aislamiento
-```
+![width:450px align-center](access_control_diagram.svg)
 
 ---
 
