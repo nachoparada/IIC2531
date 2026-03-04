@@ -1,803 +1,772 @@
-# Lab 3: Symbolic execution
+# Lab 2: Separación de privilegios y sandboxing del lado del servidor
 
-Introducción
-------------
+Este laboratorio te introducirá a la separación de privilegios y sandboxing
+del lado del servidor, en el contexto de una aplicación web simple en Python llamada
+zoobar, donde los usuarios transfieren "zoobars" (créditos) entre ellos.
+El objetivo principal de la separación de privilegios es asegurar que si un adversario
+compromete una parte de una aplicación, el adversario no comprometa las
+otras partes también. Para ayudarte a separar privilegios en esta aplicación, el
+servidor web `zookws` que ya viste en el laboratorio anterior está
+diseñado para ejecutar una aplicación web que consiste en múltiples componentes.
+Si tienes curiosidad, este diseño está basado en el servidor web [OKWS](https://okws.org/), descrito en un
+[paper de investigación](https://css.csail.mit.edu/6.858/2024/readings/okws.pdf) y usado por [okcupid.com](https://www.okcupid.com/). En un sistema moderno
+a gran escala, el diseño probablemente consistiría en muchas más partes móviles, como
+usar Kubernetes para ejecutar todos los componentes de tu aplicación,
+usar una librería RPC como gRPC para comunicar entre componentes, etc,
+pero `zookws` empaqueta todo esto en un sistema relativamente simple.
 
-Muchos exploits de seguridad se deben a bugs de software. Este laboratorio te introducirá a
-una técnica poderosa para encontrar bugs en software: *ejecución simbólica*.
-Esta puede ser una buena forma de auditar tu aplicación en busca de vulnerabilidades de seguridad para
-que luego puedas corregirlas. Al final de este laboratorio, tendrás un sistema de
-ejecución simbólica que puede tomar la aplicación web Zoobar y encontrar mecánicamente
-entradas que disparan diferentes tipos de bugs en Zoobar que pueden llevar a vulnerabilidades
-de seguridad. (Más precisamente, este laboratorio construirá un sistema de
-ejecución concolic; explicaremos qué significa esto más adelante.)
+En este laboratorio, configurarás un servidor web con separación de privilegios,
+examinarás posibles vulnerabilidades, y dividirás el código de la aplicación
+en componentes con menos privilegios para minimizar los efectos de cualquier
+vulnerabilidad individual. El laboratorio usará soporte moderno para separación de
+privilegios, [contenedores Linux](https://linuxcontainers.org/).
+(El diseño original de OKWS usaba IDs de usuario y chroot, porque los contenedores
+Linux y namespaces no existían en ese momento.)
 
-El [artículo EXE](https://css.csail.mit.edu/6.858/2022/readings/exe.pdf) describe un sistema de
-ejecución simbólica para programas en C. Por simplicidad, este laboratorio se enfocará
-en construir un sistema de ejecución simbólica/concolica para programas en Python,
-modificando objetos Python y sobrecargando métodos específicos. Mucho
-como EXE, usaremos un solucionador SMT para verificar restricciones
-satisfacibles y encontrar entradas de ejemplo para el programa que estamos probando.
-(Como nota al margen, SMT significa [Satisfiability Modulo Theories](https://en.wikipedia.org/wiki/Satisfiability_Modulo_Theories), lo que significa que el solucionador puede verificar restricciones
-que involucran tanto expresiones tradicionales de satisfactibilidad booleana como
-restricciones que se refieren a otras "teorías" como enteros, vectores de bits,
-cadenas, y así sucesivamente.)
+También extenderás la aplicación web Zoobar para soportar
+_perfiles ejecutables_, que permiten a los usuarios usar código Python como
+sus perfiles. Para hacer un perfil, un usuario guarda un programa Python
+en su perfil en su página principal de Zoobar. (Para indicar que el
+perfil contiene código Python, la primera línea debe ser `#!python`.)
+Cada vez que otro usuario vea el perfil Python del usuario, el servidor
+ejecutará el código Python en el perfil de ese usuario para generar la
+salida del perfil resultante. Esto permitirá a los usuarios implementar una variedad de características
+en sus perfiles, como:
 
-En este laboratorio, primero te familiarizarás con el uso de Z3,
-un solucionador SMT popular, usándolo para encontrar una forma correcta de calcular
-el promedio sin signo (y con signo) de dos valores de 32 bits. Luego
-crearás wrappers para operaciones enteras en Python (similar a como EXE proporciona
-reemplazos para operaciones en valores simbólicos), e implementarás la lógica
-central de invocar Z3 para explorar diferentes rutas de ejecución posibles.
-Finalmente, explorarás cómo aplicar este enfoque a aplicaciones web,
-que tienden a manejar cadenas en lugar de valores enteros. Envolverás
-operaciones en cadenas Python, implementarás wrappers amigables a simbólicos alrededor
-de la interfaz de base de datos SQLalchemy, y usarás el sistema resultante para encontrar
-vulnerabilidades de seguridad en Zoobar.
+- Un perfil que saluda a los visitantes por su nombre de usuario.
+- Un perfil que lleva registro de los últimos varios visitantes a ese perfil.
+- Un perfil que da un `zoobar` a cada visitante (límite 1 por minuto).
 
+Soportar esto de manera segura requiere hacer sandbox del código del perfil en el servidor,
+para que no pueda realizar operaciones arbitrarias o acceder a archivos arbitrarios.
+Por otro lado, este código puede necesitar llevar registro de datos persistentes en
+algunos archivos, o acceder a las bases de datos existentes de zoobar, para funcionar correctamente.
+Usarás la librería de llamadas a procedimientos remotos y algo de código shim que proporcionamos para
+hacer sandbox de manera segura a los perfiles ejecutables en el servidor.
 
-Comenzando
-----------
-
-Para obtener el nuevo código fuente, primero usa Git para hacer commit de tus soluciones del laboratorio 2,
-luego ejecuta `git pull` para obtener el nuevo código, y luego
-haz checkout de la rama `lab3`:
+Para obtener el nuevo código fuente, usa Git para hacer commit de tus soluciones del Lab 1,
+y luego cambia a la rama lab2.
 
 ```
-student@vm-6858:~$ cd lab
-student@vm-6858:~/lab$ git commit -am 'my solution to lab2'
-[lab1 f54fd4d] my solution to lab2
+student@6566-v24:~$ cd lab
+student@6566-v24:~/lab$ git status
+...
+student@6566-v24:~/lab$ git add exploit-*.py http.c zookd.c [and any other new files...]
+student@6566-v24:~/lab$ git commit -am 'my solution to lab1'
+[lab1 c54dd4d] my solution to lab1
  1 files changed, 1 insertions(+), 0 deletions(-)
-student@vm-6858:~/lab$ git pull
+student@6566-v24:~/lab$ git fetch
 ...
-student@vm-6858:~/lab$ git checkout -b lab3 origin/lab3
-Branch lab3 set up to track remote branch lab3 from origin.
-Switched to a new branch 'lab3'
-student@vm-6858:~/lab$
+student@6566-v24:~/lab$ git checkout -b lab2 origin/lab2
+Branch lab2 set up to track remote branch lab2 from origin.
+Switched to a new branch 'lab2'
 
 ```
 
-**ADVERTENCIA:** ¡*no* hagas merge de tus soluciones del laboratorio 2 en el código fuente del
-laboratorio 3! Nuestro sistema básico de ejecución simbólica no puede rastrear restricciones
-simbólicas a través de RPC entre múltiples procesos, por lo que nos enfocaremos
-en usar ejecución simbólica en un sitio Zoobar sin separación de privilegios.
-El sistema de ejecución simbólica también nos ayudará a encontrar bugs que la separación
-de privilegios no mitiga completamente.
+Luego, asegurate de actualizar `sources.list` con el siguiente comando desde la carpeta `lab`.
 
-Luego, asegúrate de que el código fuente del laboratorio 3 esté ejecutándose correctamente en tu
-VM, ejecutando `make check`. Como se muestra a continuación,
-este comando debería reportar que todas las verificaciones fallan, pero si obtienes otros
-mensajes de error, detente y averigua qué salió mal.
-
-
-```bash
-student@vm-6858:~/lab$ make check
-./check\_lab3.py
-FAIL Exercise 1: unsigned average
-FAIL Challenge 1: signed average
-FAIL Exercise 2: concolic multiply
-FAIL Exercise 2: concolic divide
-FAIL Exercise 2: concolic divide+multiply+add
-FAIL Exercise 3: concrete input for 1234
-FAIL Exercise 4: concolic\_find\_input constr2
-PASS Exercise 4: concolic\_find\_input constr3
-FAIL Exercise 5: concolic\_force\_branch
-FAIL Exercise 6: concolic execution for integers
-FAIL Exercise 7: concolic length
-FAIL Exercise 7: concolic contains
-FAIL Exercise 7: concolic execution for strings
-FAIL Exercise 8: concolic database lookup (str)
-FAIL Exercise 8: concolic database lookup (int)
-FAIL Exercise 9: eval injection not found
-FAIL Exercise 9: balance mismatch not found
-FAIL Exercise 9: zoobar theft not found
-PASS Exercise 10: eval injection not found
-PASS Exercise 10: balance mismatch not found
-PASS Exercise 10: zoobar theft not found
-student@vm-6858:~/lab$
+```
+sudo cp sources.list /etc/apt/sources.list
 ```
 
-Nota que partes del sistema de ejecución concolica son bastante intensivas en CPU.
-Si estás ejecutando QEMU sin soporte KVM, podrías observar que la
-última verificación (para el ejercicio 6) puede tomar mucho tiempo (más de 5 minutos).
-Considera habilitar KVM o usar alguna otra VMM de bajo overhead (como VMware).
+Una vez que tu código fuente esté en su lugar, asegúrate de que puedes compilar e instalar
+el servidor web y la aplicación `zoobar`:
 
-
-Usando un solucionador SMT
---------------------------
-
-
-Una pieza clave de maquinaria usada por la ejecución simbólica es un solucionador SMT.
-Para este laboratorio, usarás el [solucionador Z3](https://github.com/Z3Prover/z3)
-de Microsoft Research. Invocaremos Z3 usando su API basada en Python;
-puedes encontrar útil consultar el
-[tutorial z3py](https://ericpony.github.io/z3py-tutorial/) y la
-[documentación de la API de Python de Z3](https://z3prover.github.io/api/html/namespacez3py.html). El laboratorio también hará uso del
-[soporte de Z3 para
-cadenas](https://rise4fun.com/z3/tutorialcontent/sequences). El laboratorio viene con una versión binaria preconstruida de Z3; fue
-construida desde el [repositorio de Z3 en github](https://github.com/Z3Prover/z3).
-
-Como primer paso para aprender sobre Z3, lo usaremos para ayudarnos a implementar
-un fragmento de código aparentemente simple pero propenso a errores: *calcular el
-promedio de dos enteros de 32 bits*. Esto es sorprendentemente sutil de
-hacer correctamente. Un enfoque ingenuo para calcular el promedio de x
-e y podría ser usar (x+y)/2. Sin embargo, si tanto
-x como y son grandes, su suma x+y podría
-desbordarse y envolverse alrededor del módulo 2^32, por lo que (x+y)/2 no será
-el valor promedio correcto. De hecho, los errores de desbordamiento de enteros son una
-fuente significativa de problemas de seguridad para código de sistemas (revisa el [artículo
-KINT](https://people.csail.mit.edu/nickolai/papers/wang-kint-2013-06-24.pdf) si tienes curiosidad por aprender más sobre eso), por lo que es importante
-saber cómo escribir este código correctamente.
-
-Z3 puede ayudarnos a obtener una implementación correcta de la función de promedio verificando
-si una implementación particular que tenemos en mente es correcta.
-En particular, dada una expresión booleana, Z3 puede decirnos si
-es posible hacer que esa expresión booleana sea verdadera (es decir, satisfacerla).
-Además, si es posible hacer que la expresión sea verdadera, y la expresión
-contiene algunas variables, Z3 nos dará una asignación de ejemplo de valores
-a estas variables que hace que la expresión sea verdadera.
-
-
-Para ver cómo podemos usar Z3, mira el código que proporcionamos para
-ti en `int-avg.py`. Las primeras líneas construyen dos variables de 32 bits
-llamadas `a` y `b`. La siguiente línea intenta
-calcular el promedio *sin signo* de a y b
-(es decir, tratando tanto a como b como enteros sin signo)
-y lo almacena en `u_avg`. Nota que este código *no*
-realiza realmente la suma y división. En su lugar, construye una
-expresión simbólica que representa estas operaciones, y Z3 razonará
-sobre los valores posibles de esta expresión más adelante. Puedes observar
-esto simplemente imprimiendo la variable `u_avg`:
-
-
-```bash
-student@vm-6858:~/lab$ python3
-Python 3.9.7 (default, Sep 10 2021, 14:59:43) 
-[GCC 11.2.0] on linux
-Type "help", "copyright", "credits" or "license" for more information.
->>> import z3
->>> a = z3.BitVec('a', 32)
->>> b = z3.BitVec('b', 32)
->>> u\_avg = z3.UDiv(a + b, 2)
->>> print(u\_avg)
-UDiv(a + b, 2)
->>> s\_avg = (a + b) / 2
->>> print(s\_avg)
-(a + b)/2
->>>
 ```
-
-Como dice el comentario en el código fuente, debes tener cuidado con la
-diferencia entre operaciones enteras con signo y sin signo. En
-Z3, los operadores por defecto de Python para división (/) y
-desplazamiento a la derecha (>>) tratan los vectores de bits como valores
-con signo. Cuando quieres realizar operaciones sin signo, debes
-usar las funciones
-[z3.UDiv](https://z3prover.github.io/api/html/namespacez3py.html#a64c02a843a4ac8781dd666a991797906)
-y
-[z3.LShR](https://z3prover.github.io/api/html/namespacez3py.html#a6bffa9a3debf2b93f9407ee7eced222f)
-en su lugar.
-
-El código inicial calcula `u_avg` de la forma ingenua que
-discutimos anteriormente, y no siempre es correcto. Veamos ahora cómo Z3 puede
-ayudarnos a detectar este error. En el resto de `int-avg.py`, calculamos
-un valor de referencia que representa el promedio esperado y correcto
-de `a` y `b`. Para calcular este valor de referencia,
-"hacemos trampa": en realidad convertimos tanto `a` como `b` en enteros de 33 bits
-(un bit más que antes) usando
-[z3.ZeroExt](https://z3prover.github.io/api/html/namespacez3py.html#a5193573b414389d308baa47eab707fe2).
-Luego calculamos su promedio usando el método ingenuo, pero como estamos
-usando aritmética de 33 bits, no hay desbordamiento, y el método ingenuo
-funciona correctamente. Finalmente truncamos el valor de 33 bits de vuelta a
-32 bits, lo cual también es seguro de hacer (porque el promedio siempre
-cabrá en 32 bits), y almacenamos la expresión simbólica resultante en
-`real_u_avg`.
-
-Ahora, para verificar si `u_avg` calculó el promedio correctamente, simplemente
-preguntamos a Z3 si es posible satisfacer la expresión
-`u_avg != real_u_avg`, lo que significa que nuestro valor `u_avg` no es correcto.
-En este caso, como nuestro promedio ingenuo de 32 bits está roto, la expresión
-es satisfacible, y Z3 nos lo dice (por ahora, puedes ignorar la segunda
-parte sobre el promedio con signo):
-
-
-```bash
-student@vm-6858:~/lab$ ./int-avg.py
-Checking unsigned avg using Z3 expression:
-    UDiv(a + b, 2) !=
-    Extract(31, 0, UDiv(ZeroExt(1, a) + ZeroExt(1, b), 2))
-  Answer for unsigned avg: sat
-  Example: {b: 4292870143, a: 4294967287}
-  Your average: 2146435067
-  Real average: 4293918715
-Checking signed avg using Z3 expression:
-    (a + b)/2 !=
-    Extract(31, 0, (SignExt(1, a) + SignExt(1, b))/2)
-  Answer for signed avg: sat
-  Example: {b: -2147483648, a: -2147483648}
-  Your average: 0
-  Real average: -2147483648
-student@vm-6858:~/lab$
-```
-
-Como puedes ver, Z3 nos dice que la expresión es satisfacible, y nos da
-una asignación de ejemplo de valores tanto para `a` como para `b`
-para los cuales la expresión es verdadera. Efectivamente, estos valores de ejemplo parecen
-bastante grandes, y su suma claramente excede 2^32, rompiendo nuestro
-método ingenuo de promedio.
-
-
->**Ejercicio 1.**
->Implementa una función correcta para calcular el promedio sin signo de
-`a` y `b` usando solo aritmética de 32 bits, modificando la línea `u_avg = ...`
-en `int-avg.py`.
->
->Para los propósitos de este ejercicio, no se te permite cambiar el
-ancho de bits de tus operandos. Esto está destinado a representar el mundo real,
-donde no puedes simplemente agregar un bit más al ancho del registro de tu CPU.
->
->Puedes encontrar útil buscar en línea formas correctas
-de realizar aritmética entera de ancho fijo. El libro [Hacker's Delight](https://web.archive.org/web/20190915025154/http://www.hackersdelight.org/) de Henry
-S. Warren es una fuente particularmente buena de tales trucos.
->
->Verifica tu función de promedio ejecutando nuevamente
-`./int-avg.py` o
-`make check`.
-Si tu implementación es correcta, `int-avg.py` debería producir
-el mensaje Answer for unsigned avg: `unsat`.
-
->**¡Desafío! (opcional)**
->Para crédito adicional, descubre cómo calcular el promedio de dos
-valores de 32 bits *con signo*. Modifica la línea `s_avg = ...`
-en `int-avg.py`, y ejecuta `./int-avg.py` o
-`make check` para verificar tu respuesta.
-Ten en cuenta la dirección del redondeo: `3/2=1` y `-3/2=-1`, por lo que
-el promedio de 1 y 2 debería ser 1, y el promedio de
--2 y -1 debería ser -1.
->
->Mientras exploras la aritmética con signo, puedes encontrar útil saber que Z3
-tiene dos operadores diferentes tipo módulo. El primero es módulo con signo,
-que obtienes usando `a % b` en la API de Python de Z3. Aquí, el
-signo del resultado sigue el signo del divisor (es decir, `b`).
-Por ejemplo, `-5 % 2 = 1`. El segundo es resto con signo,
-que obtienes usando `z3.SRem(a, b)`. Aquí, el signo del
-resultado sigue el signo del dividendo (es decir, a). Con las
-mismas entradas de ejemplo, `z3.SRem(-5, 2) = -1`.
-
-
-
-
-Interludio: ¿qué son la ejecución simbólica y concolica?
---------------------------------------------------------
-
-Como probablemente recuerdas del artículo EXE, la ejecución simbólica es un
-enfoque para probar un programa observando cómo se comporta el programa con
-diferentes entradas posibles. Típicamente, el objetivo de la ejecución simbólica es
-lograr una alta [cobertura de código](https://en.wikipedia.org/wiki/Code_coverage) o cobertura de rutas en el programa. En el contexto de seguridad,
-esto es útil porque ayuda a explorar rutas de código raras que podrían contener
-vulnerabilidades pero que no se están disparando en ejecuciones típicas
-del código. A alto nivel, si estamos construyendo un sistema de ejecución simbólica,
-tenemos que abordar varios puntos:
-
-1. Mientras el programa construye valores intermedios basados en la entrada
-(por ejemplo, tomando dos valores enteros de entrada, calculando su promedio, y
-almacenando eso en alguna variable), necesitamos recordar la relación entre
-la entrada y estos valores intermedios. Típicamente esto se hace
-permitiendo que las variables o ubicaciones de memoria tengan valores
-*concretos* o *simbólicos*. Un valor concreto es lo que un programa ordinario
-almacenaría en una variable o ubicación de memoria: algún valor específico, como
-el entero 42. Un valor simbólico no es un valor específico sino más bien
-una expresión simbólica que describe lo que el valor *sería* como
-una función de las entradas, como (a+b)/2. Esto es similar
-a la expresión simbólica de Z3 que construiste para u\_avg en el
-primer ejercicio anterior.
-
-2. Necesitamos determinar qué decisiones de flujo de control (ramas) la
-aplicación toma basándose en la entrada. Esto se reduce a construir
-una restricción simbólica cada vez que el programa se ramifica, describiendo
-la condición booleana (en términos de la entrada original del programa)
-bajo la cual el programa toma alguna rama particular (o no).
-Ya que estamos rastreando cómo todos los valores intermedios están relacionados
-con la entrada original del programa, usando valores simbólicos, típicamente no
-necesitamos mirar hacia atrás a la entrada original para hacer estas restricciones.
-Estas restricciones son similares a la restricción que usaste arriba para buscar
-bugs en la función de promedio entero. Determinar estas restricciones de flujo de control es importante porque si el
-programa inicialmente va de una manera particular en alguna rama, nos gustaría
-descubrir cómo hacer que vaya por el otro camino, para ver si hay
-bugs interesantes en ese otro código. En el caso de EXE, usan
-un traductor de C-a-C para insertar su propio código en todas las ramas.
-
-3. Para cada una de las ramas anteriores, necesitamos decidir si hay
-una entrada posible que causará que el programa se ejecute de la otra manera
-en una rama. (Más generalmente, a menudo pensamos en rutas completas de flujo de control,
-en lugar de ramas individuales aisladas.) Esto nos ayuda
-a encontrar decisiones de flujo de control en un programa que podemos afectar ajustando
-la entrada (a diferencia de decisiones de flujo de control que siempre irán de una
-manera cierta en un programa, independientemente de la entrada que estemos considerando).
-Todos los sistemas de ejecución simbólica dependen de algún tipo de solucionador SMT para hacer esto.
-
-4. Necesitamos especificar qué estamos buscando en nuestras pruebas.
-Típicamente esto se piensa mejor en términos de alguna invariante que te
-importa asegurar en tu programa, y la ejecución simbólica busca
-entradas que violen esta invariante. Una cosa que podríamos buscar es
-crashes (es decir, la invariante es que nuestro programa nunca debería crashearse).
-Buscar crashes tiene mucho sentido en el contexto de programas en C,
-donde los crashes a menudo indican corrupción de memoria que casi ciertamente es un
-bug y a menudo podría ser explotado. En lenguajes de más alto nivel como Python,
-los bugs de corrupción de memoria no son un problema por diseño, pero aún podríamos
-buscar otros tipos de problemas, como ataques de inyección de código a nivel Python
-(alguna parte de la entrada se pasa a eval(), por
-ejemplo), o invariantes específicas de la aplicación que importan para la seguridad.
-
-5. Finalmente, dadas todas las rutas de flujo de control a través del programa
-que son posibles de ejecutar, necesitamos decidir qué ruta probar realmente.
-Esto es importante porque puede haber exponencialmente muchas rutas diferentes
-a medida que el tamaño del programa crece, y rápidamente se vuelve
-inviable probar todas ellas. Por lo tanto, los sistemas de ejecución simbólica típicamente
-incluyen algún tipo de *planificador* o *estrategia de búsqueda* que
-decide qué ruta es la más prometedora en términos de encontrar violaciones
-de nuestra invariante. Un ejemplo simple de una estrategia de búsqueda es probar
-ramas que no hemos probado antes, con la esperanza de que ejecutará nuevo
-código que aún no hemos ejecutado; esto conducirá a una mayor cobertura de código,
-y quizás este nuevo código contiene un bug en el que aún no nos hemos topado.
-
-Una alternativa a la ejecución simbólica es [fuzzing](https://en.wikipedia.org/wiki/Fuzz_testing) (también
-llamado prueba de fuzzing). El fuzzing toma un enfoque aleatorizado: en lugar
-de tratar de razonar cuidadosamente sobre qué entradas dispararán diferentes
-rutas de código en la aplicación, el fuzzing implica construir entradas
-aleatorias concretas para el programa y verificar cómo se comporta el programa.
-Esto tiene la ventaja de ser relativamente fácil, pero por otro lado,
-puede ser difícil construir entradas precisas que alcancen algún caso
-específico en el código de la aplicación.
-
-Un desafío en construir un sistema de ejecución simbólica, como EXE, es
-que tu sistema tiene que saber cómo ejecutar todas las operaciones posibles en
-valores simbólicos (pasos 1 y 2 anteriores).
-En este laboratorio, vamos a interponernos
-a nivel de objetos Python (en particular, enteros y cadenas).
-Esto es desafiante para la ejecución simbólica porque hay una cantidad muy
-grande de operaciones que se pueden hacer en estos objetos Python,
-por lo que construir un sistema completo de ejecución simbólica para una interfaz de tan alto nivel
-sería un proceso tedioso.
-
-Afortunadamente, hay una opción más fácil, llamada *ejecución concolica*,
-que puedes pensar como en algún lugar en el medio entre fuzzing completamente
-aleatorio y ejecución simbólica completa. La idea es que, en lugar
-de rastrear valores puramente simbólicos (como en EXE), podemos almacenar
-tanto un valor concreto *como* simbólico para variables que son
-derivadas de la entrada. (El nombre *concolic* es un acrónimo
-de *concrete* y *symbolic*.) Ahora que tenemos tanto un
-valor concreto como simbólico, casi podemos obtener lo mejor de ambos mundos:
-
-* Si la aplicación realiza alguna operación que nuestro sistema concolico
-conoce, ejecutaremos más o menos como ejecución simbólica
-(excepto que también propagaremos la parte concreta de cada valor).
-Por ejemplo, supongamos que tenemos dos variables enteras concolicas `aa`
-y `bb`, cuyos valores concretos son 5 y 6, y cuyas expresiones
-simbólicas son `a` y `b`. Si la aplicación almacena
-`aa+bb` en la variable `cc`, la variable `cc` ahora
-tendrá valor concreto 11 y expresión simbólica `a+b`. Similarmente,
-si la aplicación se ramifica en `cc==12`, el programa puede ejecutarse
-como si la condición de rama fuera falsa (ya que `11 != 12`) y registrar la
-condición de rama simbólica correspondiente (`a+b != 12`).
-
-* Si, por otro lado, la aplicación realiza alguna operación que nuestro
-sistema concolico no conoce, la aplicación solo obtendrá el
-valor concreto. Por ejemplo, si la aplicación escribe la variable
-`cc` en un archivo, o quizás la pasa a alguna biblioteca externa
-que no instrumentamos, el código aún puede ejecutarse, usando el valor
-concreto 11 como si la aplicación simplemente estuviera ejecutándose normalmente.
-
-El beneficio de la ejecución concolica, para los propósitos de este laboratorio, es
-que no necesitamos ser completos en términos de soportar operaciones
-en valores simbólicos. Mientras soportemos suficientes operaciones para encontrar
-bugs interesantes que nos importan en la aplicación, el sistema será
-suficientemente bueno (y en la práctica, la mayoría de los sistemas de búsqueda de bugs son aproximados
-de todos modos, ya que generalmente es inviable encontrar todos los bugs). La compensación
-es por supuesto que, si la aplicación realiza algunas operaciones que no
-soportamos, perderemos el rastro de la parte simbólica, y no podremos
-hacer exploración estilo ejecución simbólica de esas rutas.
-Si estás interesado, puedes aprender más sobre ejecución concolica
-leyendo el [artículo DART](https://css.csail.mit.edu/6.858/2022/readings/dart.pdf)
-de Godefroid, Klarlund y Sen.
-
-Ejecución concolica para enteros
----------------------------------
-
-Para comenzar, implementarás un sistema de ejecución concolica para valores
-enteros. El código esqueleto que te proporcionamos para ejecución concolica
-está en `symex/fuzzy.py` en tu directorio de laboratorio. Hay varias
-capas importantes de abstracción que están implementadas en `fuzzy.py`:
-
-* **El AST.** En lugar de usar expresiones Z3 para representar valores
-simbólicos, como hiciste en el ejercicio `int-avg.py` anterior, construimos
-nuestro propio árbol de sintaxis abstracta (AST) para representar expresiones simbólicas.
-Un nodo AST podría ser una variable simple (representada por un objeto `sym_str
-o `sym_int`), un valor constante (representado por un objeto
-`const_int`, `const_str`, o `const_bool`), o
-alguna función u operador que toma otros nodos AST como argumentos (por ejemplo,
-`sym_eq(a, b)` para representar la expresión booleana `a==b`
-donde `a` y `b` son nodos AST, o `sym_plus(a, b)`
-para representar la expresión entera `a+b`).
-  * Cada nodo AST n puede convertirse en una expresión Z3
-llamando `z3expr(n)`. Esto funciona llamando `n._z3expr()`,
-y cada nodo AST implementa el método `_z3expr` que devuelve
-la representación Z3 correspondiente.
-  * La razón por la que introducimos nuestra propia capa AST, en lugar de usar la representación
-simbólica de Z3, es que necesitamos realizar ciertas manipulaciones en el
-AST que son difíciles de hacer con la representación de Z3. Además,
-necesitamos bifurcar un proceso separado para invocar el solucionador de Z3, de modo que en
-caso de que el solucionador Z3 tome mucho tiempo, podamos hacer timeout, matar ese
-proceso, y asumir que la restricción simplemente no es resoluble. (En este caso,
-podríamos perder esas rutas, pero al menos haremos progreso explorando
-otras rutas.) Tener nuestro propio AST nos permite aislar limpiamente el estado de Z3
-solo al proceso bifurcado.
-
-* **Los envoltorios concolicos.** Para interceptar operaciones a nivel Python y
-realizar ejecución concolica, reemplazamos los objetos regulares de Python `int` y
-str con subclases concolicas: `concolic_int`
-hereda de int y `concolic_str` hereda de
-`str`. Cada uno de estos envoltorios concolicos almacena un valor
-concreto (en `self.__v`) y una expresión simbólica (un nodo AST,
-en `self.__sym`). Cuando la aplicación calcula alguna expresión
-derivada de un valor concolico (por ejemplo, `a+1` donde a es
-un `concolic_int`), necesitamos interceptar la operación y devolver
-otro valor concolico que contiene tanto el valor de resultado concreto como una
-expresión simbólica de cómo se calculó el resultado.
-  * Para realizar esta interceptación, sobrecargamos varios métodos en las
-clases `concolic_int` y `concolic_str`. Por ejemplo,
-`concolic_int.__add__` se invoca cuando la aplicación calcula
-`a+1` en el ejemplo anterior, y este método devuelve un nuevo valor
-concolico que representa el resultado.
-  * En principio, deberíamos tener un `concolic_bool` que sea una subclase
-de `bool` también. Desafortunadamente, `bool` no puede ser subclassed
-en Python (ver [aquí](https://docs.python.org/3/library/functions.html#bool)
-y [aquí](https://mail.python.org/pipermail/python-dev/2002-March/020822.html)).
-Entonces, hacemos que `concolic_bool` sea una función que lógicamente simula
-que, una vez que construyes un valor booleano concolico, el programa inmediatamente
-se ramifica en su valor, por lo que `concolic_bool` también agrega una restricción
-a la condición de ruta actual. (La restricción es que la expresión
-simbólica del valor booleano es igual al valor concreto.) La
-función `concolic_bool` luego devuelve un valor booleano concreto.
-
-* **Las entradas concretas.**
-Las entradas al programa que se está probando bajo ejecución concolica están
-almacenadas en el diccionario `concrete_values`.
-Este diccionario da nombres de cadena a las entradas del programa,
-y mapea cada nombre al valor de esa entrada.
-El valor es
-un entero regular de Python (para variables enteras) o una cadena regular de Python
-(para variables de cadena).
-  * La razón por la que `concrete_values` es una variable global es que las aplicaciones
-crean valores concolicos invocando `fuzzy.mk_str(name)` o
-`fuzzy.mk_int(name)` para construir una cadena concolica o un entero concolico,
-respectivamente. Esto devuelve un nuevo valor concolico, cuya parte simbólica
-es un nodo AST nuevo correspondiente a una variable llamada name,
-pero cuyo valor concreto se busca en el diccionario
-`concrete_values`. Si no hay un valor específico asignado a esa variable
-en `concrete_values`, el sistema usa por defecto algún valor inicial
-(0 para enteros y la cadena vacía para cadenas).
-  * El marco de ejecución concolica mantiene una cola de diferentes
-entradas para probar, en un objeto `InputQueue` (también definido en
-`symex/fuzzy.py`). El marco de ejecución concolica primero agrega una
-entrada inicial (el diccionario vacío {}), y luego ejecuta el código.
-Si la aplicación hace alguna rama, el sistema de ejecución concolica
-invocará Z3 para encontrar nuevas entradas para probar otras rutas en el código,
-agregará esas entradas a la cola de entradas, y seguirá iterando hasta que no haya
-más entradas para probar.
-
-* **El solucionador SMT.**
-La función `fork_and_check(c)` verifica si la restricción
-`c` (un AST) es una expresión satisfacible, y devuelve un par
-de valores: el estado de satisfactibilidad ok y el modelo de ejemplo
-(asignación de valores a variables) si la restricción es satisfacible. La
-variable ok es `z3.sat` si la restricción es satisfacible,
-y `z3.unsat` o `z3.unknown` en caso contrario. Internamente, esta
-función bifurca un proceso separado, intenta ejecutar el solucionador Z3, pero si
-toma más de unos segundos (controlado por `z3_timeout`),
-mata el proceso y devuelve `z3.unknown`.
-
-* **La condición de ruta actual.**
-Cuando la aplicación se ejecuta y toma decisiones de flujo de control basándose en
-el valor de un valor concolico (ver discusión de `concolic_bool`
-arriba), la restricción que representa esa rama se agrega a la
-lista `cur_path_constr`. Para generar entradas que
-tomen una decisión diferente en un punto a lo largo de la ruta, la restricción
-requerida es la unión de las restricciones antes de ese punto en
-la ruta, más la negación de la restricción en ese punto.
-Para ayudar con depuración y heurísticas de
-búsqueda, información sobre la línea de código que disparó cada rama
-se agrega a la lista `cur_path_constr_callers`.
-
-Ahora, tu trabajo será terminar la implementación de `concolic_int`,
-y luego implementar el núcleo del bucle de ejecución concolica. Proporcionamos
-dos programas de prueba para ti, `check-concolic-int.py` y
-`check-symex-int.py`. Echa un vistazo a estos programas para tener una idea
-de cómo estamos usando ejecución concolica, y qué código estos casos de prueba están
-invocando.
-
-
->**Ejercicio 2.**
->Termina la implementación de `concolic_int` agregando soporte para
-operaciones de multiplicación y división enteras. Necesitarás sobrecargar métodos adicionales
-en la clase `concolic_int` (ver la documentación para
-[funciones de operador
-en Python 3](https://docs.python.org/3/library/operator.html)), agregar nodos AST para operaciones de multiplicación y
-división, e implementar `_z3expr` apropiadamente para esos
-nodos AST.
->
->Busca los comentarios Ejercicio 2: tu código aquí en
-`symex/fuzzy.py` para encontrar lugares donde creemos que podrías necesitar
-escribir código para resolver este ejercicio.
->
->Ejecuta `./check-concolic-int.py` o `make check` para verificar que tus cambios a
-`concolic_int` funcionen correctamente.
-
-
-> **Ejercicio 3**. Un componente importante de la ejecución concolica
- es `concolic_exec_input()` en `symex/fuzzy.py`. Te hemos dado
- la implementación. La usarás para construir un sistema completo de ejecución concolica.
- Para entender cómo usar `concolic_exec_input()`, debes
- crear una entrada tal que pases la primera verificación
- en `symex/check-symex-int.py`. No
- modifiques `symex/check-symex-int.py` directamente, sino modifica
- `symex_exercises.py`.
->
-> Ejecuta `./check-symex-int.py` o `make check` para verificar tu solución.
-
-
->**Ejercicio 4**. Otro componente importante en la ejecución concolica
- es encontrar una entrada concreta para una restricción. Completa la
- implementación de `concolic_find_input` en `symex/fuzzy.py` y
- asegúrate de pasar el segundo caso de prueba de `symex/check-symex-int.py`.
- Para este ejercicio, tendrás que invocar Z3, algo así como
- `(ok, model) = fork_and_check(constr)` (ver los comentarios en el código).
->
-> Ejecuta `./check-symex-int.py` o `make check` para verificar tu solución.
-
-
->**Ejercicio 5**. Un componente importante final en la ejecución concolica
- es explorar diferentes ramas de ejecución. Completa la
- implementación de `concolic_force_branch` en `symex/fuzzy.py`
- y asegúrate de pasar el caso de prueba final
- de `symex/check-symex-int.py`.
->
-> Ejecuta `./check-symex-int.py` o `make check` para verificar tu solución.
-
-
->**Ejercicio 6**. Ahora implementa ejecución concolica de una
- función en `concolic\_execs()` en
-`symex/fuzzy.py`. El objetivo es eventualmente hacer que cada rama
-de la función sea ejecutada. Lee el comentario para un plan de ataque propuesto
-para implementar ese bucle. Las funciones en los ejercicios 3-5 deberían ser
-bastante útiles.
->
->Ejecuta `./check-symex-int.py`
-o `make check` para verificar que
-tu `concolic_execs()` funcione correctamente.
->
->Ten cuidado de que nuestra verificación para este ejercicio *no* está completa.
-Bien podrías encontrar que más adelante algo no funciona, y tendrás
-que revisar tu código para este ejercicio.
-
-Ejecución concolica para cadenas y Zoobar
------------------------------------------
-
-Antes de poder ejecutar toda la aplicación Zoobar a través de nuestro sistema concolico,
-primero tenemos que agregar soporte para cadenas, además del soporte para enteros
-que agregamos arriba. Este es ahora tu trabajo.
-
->**Ejercicio 7**.
->Termina la implementación de ejecución concolica para cadenas y arreglos de bytes en
-`symex/fuzzy.py`. Dejamos fuera soporte para dos operaciones en
-objetos `concolic_str` y `concolic_bytes`. La primera es calcular la longitud
-de una cadena, y la segunda es verificar si una cadena particular
-`a` aparece en la cadena `b` (es decir, `a` está contenida
-en `b`, la implementación subyacente del constructo de Python
-"a in b").
->
->Busca el comentario Ejercicio 7: tu código aquí para encontrar dónde
-debes implementar el código para este ejercicio. Ya hemos
-implementado los nodos AST `sym_contains` y `sym_length`
-para ti, que deberían ser útiles para este ejercicio.
->
->Ejecuta `./check-concolic-str.py` *y*
-`./check-symex-str.py` (o simplemente ejecuta
-`make check`) para verificar que tu respuesta a
-este ejercicio funcione correctamente.
-
-
-Además de realizar operaciones de cadena, el código de la aplicación Zoobar
-hace consultas a la base de datos (por ejemplo, buscar el objeto `Profile`
-de un usuario desde la base de datos de perfiles). Nuestro plan es suministrar una solicitud
-HTTP concolica a Zoobar, por lo que el nombre de usuario que se está buscando será
-un valor concolico también (viniendo a través de la cookie HTTP). Pero ¿cómo podemos
-realizar consultas SQL en un valor concolico? Nos gustaría permitir que el
-sistema de ejecución concolica de alguna manera explore todos los registros posibles que
-podría obtener de la base de datos, pero la consulta SQL va al código de SQLite
-que está escrito en C, no en Python, por lo que no podemos interponernos en ese
-código.
-
->**Ejercicio 8**.
->Descubre cómo manejar la base de datos SQL para que el motor concolico
-pueda crear restricciones contra los datos devueltos por la base de datos.
-Para ayudarte a hacer esto, hemos escrito un wrapper vacío alrededor del método
-get de sqlalchemy, en `symex/symsql.py`. Implementa este wrapper
-para que la ejecución concolica pueda probar todos los registros posibles en una base de datos.
-Examina `./check-symex-sql.py` para ver cómo
-estamos pensando realizar búsquedas en la base de datos en valores concolicos.
->
->Probablemente necesitarás consultar la referencia para el
-[objeto de consulta de SQLalchemy](https://docs.sqlalchemy.org/en/11/orm/query.html) para entender cuál debería ser el comportamiento de get
-y qué debería hacer tu implementación de reemplazo.
->
->Ejecuta `./check-symex-sql.py` (o simplemente ejecuta
-`make check`) para verificar que tu respuesta a
-este ejercicio funcione correctamente.
-
-Ahora que podemos realizar ejecución concolica para cadenas e incluso consultas de
-base de datos, finalmente podemos intentar ejecutar Zoobar bajo ejecución concolica.
-Echa un vistazo al programa `check-symex-zoobar.py` para ver cómo
-podemos invocar Zoobar con entradas simbólicas. Para asegurar que la ejecución concolica
-de Zoobar termine relativamente rápido, sobre-restringimos las
-entradas iniciales a Zoobar. En particular, especificamos que el método HTTP
-(en `environ['REQUEST_METHOD']`) siempre es `GET`, y que
-la URL solicitada (en `environ['PATH\_INFO']`) siempre comienza con
-trans. Esto reduce enormemente el número de rutas posibles que
-la ejecución concolica debe explorar; hacer estas entradas arbitrarias conduce a
-alrededor de 2000 rutas que deben ser exploradas, lo que toma alrededor de 10 minutos.
-
-Intenta ejecutar `check-symex-zoobar.py` para asegurar que todo el
-código que has implementado hasta ahora en este laboratorio funcione correctamente. Sugerimos
-ejecutarlo dentro de script para que la salida se guarde en el
-archivo `typescript` para inspección posterior:
-
-
-```bash
-student@vm-6858:~/lab$ script -c ./check-symex-zoobar.py
-Script started, file is typescript
-Trying concrete values: {}
-startresp 404 NOT FOUND [('Content-Type', 'text/html'), ('Content-Length', '233'), ('X-XSS-Protection', '0')]
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<title>404 Not Found</title>
-<h1>Not Found</h1>
-<p>The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.</p>
-
-Trying concrete values: {'referrer': '', 'cookie': '', 'path': 'fer'}
-/home/student/lab/zoobar/debug.py:23 :: \_\_try : caught exception in function transfer:
- Traceback (most recent call last):
-  File "/home/student/lab/zoobar/debug.py", line 20, in \_\_try
-    return f(*args, **kwargs)
-  File "/home/student/lab/zoobar/login.py", line 59, in loginhelper
-    if not logged\_in():
-  File "/home/student/lab/zoobar/login.py", line 50, in logged\_in
-    g.user.checkCookie(request.cookies.get("PyZoobarLogin"))
-  File "/usr/lib/python2.7/dist-packages/werkzeug/local.py", line 338, in \_\_getattr\_\_
-    return getattr(self.\_get\_current\_object(), name)
-  File "/usr/lib/python2.7/dist-packages/werkzeug/utils.py", line 71, in \_\_get\_\_
-    value = self.func(obj)
-  File "/home/student/lab/symex/symflask.py", line 44, in cookies
-    fuzzy.require(hdr == name + '=' + val)
-  File "/home/student/lab/symex/fuzzy.py", line 362, in require
-    raise RequireMismatch()
-RequireMismatch
-
-startresp 500 INTERNAL SERVER ERROR [('Content-Type', 'text/html'), ('Content-Length', '291')]
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<title>500 Internal Server Error</title>
-<h1>Internal Server Error</h1>
-<p>The server encountered an internal error and was unable to complete your request.  Either the server is overloaded or there is an error in the application.
-</p>
-
-Trying concrete values: {'referrer': '', 'path': 'fer', 'cookie\_name': 'v', 'cookie': 'v=aC', 'cookie\_val': 'aC'}
+student@6566-v24:~/lab$ make
+cc zookd.c -c -o zookd.o -m64 -g -std=c99 -Wall -Wno-format-overflow -D\_GNU\_SOURCE -static -fno-stack-protector
+cc http.c -c -o http.o -m64 -g -std=c99 -Wall -Wno-format-overflow -D\_GNU\_SOURCE -static -fno-stack-protector
 ...
-Stopping after 139 iterations
-Script done, file is typescript
-student@vm-6858:~/lab$
-```
-
-Entonces, ¿qué bugs encontramos en estas 139 rutas diferentes? Como Zoobar
-está escrito en Python, no hay bugs de corrupción de memoria o crashes,
-por lo que no es inmediatamente claro cómo podríamos decir que hay un problema.
-Como resultado, tenemos que escribir invariantes explícitas para detectar situaciones malas
-indicativas de un problema de seguridad.
-
-Una de esas invariantes que hemos proporcionado para ti es una verificación de inyección eval;
-es decir, entrada arbitraria que se pasa a la función `eval()`
-en Python. Examina `symex/symeval.py` para ver cómo verificamos
-inyección eval. Hacemos una aproximación que parece razonable en
-la práctica: si la cadena pasada a `eval()` puede alguna vez contener
-`;badstuff();` en algún lugar de la cadena, es una buena apuesta que
-tenemos una vulnerabilidad de inyección `eval`. Como la implementación de eval
-está escrita en Python, la verificación '`;badstuff();`' en
-`expr` invoca tu método sobrecargado en `concolic_str`, y
-esto le dice al sistema de ejecución concolica que intente construir una entrada
-que contenga esa subcadena.
-
-Puedes ver si Zoobar contiene alguno de estos bugs buscando la
-cadena impresa por esa verificación en `symex/symeval.py` en la
-salida de `check-symex-zoobar.py`:
+cc zookfs.c -c -o zookfs.o -m64 -g -std=c99 -Wall -Wno-format-overflow -D\_GNU\_SOURCE -static -fno-stack-protector
+cc -m64  zookfs.o http.o   -o zookfs
+cc zookd2.c -c -o zookd2.o -m64 -g -std=c99 -Wall -Wno-format-overflow -D\_GNU\_SOURCE -static -fno-stack-protector
+cc -m64  zookd2.o http.o   -o zookd2
+student@6566-v24:~/lab$
 
 ```
-student@vm-6858:~/lab$ grep "Exception: eval injection" typescript
-Exception: eval injection
-Exception: eval injection
-student@vm-6858:~/lab$
+
+## Preludio: ¿Qué es un zoobar?
+
+Para entender la aplicación `zoobar` en sí, primero examinaremos
+el código de la aplicación web zoobar.
+
+Una de las características clave de la aplicación `zoobar` es la capacidad de
+transferir créditos entre usuarios. Esta característica está implementada por el
+script `transfer.py`.
+
+Para tener una idea de lo que hace transfer, inicia el sitio web zoobar. Para
+el lab 2, iniciamos el servidor web usando el launcher `zookld.py`, que es
+similar al daemon launcher `okld` en OKWS:
+
+```
+student@6566-v24:~/lab$ ./zookld.py
+~base: Creating container
+Unpacking the rootfs
+~base: Configuring
+*... lots of output ...*
+main: Creating container
+main: Copying files
+main: Running zooksvc.py
+main: zooksvc.py: dispatcher main, port 8080
+main: zooksvc.py: running ['./zookd2', '3', '5']
+main: zookd2: Start with 1 service(s)
+main: zookd2: Dispatch ^(.*)$ for service 0
+main: zookd2: Host 10.1.1.4 (link 1) service 0
+main: zookd2: Port 8081 for service 0
+zookfs: Creating container
+zookfs: Copying files
+zookfs: Running zooksvc.py
+zookfs: zooksvc.py: running ['./zookfs', '8081']
+echo: Creating container
+echo: Copying files
+echo: Running zooksvc.py
+echo: zooksvc.py: running ['.//zoobar/echo-server.py', '8081']
+echo: Running on port 8081
+student@6566-v24:~/lab$
+
 ```
 
-Parece que el sistema de ejecución concolica encontró dos entradas diferentes
-que conducen a nuestra verificación de "inyección eval". Ahora podrías mirar las
-líneas justo antes de ese mensaje para ver qué entrada concreta dispara la inyección eval.
-Esto puede ayudar enormemente a un desarrollador en la práctica a encontrar y
-corregir tal bug.
+La primera vez que ejecutes `zookld.py` correrá por minutos,
+porque está construyendo el contenedor base, lo que involucra
+construir una imagen Linux e instalar todo el software que `zoobar`
+necesita. Luego, construye otros tres
+contenedores: `main`, `zookfs`, y `echo`.
+Los contenedores en sí están almacenados en el directorio `~/.local/share/lxc`,
+si tienes curiosidad sobre cómo están implementados los contenedores.
+`zookld.py`
+usa `zookconf.py` para construir y configurar los contenedores.
+Si obtienes errores sobre crear o iniciar contenedores, intenta
+resetear el estado del contenedor usando el comando `./zookclean.py`
+y/o reiniciar tu VM.
 
-Ahora, tu trabajo será implementar dos verificaciones de invariante adicionales para
-ver si los balances de Zoobar pueden alguna vez corromperse. En particular, queremos
-hacer cumplir dos garantías:
+Puedes manipular los contenedores con los siguientes comandos:
 
-* Si no se registran nuevos usuarios, la suma de los balances de Zoobar en todas las
-cuentas debe permanecer igual antes y después de cada solicitud.
-(Es decir, los zoobars nunca deberían crearse de la nada.)
+- `zookld.py`: inicia contenedores listados en zook.conf
+- `zookps.py`: lista el estado de los contenedores listados
+  en zook.conf y los procesos ejecutándose en ellos.
+- `zookstop.py`: detiene los contenedores listados en zook.conf
+- `zookclean.py`: elimina todos los contenedores de `~/.local/share/lxc`, por si quieres empezar desde
+  cero de nuevo.
 
-* Si un usuario `u` no emite ninguna solicitud a Zoobar, el balance de Zoobar de `u`
-no debería reducirse. (Es decir, debería ser imposible
-que las solicitudes de un usuario roben los zoobars de otro usuario.)
+Cada uno de estos comandos también puede tomar el nombre de un contenedor individual (e.g., `main`)
+y aplicar la operación solo a ese contenedor.
 
->**Ejercicio 9**.
->Agrega verificaciones de invariante a check-symex-zoobar.py para implementar las
-dos reglas anteriores (preservación del balance total y sin robo de zoobars). Busca
-el comentario Ejercicio 9: tu código aquí para ver dónde
-debes escribir este código. Cuando detectes un desajuste del balance de zoobars, llama
-a la función `report_balance_mismatch()`. Cuando detectes robo de zoobars,
-llama a `report_zoobar_theft()`.
+Todos estos comandos son wrappers alrededor de
+la [API Python de LXC](https://linuxcontainers.org/lxc/documentation/#python).
+También puedes ejecutar muchos de los comandos LXC desde [línea de comandos](https://linuxcontainers.org/lxc/manpages/);
+en particular, `lxc-attach -n name` te dará un
+shell root en el contenedor name, que podrías encontrar útil para debugging.
+
+Ejecuta `zookps.py` para ver si tus contenedores están ejecutándose. Luego, asegúrate
+de que puedes ejecutar el servidor web, y acceder al sitio web desde tu navegador, como
+sigue:
+
+```
+student@6566-v24:~/lab$ ip addr show dev eth0
+2: eth0:  mtu 1500 qdisc fq_codel state UP group default qlen 1000
+ link/ether 00:0c:29:b4:55:8e brd ff:ff:ff:ff:ff:ff
+ altname enp0s3
+ altname ens3
+ inet 192.168.24.128/24 brd 192.168.24.255 scope global eth0
+ valid_lft forever preferred_lft forever
+ inet6 fe80::20c:29ff:feb4:558e/64 scope link
+ valid_lft forever preferred_lft forever
+
+```
+
+En este ejemplo particular, querrías
+abrir tu navegador e ir a `http://192.168.24.128:8888/zoobar/index.cgi/`,
+o, si estás usando KVM, a `http://localhost:8888/zoobar/index.cgi/`.
+Deberías ver el sitio web `zoobar`.
+
+Nota el puerto diferente, `8888` en lugar de `8080`, en las URLs de arriba.
+Esto es porque en realidad queremos conectarnos al contenedor
+`main`, pero está en una red virtual interna que solo es accesible
+desde la VM misma. Configuramos el kernel Linux en la VM para reenviar
+conexiones del puerto `8888` al puerto `8080` en el contenedor `main`.
+Puedes ver las reglas iptables que usamos para lograr esto en
+`/etc/rc.local` en tu VM.
+
+Si tienes problemas viendo el sitio web, una posible causa
+es que las correcciones que hiciste en el Lab 1 para arreglar los bugs de buffer overflow
+pueden ser demasiado estrictas. Si es así, por favor corrígelo antes de continuar.
+
+> **Ejercicio 1.**
+> En tu navegador, conéctate al sitio web `zoobar`, y crea dos cuentas de
+> usuario. Inicia sesión como uno de los usuarios, y transfiere zoobars de un usuario a
+> otro haciendo clic en el enlace de transfer y llenando el formulario. Juega
+> con las otras características también para tener una idea de lo que permite a los usuarios
+> hacer. En resumen, un usuario registrado puede actualizar su perfil, transferir
+> "zoobars" (créditos) a otro usuario, y buscar el balance de zoobar, perfil,
+> y transacciones de otros usuarios en el sistema.
 >
->Recuerda que nuestra verificación para los ejercicios 3-6, donde implementaste el núcleo
-del sistema de ejecución concolica, no estaba completa. Si estás teniendo
-problemas con este ejercicio, puede ser que no implementaste los ejercicios
-3-6 correctamente, por lo que puede que necesites volver y corregirlos.
+> Lee el código de `zoobar` y ve cómo transfer.py
+> se invoca cuando un usuario envía una transfer en la página de transfer. Un buen lugar para
+> empezar para esta parte del laboratorio es `templates/transfer.html`,
+> `__init__.py`, `transfer.py`, y `bank.py` en el directorio zoobar.
 >
->Para verificar si tu solución funciona correctamente, necesitas ejecutar nuevamente
-`./check-symex-zoobar.py` y ver si
-la salida contiene los mensajes `WARNING: Balance mismatch detected`
-y `WARNING: Zoobar theft detected`. Alternativamente, puedes
-ejecutar `make check`, que hará esto por
-ti (ejecuta `check-symex-zoobar.py` y busca estas cadenas mágicas).
+> **Nota:** No necesitas entregar nada para este ejercicio, pero asegúrate
+> de que entiendes la estructura de la aplicación `zoobar`--¡te ahorrará
+> tiempo en el futuro!
 
+## Separación de privilegios
 
-Finalmente, tu trabajo es corregir estos dos bugs (desajuste del balance de zoobars
-y robo de zoobars), y asegurarte de que tu sistema de ejecución simbólica
-reporte correctamente que estos bugs ya no son alcanzables.
-Para corregir los bugs, pedimos que *no* modifiques el código fuente original
-de Zoobar en el directorio `zoobar`, para que
-`make check` pueda seguir funcionando. En su lugar, por favor haz una copia de cualquier
-archivo `.py` que quieras corregir del directorio zoobar en
-`zoobar-fixed`. Luego usa el script `check-symex-zoobar-fixed.sh`
-para ver si tus correcciones funcionan correctamente.
+Habiendo examinado el código de la aplicación `zoobar`, vale la pena empezar a pensar
+sobre cómo aplicar separación de privilegios a la infraestructura `zookws` y
+zoobar para que los bugs en la infraestructura no permitan a un
+adversario, por ejemplo, transferir zoobars a la cuenta del adversario.
 
-Ya corregimos el bug de inyección eval para ti, en
-`zoobar-fixed/transfer.py`. También debes asegurarte de que tu
-sistema de ejecución concolica ya no reporte bugs de inyección eval.
+El servidor web para este laboratorio usa contenedores para diferentes partes del servidor
+web. Los contenedores están definidos en `zook.conf`.
+`zookld.py` usa `zookconf.py` para leer `zook.conf`
+(vía `readconf.py`) y configurar los contenedores. Como parte de este laboratorio
+definirás nuevos contenedores y modificarás cómo se configuran los contenedores. Para ese
+propósito necesitas trabajar con LXC y podrías encontrar útil referirte a la
+documentación sobre [LXC](https://linuxcontainers.org/lxc/introduction/).
 
->**Ejercicio 10**.
->Corrige los dos bugs que encontraste en el Ejercicio 9, copiando los archivos `.py`
-que necesites modificar del directorio `zoobar` a
-`zoobar-fixed` y cambiándolos allí.
+Dos aspectos hacen que la separación de privilegios sea desafiante en el mundo real y en
+este laboratorio. Primero, la separación de privilegios requiere que desarmes la
+aplicación y la dividas en piezas separadas. Aunque hemos tratado de
+estructurar la aplicación bien para que sea fácil de dividir, hay lugares
+donde debes rediseñar ciertas partes para hacer posible la separación de privilegios.
+Segundo, debes asegurar que cada pieza se ejecute con privilegios mínimos, lo que
+requiere configurar permisos precisamente y configurar las piezas
+correctamente. Con suerte, al final de este laboratorio, tendrás una mejor
+comprensión de por qué muchas aplicaciones tienen vulnerabilidades de seguridad relacionadas
+con la falla de separar privilegios adecuadamente: ¡la separación de privilegios adecuada es
+difícil!
+
+Un problema en el que podrías encontrarte es que es complicado hacer debug de una aplicación
+compleja que está compuesta de muchas piezas. Para ayudarte, hemos proporcionado
+una librería de debug simple en `debug.py`, que es importada por cada
+script de Python que te damos. La librería de debug proporciona una sola
+función, `log(msg)`, que imprime el mensaje `msg` a
+`stderr` (que debería ir a la terminal donde ejecutaste `zookld`),
+junto con un stack trace de dónde se llamó la función `log`.
+
+Toda la salida del código ejecutándose en varios contenedores que veas en tu
+terminal también debería estar prefijada con el nombre del contenedor.
+Por ejemplo, cuando veas `main: zookd2: Forwarding to 10.1.1.4:8081
+for /zoobar/media/zoobar.css`, significa que el mensaje viene del
+contenedor `main`.
+
+Si algo no parece estar funcionando, intenta averiguar qué salió mal, o
+contacta al personal del curso (profesor o ayudantes), antes de proceder.
+
+## Parte 1: Separar privilegios de la configuración del servidor web usando contenedores
+
+En el lab 1, `zookws` consistía esencialmente de un proceso:
+`zookd`. Desde el punto de vista de seguridad, esta estructura no es ideal:
+por ejemplo, cualquier buffer overflow que encontraste, puedes usarlo para tomar
+control de `zookws`. Por ejemplo, puedes invocar los scripts dinámicos con
+argumentos de tu elección (e.g., darte muchos zoobars a ti mismo), o más simple,
+solo escribir la base de datos que contiene las cuentas de `zoobar` directamente.
+
+Este laboratorio refactoriza `zookd`
+siguiendo el diseño [OKWS](https://okws.org/). Similar a OKWS,
+`zookws` consiste de un programa launcher `zookld.py` que
+lanza servicios configurados en el archivo `zook.conf`, un
+`zookd` que solo enruta solicitudes a servicios correspondientes, así como
+varios servicios. Por simplicidad `zookws` no implementa `helper` o
+`daemon logger` como lo hace OKWS. Puedes pensar en `zookld.py` como una versión
+minimalista de Kubernetes.
+
+Ejecutaremos cada componente en un contenedor Linux separado. Los contenedores Linux
+proporcionan la ilusión de una máquina Linux virtual sin usar máquinas virtuales;
+están implementados usando procesos Linux. Un proceso en un contenedor está
+más aislado que los procesos Linux estándar: un proceso dentro de un contenedor
+tiene acceso limitado a los namespaces del kernel, tiene acceso limitado a las system calls,
+y no tiene acceso al sistema de archivos. En muchos aspectos, se comportan como máquinas
+virtuales: se inician desde una imagen de maquina virtual, tienen su propia dirección IP, su
+propio sistema de archivos, etc. Les asignas direcciones IP, copias los archivos correctos
+en ellos, y arreglas llamadas a procedimientos remotos entre ellos.
+
+Usaremos contenedores _sin privilegios_, que se ejecutan como un proceso de usuario
+sin privilegios (i.e., no root). Incluso si el proceso ejecutándose dentro del
+contenedor se ejecuta con privilegios de root, el contenedor mismo se ejecuta como un
+usuario sin privilegios.
+
+Con contenedores, incluso si hay un exploit (e.g., otro buffer overflow
+en zookd), el contenedor ejecutando `zookd` le dará al atacante
+poco control. Por ejemplo, tomar control de `zookd`, no permitirá al
+atacante invocar los scripts dinámicos o escribir la base de datos directamente que se ejecuta
+dentro de otro contenedor. Además, `zookd` no puede salir de su
+contenedor y tomar control del kernel Linux subyacente.
+
+El archivo `zook.conf` es el archivo de configuración que especifica cómo
+cada contenedor debería ejecutarse. Por ejemplo, la entrada `main`:
+
+```
+[main]
+    cmd = zookd2
+    dir = /home/student
+    lxcbr = 0
+    port = 8080
+    http_svcs = zookfs
+
+```
+
+especifica que el comando para ejecutar `main` es `zookd2`, en el directorio
+`/home/student/` en un contenedor conectado a la red virtual 0
+(`lxcbr`, abreviación de LXC bridge), y
+que `cmd` obtiene el puerto `8080` para recibir/enviar solicitudes.
+
+En la VM del laboratorio que estás usando, pre-creamos 10 redes virtuales,
+`lxcbr0` a través de `lxcbr9`, que puedes usar, correspondiendo
+a las direcciones de red `10.1.0.*` a través de `10.1.9.*`
+respectivamente (o `10.1.0.0/24` a través de `10.1.9.0/24` en
+notación [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)). Cada contenedor obtiene la dirección IP .4 en la subred de su
+red virtual; por ejemplo, si asignas algún servicio a `lxcbr = 7`,
+tendrá la dirección IP `10.1.7.4`.
+
+La razón para tener múltiples redes virtuales es proporcionar un fuerte aislamiento de red
+entre contenedores. Los contenedores conectados a la misma red virtual
+pueden enviarse paquetes directamente entre ellos, y un contenedor comprometido podría falsificar
+paquetes de la dirección IP de otro contenedor. Por otro lado, los contenedores
+en diferentes redes virtuales deben pasar por el kernel Linux del host para enrutar
+paquetes, y el kernel Linux asegura que los paquetes que vienen de una red virtual
+no falsifiquen una dirección de origen de una red virtual diferente (habilitado
+por la opción del kernel [rp_filter](https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt)).
+
+Por defecto, cada contenedor permite paquetes entrantes de cualquier otro
+contenedor. Restringirás esto más tarde en el laboratorio, y el uso de
+redes virtuales separadas asegurará que un contenedor comprometido no pueda
+evadir estas restricciones a nivel de red.
+
+El archivo `zook.conf` configura solo un servicio HTTP (a través de
+la línea `http_svcs`), `zookfs`, que tanto sirve archivos
+estáticos como ejecuta scripts dinámicos. Más adelante en este laboratorio, necesitarás
+ejecutar múltiples servicios HTTP, lo que puedes hacer listando todos ellos,
+separados por coma, en la línea `http_svcs`; por ejemplo,
+`http_svcs = first,second,third`.
+
+El servicio `zookfs` funciona
+invocando el ejecutable `zookfs`, que se ejecuta en el directorio
+`/home/student` en el contenedor conectado a `lxcbr = 1`
+(y por tanto con dirección IP `10.1.1.4`).
+
+Las líneas `fwrule` que ves comentadas en la descripción del servicio `zookfs`
+en `zook.conf`
+especifican filtros que controlan la comunicación a ese contenedor:
+
+```
+[zookfs]
+    cmd = zookfs
+    url = .*
+    dir = /home/student
+    lxcbr = 1
+    port = 8081
+    ## Filter rules are inserted in the order they appear in this file.
+    ## Thus, in the below example (commented out initially) the first
+    ## filters applied are the ACCEPT ones, and then the REJECT one.
+    ## Use `iptables -nvL INPUT' on the appropriate container to see all
+    ## the filters that are in effect on that container.
+    # fwrule = -s main -j ACCEPT
+    # fwrule = -s echo -j ACCEPT
+    # fwrule = -j REJECT
+
+```
+
+Por ejemplo, las reglas comentadas permiten paquetes de los contenedores `main`
+y `echo`, pero bloquean todos los otros paquetes. Cambiarás
+estas reglas (y definirás reglas similares para otros contenedores)
+mientras separamos privilegios más zookws.
+
+Comenzaremos a separar privilegios más el servicio `zookfs` que
+maneja tanto archivos estáticos como scripts dinámicos. Aunque se ejecuta en un contenedor,
+algunos scripts de Python podrían tener fácilmente agujeros de seguridad; un script de Python vulnerable
+podría ser engañado para eliminar archivos estáticos importantes que el servidor está
+sirviendo. Por el contrario, el código de servicio de archivos estáticos podría ser engañado para servir
+las bases de datos usadas por los scripts de Python, como `person.db`
+y `transfer.db`. Una mejor organización es dividir `zookfs`
+en dos servicios, uno para archivos estáticos y el otro para scripts de Python,
+ejecutándose como usuarios diferentes.
+
+> **Ejercicio 2.**
+> Modifica zook.conf para reemplazar `zookfs` con
+> dos servicios separados, `dynamic` y `static`.
+> Ambos deberían usar `cmd = zookfs`.
 >
->Recuerda que nuestra verificación para los ejercicios 3-6, donde implementaste el núcleo
-del sistema de ejecución concolica, no estaba completa. Si estás teniendo
-problemas con este ejercicio, puede ser que no implementaste los ejercicios
-3-6 correctamente, por lo que puede que necesites volver y corregirlos.
+> `dynamic` debería ejecutar solo `/zoobar/index.cgi`
+> (que ejecuta todos los scripts de Python), pero no debería servir ningún archivo
+> estático.
+> static debería servir archivos estáticos pero no ejecutar nada.
 >
->Para verificar si tu solución funciona correctamente, necesitas ejecutar
-`./check-symex-zoobar-fixed.sh` y ver si la
-salida todavía contiene los mensajes `Exception: eval injection`,
-`WARNING: Balance mismatch detected` y
-`WARNING: Zoobar theft detected`. Alternativamente, puedes ejecutar
-`make check`, que hará esto por ti.
+> Para eliminar el contenedor `zookfs` para que `zookld.py`
+> no lo inicie, ejecuta ./zookclean.py zookfs.
+>
+> Ejecuta los servicios dynamic y static en diferentes redes virtuales.
+>
+> Esta separación requiere que zookd determine cuál
+> servicio debería manejar una solicitud particular.
+> Puedes usar el filtrado de URL de `zookws` para hacer esto,
+> sin modificar la aplicación o las URLs que usa.
+> Los filtros de URL están especificados en zook.conf,
+> y soportan expresiones regulares.
+> Por ejemplo, `url = .*` coincide con todas las solicitudes, mientras que
+> `url = /zoobar/(abc|def)\.html` coincide con solicitudes
+> a `/zoobar/abc.html` y `/zoobar/def.html`.
+>
+> Para este ejercicio, solo deberías modificar zook.conf; no modifiques código C o
+> Python.
+>
+> Ejecuta make check para verificar que
+> tu configuración modificada pase nuestras pruebas.
 
+Nos gustaría controlar con quién dynamic y static pueden comunicarse. Por
+ejemplo, incluso si static fuera comprometido, queremos que el atacante sea
+incapaz de comunicarse con dynamic, haciendo más difícil para el atacante
+comprometer dynamic también. Por tanto, nos gustaría configurar reglas de
+firewall en cada contenedor para hacer cumplir este aislamiento. Usaremos
+[iptables](https://wiki.archlinux.org/index.php/iptables)
+para insertar reglas de filtro en cada contenedor, para que static solo
+acepte paquetes de main (que ejecuta zookd). Esto asegura
+que dynamic no pueda enviar paquetes directamente a static.
+Similarmente, dynamic debería solo aceptar paquetes de main,
+y no de static. Configurar reglas de seguridad como estas es
+a menudo referido como segregación de red.
 
-¡Estás listo!
-Envía tus respuestas a la tarea del laboratorio ejecutando
-make prepare-submit y sube el archivo resultante
-lab3-handin.tar.gz a Canvas.
+> **Ejercicio 3.**
+> Escribe entradas fwrule apropiadas
+> para main, static, y dynamic para limitar la
+> comunicación como se especifica arriba.
+>
+> Si obtienes los filtros incorrectos, podrías ser incapaz de conectarte con cualquier
+> contenedor. Puedes resetear el firewall para permitir toda
+> comunicación deteniendo e iniciando los contenedores de nuevo,
+> usando `zookstop.py` seguido de `zookld.py`.
 
+## Interludio: Librería RPC
+
+En esta parte, separarás privilegios de la aplicación zoobar
+en sí en varios procesos, ejecutándose en diferentes contenedores. Nos gustaría
+limitar el daño de cualquier bug futuro que surja. Es decir, si una pieza de
+la aplicación `zoobar` tiene un bug explotable, nos gustaría prevenir que un
+atacante use ese bug para entrar en otras partes de la aplicación
+zoobar.
+
+Un desafío al dividir la aplicación `zoobar` en varios contenedores
+es que los procesos dentro de los contenedores deben tener una manera de comunicarse entre
+ellos. Primero estudiarás una librería de Remote Procedure Call (RPC) que permite
+a los procesos comunicarse. Luego, usarás esa librería para
+separar `zoobar` en varios procesos, cada uno dentro de su propio contenedor,
+que se comunican usando RPC.
+
+Para ilustrar cómo se podría usar nuestra librería RPC, hemos implementado un servicio
+"echo" simple para ti, en `zoobar/echo-server.py`. Este servicio es
+invocado por `zookld` y se ejecuta dentro de su propio contenedor; busca
+la sección echo de `zook.conf` para ver cómo se inicia.
+
+`echo-server.py` está implementado definiendo una clase RPC
+`EchoRpcServer` que hereda de `RpcServer`, que a su vez
+viene de `zoobar/rpclib.py`. La clase RPC `EchoRpcServer`
+define los métodos que el servidor soporta, y `rpclib` invoca esos
+métodos cuando un cliente envía una solicitud. El servidor define un método simple que
+hace echo de la solicitud de un cliente.
+
+`echo-server.py` inicia el servidor llamando a
+`run_fork(port)`. Esta función escucha en un
+socket TCP. El puerto viene del argumento, que en
+este caso es `8081` (especificado en `zook.conf`).
+Cuando un cliente se conecta a este socket, la función hace fork del proceso
+actual. Una copia del proceso recibe mensajes y responde en
+la conexión recién abierta, mientras que el otro proceso escucha otros
+clientes que podrían abrir el socket.
+
+También hemos incluido un cliente simple de este servicio echo como parte
+de la aplicación web Zoobar. En particular, si vas a la
+URL `/zoobar/index.cgi/echo?s=hello`, la solicitud se enruta
+a `zoobar/echo.py`. Ese código usa el cliente RPC (implementado
+por `rpclib`) para conectarse al servicio echo en (dirección IP del host,
+puerto). El cliente busca la (dirección IP del host, puerto)
+en zook.conf. El cliente invoca la operación echo. Una vez que
+recibe la respuesta del servicio echo, retorna una página web conteniendo
+la respuesta con echo.
+
+El código del lado cliente RPC en rpclib está implementado por el
+método call de la clase RpcClient. Este método
+formatea los argumentos en una cadena, escribe la cadena en la conexión
+al servidor, y espera una respuesta (una cadena). Al recibir la
+respuesta, call parsea la cadena, y retorna los resultados al
+llamador.
+
+## Parte 2: Separar privilegios del servicio de login en Zoobar
+
+Ahora usaremos la librería RPC para mejorar la seguridad de las
+contraseñas de usuario almacenadas en la aplicación web Zoobar. Ahora mismo, un adversario que
+explota una vulnerabilidad en cualquier parte de la aplicación Zoobar puede obtener todas las
+contraseñas de usuario de la base de datos person.
+
+El primer paso hacia proteger las contraseñas será crear un servicio
+que maneje contraseñas de usuario y cookies, para que solo ese servicio
+pueda acceder a ellas directamente, y el resto de la aplicación Zoobar no pueda.
+En particular, queremos separar el código que maneja la autenticación de usuario
+(i.e., contraseñas y tokens) del resto del código de la aplicación. La aplicación
+zoobar actual almacena todo sobre el usuario (su perfil,
+su balance de zoobar, y información de autenticación) en la tabla Person
+(ver `zoodb.py`). Queremos mover la información de autenticación fuera de
+la tabla Person a una tabla Cred separada (Cred significa
+Credentials), y mover el código que accede a esta información de
+autenticación (i.e., `auth.py`) a un servicio separado.
+
+Nota que no es completamente necesario dividir los datos en
+tablas separadas para seguridad: cada contenedor terminaría con su
+propia copia de la base de datos, y no tendría datos en las partes de la
+base de datos que nunca pobló. Dividimos los datos en tablas
+separadas de todos modos, porque ayuda a entender cómo dividir los servicios
+correctamente.
+
+Específicamente, tu trabajo será el siguiente:
+
+- Decide qué interfaz debería proporcionar tu servicio de autenticación
+  (i.e., qué funciones ejecutará para clientes). Mira el
+  código en `login.py` y `auth.py`, y decide qué
+  necesita ejecutarse en el servicio de autenticación, y qué puede ejecutarse en
+  el cliente (i.e., ser parte del resto del código zoobar). Ten
+  en mente que tu objetivo es proteger tanto contraseñas como tokens.
+  Hemos proporcionado stubs RPC iniciales para el cliente en el archivo
+  `zoobar/auth_client.py`.
+- Crea un nuevo servicio auth para autenticación de usuario, siguiendo las líneas de
+  `echo-server.py`. Hemos proporcionado un archivo inicial para
+  ti, `zoobar/auth-server.py`, que deberías modificar para
+  este propósito. La implementación de este servicio debería usar las
+  funciones existentes en `auth.py`.
+- Modifica `zook.conf` para iniciar el `auth-server`
+  apropiadamente (en un contenedor en una red virtual diferente).
+- Divide las credenciales de usuario (i.e., contraseñas y tokens) de
+  la base de datos Person en una base de datos Cred
+  separada, almacenada en /zoobar/db/cred. No mantengas ninguna
+  contraseña o token en la base de datos Person antigua.
+- Modifica el código de login en `login.py` para invocar tu
+  servicio auth en lugar de llamar a `auth.py` directamente.
+
+> **Ejercicio 4.**
+> Implementa separación de privilegios para autenticación de usuario, como se describe arriba.
+>
+> Un buen punto de partida sería primero dividir las credenciales
+> originalmente almacenadas en la base de datos Person en una base de datos
+> Cred separada, pero aún hacer todo en el servicio
+> dynamic. No olvides crear una entrada regular de base de datos Person
+> para usuarios recién registrados.
+>
+> Una vez que eso funcione, agrega llamadas de función explícitas entre el código que
+> esperas que aún viva en el servicio dynamic (que no
+> toca Cred) y las funciones que eventualmente moverás
+> al auth-server (que sí toca Cred). Asegúrate
+> de que esto funcione solo con funciones primero, sin mover realmente el código
+> a un auth-server separado.
+>
+> Finalmente, configura auth-server.py para ejecutar el código manejando la
+> base de datos Cred, y convierte las llamadas de función del paso
+> anterior en RPCs reales al auth-server.
+>
+> Ejecuta make check para verificar que
+> tu servicio de autenticación con separación de privilegios pase nuestras pruebas.
+
+> Ejercicio 5.
+> Especifica las entradas fwrule apropiadas para auth.
+
+Ahora, mejoraremos aún más la seguridad de las contraseñas, usando
+hashing y salting. El código de autenticación actual almacena una copia
+exacta de la contraseña del usuario en la base de datos. Así, si un adversario
+de alguna manera obtiene acceso al archivo cred.db, todas las contraseñas de
+usuario estarán inmediatamente comprometidas. ¡Peor aún, si los usuarios tienen
+la misma contraseña en múltiples sitios, el adversario podrá
+comprometer las cuentas de usuario allí también!
+
+El hashing protege contra este ataque, almacenando un hash de la
+contraseña del usuario (i.e., el resultado de aplicar una función hash a la contraseña),
+en lugar de la contraseña misma. Si la función hash es difícil de
+invertir (i.e., es un hash criptográficamente seguro), un adversario no
+podrá obtener directamente la contraseña del usuario. Sin embargo, un servidor
+aún puede verificar si un usuario proporcionó la contraseña correcta durante el login:
+solo hará hash de la contraseña del usuario, y verificará si el valor hash
+resultante es el mismo que se almacenó previamente.
+
+Una debilidad con el hashing es que un adversario puede construir una tabla
+gigante (llamada "rainbow table"), conteniendo los hashes de todas las contraseñas
+posibles. Entonces, si un adversario obtiene la contraseña con hash de alguien,
+el adversario puede simplemente buscarla en su tabla gigante, y obtener la
+contraseña original.
+
+Para derrotar el ataque de rainbow table, la mayoría de sistemas usan _salting_.
+Con salting, en lugar de almacenar un hash de la contraseña, el servidor
+almacena un hash de la contraseña concatenada con una cadena
+generada aleatoriamente (llamada salt). Para verificar si la contraseña es correcta, el servidor
+concatena la contraseña proporcionada por el usuario con el salt, y verifica si el
+resultado coincide con el hash almacenado. Nota que, para que esto funcione, ¡el servidor
+debe almacenar el valor salt usado para calcular originalmente el hash con salt!
+Sin embargo, debido al salt, el adversario ahora tendría que generar
+una tabla rainbow separada para cada valor salt posible. Esto aumenta
+enormemente la cantidad de trabajo que el adversario tiene que realizar para
+adivinar contraseñas de usuario basándose en los hashes.
+
+Una consideración final es la elección de la función hash. La mayoría de funciones
+hash, como MD5 y SHA1, están diseñadas para ser rápidas. Esto significa que
+un adversario puede probar muchas contraseñas en un período corto de tiempo, ¡lo que
+no es lo que queremos! En su lugar, deberías usar una función tipo hash especial
+que esté explícitamente diseñada para ser _lenta_. Un buen ejemplo de tal
+función hash es [PBKDF2](https://en.wikipedia.org/wiki/PBKDF2),
+que significa Password-Based Key Derivation Function (versión 2).
+
+> Ejercicio 6.
+> Implementa hashing y salting de contraseñas en tu servicio de autenticación.
+> En particular, necesitarás extender tu tabla Cred para incluir
+> una columna salt; modifica el código de registro para elegir un salt
+> aleatorio, y para almacenar un hash de la contraseña junto con el salt, en lugar
+> de la contraseña misma; y modifica el código de login para hacer hash de la contraseña
+> proporcionada junto con el salt almacenado, y compararla con el hash
+> almacenado. No elimines la columna password de la tabla Cred
+> (la verificación para el ejercicio 5 requiere que esté presente); puedes almacenar
+> la contraseña con hash en la columna password existente.
+>
+> Para implementar hashing PBKDF2, puedes usar el
+> [módulo Python PBKDF2](https://www.dlitz.net/software/python-pbkdf2/).
+> Aproximadamente, deberías importar `pbkdf2`, y luego hacer hash de
+> una contraseña usando `pbkdf2.PBKDF2(password, salt).hexread(32)`.
+> Hemos proporcionado una copia de `pbkdf2.py` en el directorio
+> zoobar. No uses la función `random.random` para generar un salt
+> ya que [la documentación del módulo random](https://docs.python.org/3/library/random.html)
+> establece que no es criptográficamente seguro. Una alternativa segura es
+> la función `os.urandom`.
+>
+> Ejecuta make check para verificar que tu
+> código de hashing y salting pase nuestras pruebas. Ten en mente que nuestras pruebas
+> no son exhaustivas.
+
+Un efecto secundario sorprendente de usar una función hash muy computacionalmente costosa
+como PBKDF2 es que un adversario ahora puede usar esto
+para lanzar ataques de denegación de servicio (DoS) en la CPU del servidor.
+Por ejemplo, el popular framework web Django publicó un
+[aviso de seguridad](https://www.djangoproject.com/weblog/2013/sep/15/security/)
+sobre esto, señalando que si un adversario trata de iniciar
+sesión en alguna cuenta proporcionando una contraseña muy grande (1MB de tamaño),
+el servidor pasaría un minuto entero tratando de calcular PBKDF2 en esa
+contraseña. La solución de Django es limitar las contraseñas proporcionadas a máximo 4KB
+de tamaño. Para este laboratorio, no requerimos que manejes tales ataques DoS.
+
+## Parte 3: Separar privilegios del banco en Zoobar
+
+Finalmente, queremos proteger el balance de `zoobar` de cada usuario de
+adversarios que podrían explotar algún bug en la aplicación Zoobar.
+Actualmente, si un adversario explota un bug en la aplicación principal Zoobar,
+puede robar los zoobars de cualquier otra persona, y esto ni siquiera aparecería
+en la base de datos Transfer si quisiéramos auditar las cosas más tarde.
+
+Para mejorar la seguridad de los balances de zoobar, nuestro plan es similar a lo que
+hiciste arriba en el servicio de autenticación: dividir la información de
+balance de `zoobar` en una base de datos Bank separada, y configurar
+un servicio bancario, cuyo trabajo es realizar operaciones en la
+nueva base de datos Bank y la base de datos Transfer existente.
+Mientras solo el servicio bancario pueda modificar las bases de datos Bank
+y Transfer, los bugs en el resto de la aplicación Zoobar
+no deberían dar a un adversario la capacidad de modificar balances de zoobar, y
+asegurará que todas las transferencias se registren correctamente para futuras auditorías.
+
+> **Ejercicio 7.**
+> Separa privilegios de la lógica bancaria en un servicio bancario separado, siguiendo las
+> líneas del servicio de autenticación. Tu servicio debería implementar
+> las funciones transfer y balance, que actualmente están
+> implementadas por `bank.py` y llamadas desde varios lugares en el
+> resto del código de la aplicación.
+>
+> Deberías dividir la información de balance de `zoobar` en
+> una base de datos Bank separada (en `zoodb.py`);
+> implementar el servidor bancario modificando `bank-server.py`;
+> agregar el servicio bancario a `zook.conf`;
+> crear stubs RPC del cliente para invocar el servicio bancario;
+> y modificar el resto del código de la aplicación para invocar los stubs
+> RPC en lugar de llamar a las funciones de `bank.py` directamente.
+>
+> No olvides manejar el caso de creación de cuenta, cuando el nuevo usuario
+> necesita obtener 10 zoobars iniciales. Esto puede requerir que cambies la
+> interfaz del servicio bancario.
+>
+> Ejecuta make check para verificar que
+> tu servicio bancario con separación de privilegios pase nuestras pruebas.
+
+Finalmente, necesitamos arreglar un problema más con el servicio bancario.
+En particular, un adversario que puede acceder al servicio bancario (i.e.,
+puede enviarle solicitudes RPC) puede realizar transferencias desde la cuenta de
+_cualquiera_ a la suya propia. Por ejemplo, puede robar 1 `zoobar` de cualquier víctima
+simplemente emitiendo una solicitud RPC transfer(victim, adversary, 1).
+El problema es que el servicio bancario no tiene idea de quién está invocando la
+operación de transferencia. Algunas librerías RPC proporcionan autenticación,
+pero nuestra librería RPC es bastante simple, así que tenemos que agregarla explícitamente.
+
+Para autenticar al llamador de la operación de transferencia,
+requeriremos que el llamador proporcione un argumento token extra,
+que debería ser un token válido para el remitente. El servicio bancario debería
+rechazar transferencias si el token es inválido.
+
+> **Ejercicio 8.**
+> Agrega autenticación al RPC de transferencia en el servicio bancario.
+> El token del usuario actual es accesible como `g.user.token`.
+> ¿Cómo debería el banco validar el token proporcionado?
+
+> **Ejercicio 9.**
+> Especifica las entradas `fwrule` apropiadas para el servicio
+> bancario.
+
+## Parte 4: Sandboxing del lado del servidor para perfiles ejecutables
+
+En esta parte final, implementarás el sandboxing para perfiles ejecutables, lo cual es desafiante porque necesitamos aislar los perfiles de diferentes usuarios entre sí y del resto del sistema.
+
+Utilizaremos dos métodos para la separación de privilegios. Usaremos un contenedor para ejecutar el servicio de perfiles, similar a las partes anteriores de este laboratorio. El servicio de perfiles tendrá varios procesos Unix: un proceso para el servidor de perfiles, que hace fork para cada solicitud de otros dos procesos (es decir, uno para el `ProfileAPIServer` y uno para el sandbox). Para separar el proceso sandbox (que ejecuta código no confiable) del servidor de perfiles, usaremos mecanismos Unix para reducir los privilegios del proceso sandbox.
+
+Debes familiarizarte con los siguientes componentes nuevos relacionados con perfiles ejecutables:
+
+- Primero, el directorio `profiles/` contiene varios perfiles ejecutables, que usarás como ejemplos:
+  - `profiles/hello-user.py` es un perfil simple que imprime de vuelta el nombre del visitante cuando se ejecuta el código del perfil, junto con la hora actual.
+  - `profiles/visit-tracker.py` lleva un registro de la última vez que cada visitante vio el perfil, e imprime la hora de la última visita (si la hay).
+  - `profiles/last-visits.py` registra los últimos tres visitantes del perfil, y los imprime.
+  - `profiles/xfer-tracker.py` imprime la última transferencia de zoobar entre el propietario del perfil y el visitante.
+  - `profiles/granter.py` le da al visitante un zoobar. Para asegurar que los visitantes no puedan robar rápidamente todos los zoobars de un usuario, este perfil otorga un zoobar solo si el propietario del perfil tiene algunos zoobars restantes, el visitante tiene menos de 20 zoobars, y ha pasado al menos un minuto desde la última vez que ese visitante obtuvo un zoobar de este perfil.
+
+- Segundo, `zoobar/sandboxlib.py` es un módulo Python que implementa sandboxing para código de perfil Python no confiable; ver la clase Sandbox, y el método `run()` que ejecuta una función especificada en el sandbox. El método run funciona haciendo fork de un proceso separado y llamando `setresuid` en el proceso hijo antes de ejecutar el código no confiable, para que el código no confiable no tenga ningún privilegio. El proceso padre lee la salida del proceso hijo (es decir, el código no confiable) y devuelve esta salida al llamador de `run()`. Si el hijo no sale después de un timeout corto (5 segundos por defecto), el proceso padre mata al hijo.
+  `Sandbox.run()` usa `chroot` para restringir el código no confiable a un directorio específico, pasado como argumento al constructor de Sandbox. Esto permite que el código de perfil no confiable realice algún acceso limitado al sistema de archivos, pero el creador de Sandbox decide qué directorio es accesible para el código del perfil.
+
+Sandbox usa solo un ID de usuario para ejecutar perfiles no confiables. Esto significa que es importante que como máximo un perfil se esté ejecutando en el sandbox a la vez. De lo contrario, un proceso en sandbox podría interferir con otro proceso en sandbox, ¡ya que ambos tienen el mismo ID de usuario! Para hacer cumplir esta garantía, Sandbox usa un archivo de bloqueo; cada vez que intenta ejecutar un sandbox, primero bloquea el archivo de bloqueo, y lo libera solo después de que el proceso en sandbox haya salido. Si dos procesos intentan ejecutar algún código en sandbox al mismo tiempo, solo uno obtendrá el archivo de bloqueo a la vez. Es importante que todos los usuarios de Sandbox especifiquen el mismo nombre de archivo de bloqueo si usan el mismo UID.
+
+¿Cómo sabe Sandbox que algún código en sandbox ha salido completamente y es seguro reutilizar el ID de usuario para ejecutar el perfil de un usuario diferente? Después de todo, el código no confiable podría haber hecho fork de otro proceso, y está esperando que algún otro perfil comience a ejecutarse con el mismo ID de usuario. Para prevenir esto, Sandbox usa los límites de recursos de Unix: usa setrlimit para limitar el número de procesos con un ID de usuario dado, para que el código en sandbox simplemente no pueda hacer fork. Esto significa que, después de que el proceso padre mata al proceso hijo (o nota que ha salido), puede concluir con seguridad que no hay procesos restantes con ese ID de usuario.
+
+- La pieza final de código es `zoobar/profile-server.py`: un servidor RPC que acepta solicitudes para ejecutar el código de perfil de algún usuario, y devuelve la salida de ejecutar ese código.
+  Este servidor usa `sandboxlib.py` para crear un Sandbox y ejecutar el código del perfil en él (vía la función run_profile). `profile-server.py` también configura un servidor RPC que permite que el código del perfil obtenga acceso a cosas fuera del sandbox, como los balances de zoobar de diferentes usuarios. El `ProfileAPIServer` implementa esta interfaz; `profile-server.py` hace fork de un proceso separado para ejecutar el `ProfileAPIServer`, y también pasa un cliente RPC conectado a este servidor al código de perfil en sandbox.
+
+Debido a que `profile-server.py` usa `sandboxlib.py`, que a su vez necesita llamar `setresuid` para hacer sandbox de algún proceso, el proceso principal de `profile-server.py` necesita ejecutarse como _root_. Como nota al margen, esta es una limitación algo irónica de los mecanismos Unix: si quieres mejorar tu seguridad ejecutando código no confiable con un ID de usuario diferente, te ves obligado a ejecutar alguna parte de tu código como _root_, lo cual es algo peligroso desde una perspectiva de seguridad.
+
+Un desafío es que el servicio de perfil realiza rpc_xfer desde la cuenta del propietario del perfil, lo cual requiere un token para el propietario. No puedes simplemente agregar un RPC al servicio de autenticación para obtener un token para el propietario del perfil, porque entonces cualquier servicio podría pedirlo; queremos que solo el servicio de perfil pueda hacer esta transferencia. De manera similar, no podemos agregar un RPC al servicio bancario para hacer una transferencia desde la cuenta de cualquiera sin un token.
+
+Queremos hacer la transferencia desde la cuenta del propietario del perfil solo si la solicitud vino del servicio de perfil. Por lo tanto, el servicio bancario debe poder autenticar que una solicitud vino del servicio de perfil. Para ayudarte a hacerlo, `rpclib.py` proporciona el nombre del servicio que llama en `self.caller`, basado en la dirección IP de la conexión desde la cual recibió la solicitud.
+
+Para comenzar, necesitarás agregar el servicio de perfil a tu zook.conf. Ejecuta el servicio en su propio contenedor y en su propio enlace de red.
+
+> **Ejercicio 10.** Agrega `profile-server.py` a tu servidor web.
+>
+> Asegúrate de que tu sitio Zoobar pueda soportar todos los cinco perfiles.
+>
+> Ejecuta `make check` para verificar que tu configuración modificada pase nuestras pruebas. El caso de prueba crea algunas cuentas de usuario, almacena uno de los perfiles de Python en el perfil de un usuario, hace que otro usuario vea ese perfil, y verifica que el otro usuario vea la salida correcta.
+>
+> Si encuentras problemas con las pruebas de `make check`, siempre puedes revisar `/tmp/html.out` para la salida html de los perfiles.
+
+El diseño de arriba tiene dos problemas de seguridad. Primero, el sandbox se ejecuta con los mismos privilegios que el servidor de perfiles y puede acceder a cualquier archivo en el sistema de archivos del contenedor de perfiles, así como comunicarse en la red para emitir RPCs directamente al banco. Segundo, los perfiles de diferentes usuarios crean archivos en el mismo directorio `/tmp`. El siguiente ejercicio resuelve ambos problemas haciendo sandbox del código del perfil usando mecanismos Unix para la separación de privilegios.
+
+> **Ejercicio 11.**
+> Modifica `rpc_run` en `profile-server.py` para que el sandbox se ejecute con un UID no-root (por ejemplo, 6858 en lugar de 0). Además, asegúrate de que cada perfil de usuario tenga acceso a sus propios archivos, y no pueda manipular los archivos de otros perfiles de usuario (por ejemplo, crea un directorio único para cada usuario, y usa `chown` y `chmod` para controlar la propiedad y el acceso a ese directorio).
+>
+> Consulta las páginas de manual para `chown` y `chmod` para ver qué hacen. Pasa tu UID y `userdir` a `Sandbox.run()`. El código en `Sandbox.run()` llama `setresuid` y `chroot` por ti, y también llama `unshare(CLONE_NEWNET)` para prevenir que el código en sandbox se comunique directamente a través de la red. Mira las páginas de manual para aprender más sobre qué están haciendo esas operaciones.
+>
+> Recuerda considerar la posibilidad de nombres de usuario con caracteres especiales.
+>
+> Ejecuta `make check` para ver si tu implementación pasa nuestros casos de prueba.
+
+> **Ejercicio 12.**
+> Especifica las entradas `fwrule` apropiadas para `profile`
+> y otros servicios. Por ejemplo, `profile` no debería poder
+> comunicarse con `auth`.
+
+¡Ya terminaste con el sandbox básico!
+
+¡Terminaste!
+Ejecuta `make prepare-submit` y sube el archivo
+`lab2-handin.tar.gz` resultante
