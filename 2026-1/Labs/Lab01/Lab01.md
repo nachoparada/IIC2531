@@ -38,7 +38,7 @@ Para cada escenario presentado, debes escribir un análisis que incluya:
 
 Sé específico. No escribas generalidades como "el sistema debe ser seguro". En cambio, escribe cosas como "solo el dueño de una cuenta puede ver su historial de compras" (política) o "las contraseñas deben hashearse con bcrypt antes de almacenarse" (mecanismo).
 
-**Formato de entrega:** Un documento PDF con tu análisis para cada escenario. Usa el template proporcionado al final de este documento.
+**Formato de entrega:** Un archivo .md con tu análisis para cada escenario. Usa el template proporcionado al final de este documento.
 
 ---
 
@@ -294,4 +294,3 @@ que no están cubiertos por ninguna política?]
 
 ---
 
-*Este laboratorio está basado en el marco conceptual de MIT 6.858 Computer Security.*
