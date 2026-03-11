@@ -51,7 +51,7 @@ style: |
 
 ---
 
-# Separación de Privilegios en OKWS
+# La importancia de la Separación de Privilegios
 
   * El problema: ¿qué hacer con los bugs?
   * Plan A: encontrarlos, corregirlos, evitar crear nuevos
@@ -113,7 +113,7 @@ style: |
   * Necesita aislar (cliente/servidor, VMs, contenedores, procesos, etc.)
   * Necesita permitir interacción controlada
   * Necesita retener buen rendimiento
-  * Hemos visto estas ideas ya en papers anteriores
+  * Veremos varias de estas ideas en futuras clases:
     * La Arquitectura de Seguridad de Google hace gran cosa de separar servicios
     * U2F separa autenticación en un dispositivo físicamente separado
     * Ahora profundizaremos en un caso de estudio detallado, el servidor web OKWS de OkCupid
@@ -122,10 +122,12 @@ style: |
 
 # Principios de OKWS
 
-* Los procesos deben correr *chrooted*.
-* Los procesos deben correr como usuarios no privilegiados.
-* Los procesos deben tener privilegios mínimos de BD.
-* Funcionalidad independiente debe estar en procesos independientes.
+* Básicamente tenemos una aplicación monólitica que necesitamos separar
+* 4 principios
+  * Los procesos deben correr *chrooted*.
+  * Los procesos deben correr como usuarios no privilegiados.
+  * Los procesos deben tener privilegios mínimos de BD.
+  * Funcionalidad independiente debe estar en procesos independientes.
 
 ---
 
@@ -266,10 +268,6 @@ style: |
   * El paper argumenta que el aislamiento por usuario es demasiado costoso
   * El costo de iniciar un proceso (o mantener proceso ejecutándose) es alto,
     * comparado con el costo de procesar una solicitud HTTP
-  * Truco/tradeoff potencial del paper de Google:
-    * Un servicio ejecutándose pero solo puede actuar en nombre de algunos usuarios
-    * "Ticket de permiso de usuario final"
-  * ¿Tendrían sentido los permisos de usuario estilo Google en OKWS?
 
 ---
 
@@ -286,7 +284,7 @@ style: |
 
 ---
 
-# Lab 2 usa contenedores Linux (lxc)
+# Lab 1 usa contenedores Linux (lxc)
 
   * No existían cuando el autor construyó OKWS
   * Los contenedores proporcionan la ilusión de máquinas virtuales sin usar máquinas virtuales
@@ -303,12 +301,12 @@ style: |
   * Iniciados desde una imagen VM
   * Tienen su propia dirección IP
   * Tienen su propio sistema de archivos
-  * Lab 2 usa contenedores *no privilegiados*
+  * Lab 1 usa contenedores *no privilegiados*
     * Estos contenedores ejecutan como procesos de usuario no-root
     * Si el proceso dentro del contenedor ejecuta como root, aún privilegios limitados
   * Más difícil salir del contenedor que proceso con chroot
-  * Lab2 también usa chroot/uid para separar procesos privilegiados en un contenedor (perfil)
-    * Pero esa es la excepción, lab 2 principalmente depende de contenedores
+  * Lab1 también usa chroot/uid para separar procesos privilegiados en un contenedor (perfil)
+    * Pero esa es la excepción, lab 1 principalmente depende de contenedores
 
 ---
 
@@ -321,8 +319,8 @@ style: |
       * Usar RPC sobre TCP para comunicarse con otros contenedores
     * Limitar comunicación entre contenedores
       * Configurar reglas de firewall para limitar comunicación entre contenedores
-    * Lab 2 tiene zookld que hace esto; similar a okld
-  * El paper de arquitectura de Google usa máquinas físicas para dividir servicios
+    * Lab 1 tiene zookld que hace esto; similar a okld
+  * El paper que veremos de arquitectura de Google usa máquinas físicas para dividir servicios
     * Los contenedores soportan la misma idea usando una sola máquina física
 
 ---
@@ -346,7 +344,7 @@ style: |
   * Algunos sistemas con partición grano fino estilo OKWS:
     * proceso ssh-agent para mantener claves crypto, vs ssh mismo
     * Chrome ejecuta cada frame en un proceso aislado
-  * VMs, FreeBSD jail, contenedores Linux (Docker), Linux seccomp, etc.
+  * VMs, contenedores Linux (Docker), Linux seccomp, etc.
 
 ---
 
@@ -360,6 +358,7 @@ style: |
 
 ---
 
+# Extras
 ---
 
 # ¿Cómo podríamos orquestar permisos por usuario en OKWS?
