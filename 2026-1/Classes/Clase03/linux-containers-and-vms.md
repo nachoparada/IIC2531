@@ -81,18 +81,16 @@ style: |
 
 # Máquinas Virtuales v/s Containers
 
-  * Una CPU con muchos kernels
-  * v/s
-  * Un kernel con muchos espacios de usuario
+
+  * **Una CPU con muchos kernels** v/s **Un kernel con muchos espacios de usuario**
 
   * Qué es el kernel?
-
 
 ---
 
 # Máquinas Virtuales v/s Containers
 
-  ![vm_vs_containers.png align-center](vm_vs_containers.png)
+  ![w:550 align-center](vm_vs_containers.png)
 
 ---
 
