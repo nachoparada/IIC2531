@@ -1,21 +1,7 @@
 Introducción
 ------------
 
-Realizarás una secuencia de laboratorios en IIC2531. Estos laboratorios te darán
-experiencia práctica con ataques comunes y contramedidas. Para hacer los
-problemas concretos, explorarás los ataques y contramedidas en el
-contexto de la aplicación web `zoobar` de las siguientes maneras:
-
-* Lab 1: explorarás la aplicación web zoobar,
-y usarás ataques de Buffer overflow para romper sus propiedades de seguridad.
-* Lab 2: mejorarás la aplicación web `zoobar` usando separación de privilegios,
-de modo que si un componente es comprometido, el adversario no obtenga
-control sobre toda la aplicación web.
-* Lab 3: construirás una herramienta de análisis de programas basada en ejecución simbólica
-para encontrar errores en código Python como la aplicación web zoobar.
-* Lab 4: mejorarás la aplicación `zoobar` contra ataques del navegador.
-
-El Lab 1 te introducirá a las vulnerabilidades de Buffer overflow, en el contexto de un
+El Lab 3 te introducirá a las vulnerabilidades de Buffer overflow, en el contexto de un
 servidor web llamado `zookws`. El servidor web `zookws` ejecuta una
 aplicación web Python simple, `zoobar`, con la cual los usuarios transfieren "zoobars"
 (créditos) entre sí. Encontrarás Buffer overflows en
@@ -24,19 +10,6 @@ inyectar código en el servidor a través de la red, y descubrirás cómo evadir
 la protección de pila no ejecutable. Los laboratorios posteriores analizarán otros aspectos de seguridad de
 la infraestructura `zoobar` y `zookws`.
 
-Cada laboratorio requiere que aprendas un nuevo lenguaje de programación u otra pieza
-de infraestructura. Por ejemplo, en este laboratorio debes familiarizarte íntimamente
-con ciertos aspectos del lenguaje C, assembly x86, gdb,
-etc. Se necesita familiaridad detallada con muchas piezas diferentes de infraestructura
-para entender ataques y defensas
-en situaciones realistas: las debilidades de seguridad a menudo aparecen en casos extremos, y
-por eso necesitas entender los detalles para crear exploits y diseñar defensas para
-esos casos extremos. Estos dos factores (nueva infraestructura y detalles) pueden hacer
-que los laboratorios consuman mucho tiempo. Deberías comenzar temprano en los laboratorios y trabajar en ellos
-diariamente por un tiempo limitado (cada laboratorio tiene varios ejercicios), en lugar de tratar
-de hacer todos los ejercicios de una sola vez justo antes de la fecha límite. Tómate el tiempo para
-entender los detalles relevantes. Si te quedas atascado, publica una pregunta en Canvas.
-
 Varios laboratorios, incluyendo este, te piden que diseñes exploits. Estos exploits
 son lo suficientemente realistas como para que puedas usarlos para un ataque real, pero
 **no debes hacerlo**. El punto de diseñar exploits es enseñarte
@@ -44,92 +17,6 @@ cómo defenderte contra ellos, no cómo usarlos---atacar sistemas informáticos
 es ilegal
 y puede meterte en serios problemas. No lo hagas.
 
-Infraestructura del laboratorio
--------------------------------
-
-Explotar Buffer overflows requiere control preciso sobre el entorno de
-ejecución. Un pequeño cambio en el compilador, variables de entorno, o
-la forma en que se ejecuta el programa puede resultar en un diseño de memoria
-y estructura de código ligeramente diferente, requiriendo así un exploit diferente. Por esta
-razón, este laboratorio usa una
-[máquina virtual](https://en.wikipedia.org/wiki/Virtual_machine) para
-ejecutar el código del servidor web vulnerable.
-
-Para comenzar a trabajar en esta tarea de laboratorio, necesitarás software que te permita ejecutar
-una máquina virtual. Para usuarios de Linux, recomendamos ejecutar la VM del curso en
-[KVM](https://www.linux-kvm.org/), que está integrado en el kernel de Linux.
-KVM debería estar disponible a través de tu distribución, y está preinstalado
-en Debian o Ubuntu, prueba `apt-get install qemu-kvm`. KVM requiere
-soporte de virtualización por hardware en tu CPU, y debes habilitar este soporte en
-tu BIOS (que a menudo, pero no siempre, es el predeterminado). Si tienes otro
-monitor de máquina virtual instalado en tu máquina (por ejemplo, VMware), ese monitor de
-máquina virtual puede agarrar el soporte de virtualización por hardware exclusivamente y
-evitar que KVM funcione.
-
-En Windows, o Linux sin KVM, usa VMware Workstation. En una Mac, usa VMware Fusion. Ambos están gratis en la página de VMware, solo debes registrarte.
-
-Una vez que tengas software de máquina virtual instalado en tu máquina, deberías
-descargar la [imagen VM del curso](https://drive.google.com/file/d/1aWBjqpDxctl7CejA5TCPyS6t1VcBE3No/view?usp=sharing), y descomprimirla en tu computador. Esta máquina virtual contiene una
-instalación de [Ubuntu](https://ubuntu.com/) 21.10 Linux.
-
-Para iniciar la VM del curso usando VMware, importa `6.858-x86\_64-v22.vmdk`.
-Ve a File > New, selecciona "create a custom virtual machine", elige Linux > Debian 9.x 64-bit, elige Legacy BIOS, y usa un disco virtual existente
-(y selecciona el archivo `6.858-x86\_64-v22.vmdk`, eligiendo la opción "Take this
-disk away"). Finalmente, haz clic en Finalizar para completar la configuración.
-
-Para iniciar la VM con KVM, ejecuta `./6.858-x86\_64-v22.sh` desde una terminal (Ctrl+A x
-para forzar salida). Si obtienes un error de permiso denegado de este script,
-prueba agregándote al grupo kvm con 
-`sudo gpasswd -a 'whoami' kvm`, luego cierra sesión y vuelve a iniciar sesión.
-
-Si estás usando una computadora con un procesador no-x86 (por ejemplo, laptops Mac
-con el procesador ARM M1), puedes ejecutar la máquina virtual usando qemu.
-Para hacer esto, primero instala [Homebrew](https://brew.sh/), luego instala
-qemu ejecutando [`brew install
-qemu`](https://formulae.brew.sh/formula/qemu), y finalmente edita el script shell `6.858-x86\_64-v22.sh` que era
-parte de la imagen VM del curso, y en macOS ajusta la bandera `-machine accel=hvf` (no `-enable-kvm`, que corresponde a Linux). En este
-punto, deberías poder iniciar la VM del curso ejecutando `./6.858-x86\_64-v22.sh`
-como se mencionó anteriormente.
-
-Finalmente, como otra alternativa a usar `qemu` en una computadora no-x86,
-puedes registrarte para una instancia t2.micro de [AWS EC2](https://aws.amazon.com/ec2/?did=ft_card&trk=ft_card),
-bajo su [AWS
-Free Tier](https://aws.amazon.com/ec2/pricing/?loc=ft#Free_tier). Luego puedes ejecutar la VM de la clase dentro de tu instancia AWS EC2,
-usando las direcciones anteriores para una máquina Linux.
-
-Usarás la cuenta de estudiante en la VM para tu trabajo. La contraseña
-para la cuenta de estudiante es 6858. También puedes obtener acceso a
-la cuenta root en la VM usando `sudo`; por ejemplo, puedes
-instalar nuevos paquetes de software usando
-`sudo apt-get install *pkgname*`.
-
-Puedes iniciar sesión en la máquina virtual usando su consola, o usar ssh para
-iniciar sesión en la máquina virtual a través de la red (virtual). Esto último también te permite
-copiar fácilmente archivos dentro y fuera de la máquina virtual con `scp` o
-`rsync`. Cómo accedes a la máquina virtual a través de la red depende de
-cómo la estés ejecutando. Si estás usando VMware, primero tendrás
-que encontrar la dirección IP de la máquina virtual. Para hacerlo, inicia sesión
-en la consola, ejecuta `ip addr show dev eth0`, y
-anota la dirección IP listada junto a inet. Con kvm, puedes usar
-localhost como la dirección IP para ssh y HTTP. Ahora puedes iniciar sesión con
-ssh ejecutando el siguiente comando desde tu máquina host:
-`ssh -p 2222 student@DIRECCIONIP`.
-
-Para evitar tener que escribir la contraseña cada vez, también puedes configurar una
-[Clave SSH](https://www.booleanworld.com/set-ssh-keys-linux-unix-server/).
-
-También puedes encontrar útil crear un alias de host para tu VM 6.858 en
-tu archivo `~/.ssh/config`, para que simplemente puedas ejecutar, por ejemplo,
-`ssh 858vm` o `scp
-file.txt 858vm:lab/file.txt`. Para hacer esto, agrega las siguientes líneas
-a tu archivo `~/.ssh/config`, ajustadas según sea necesario:
-
-```
-Host 858vm
-  User student
-  HostName localhost
-  Port 2222
-```
 
 Comenzando
 -----------
