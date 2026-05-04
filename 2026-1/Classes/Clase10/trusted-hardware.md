@@ -293,6 +293,7 @@ El chip TPM tiene:
 * **O** el hardware TPM no se reseteó sincrónicamente con la CPU.
   * [ Resultó ser "fácil" en algunas motherboards: solo cortocircuitar un pin. ]
 
+<!--
 ---
 
 # Demo: TPM en Linux
@@ -337,7 +338,7 @@ tpm2_unseal -c seal.ctx -p pcr:sha256:3
 ```
 
 **El secreto ya no es accesible porque el estado del sistema cambió.**
-
+-->
 ---
 
 # ¿Qué nos permite hacer esto?
@@ -508,20 +509,6 @@ Debe ser verdad a nivel de sector, que el atacante puede corromper separadamente
 * **Meta:** cambios localizados al ciphertext influencian el bloque completo.
 * Los esquemas existentes no tienen esta propiedad (ej., encriptar 128 bits a la vez).
 * Entonces, Bitlocker introduce un **paso de shuffling**; detalles no terriblemente relevantes aquí.
-
----
-
-# ¿Qué hay de la frescura (freshness)?
-
-Más difícil de lograr: necesita tener algún estado que no pueda ser revertido.
-
-**Strawman:** hashear todos los bloques, almacenar hash en TPM.
-
-**Problema:** actualizaciones requieren re-hashear todo el disco, lento.
-
-**Idea:** árbol de hashes (árbol Merkle).
-
-Incluso eso es frecuentemente muy costoso de actualizar.
 
 ---
 

@@ -115,6 +115,19 @@ style: |
 
 ---
 
+# ¿Cómo ayudan los certificados contra ataques?
+  * Intentas ir a https://amazon.com
+  * El atacante redirige tus paquetes a su servidor
+    * Puede interceptar vía WiFi/LAN o manipular DNS/rutas
+  * El atacante puede mostrar el certificado real, pero no conoce la clave privada
+    * La llave privada no hará match con el certificado.
+  * Si usa un certificado para attacker.com, el navegador lo rechaza
+  * Si envías el certificado de Amazon junto con la llave de Amazon vas a recibir la información, pero no vas a poder desencriptar.
+  * Otros vectores: phishing, forzar HTTP, engañar a una CA descuidada
+    * Pero aquí no te protegen los certificados
+
+---
+
 # ¿Qué es una Autoridad Certificadora?
   * Organización confiable que valida la relación DNS -> clave pública
   * Obtener un certificado:
@@ -139,6 +152,30 @@ style: |
 
 ---
 
+# ¿Qué garantiza realmente el candado?
+  * El navegador muestra la URL actual
+  * El candado significa que la CA cree que ese servidor posee el nombre del URL
+  * Si deseas amazon.com y ves candado + URL correcto, es razonable ingresar tu contraseña
+  * Si no revisas candado ni URL, el beneficio cae
+  * SSL no dice "esta página es segura"
+    * Solo asegura que hablas con el dueño del nombre DNS mostrado
+  * Sitios grandes complican el cuadro (CDN, llaves compartidas)
+  * Se requiere usuario informado y cuidadoso
+
+---
+
+# Usuarios: el eslabón débil
+  * Muchos no saben cuándo exigir el candado
+  * No miran el candado ni el URL
+  * Desconocen el nombre DNS esperado
+  * Por eso funciona el phishing (ej. www.g00gle.com)
+  * Sus preocupaciones no coinciden con lo que garantiza SSL
+    * Preguntas como "¿este comercio es honesto?"
+  * Los navegadores solían mostrar diálogos confusos
+    * Hoy intentan bloquear más automáticamente
+
+---
+
 # ¿Cómo conocen los navegadores a las CAs?
   * Necesitan la clave pública de cada CA confiable
   * Hay docenas de CAs globales
@@ -153,18 +190,6 @@ style: |
     * Carga pesada sobre la CA
     * La CA podría registrar tus actividades
   * Con certificados, el servidor prueba su identidad sin depender de la CA en tiempo real
-
----
-
-# Usuarios: el eslabón débil
-  * Muchos no saben cuándo exigir el candado
-  * No miran el candado ni el URL
-  * Desconocen el nombre DNS esperado
-  * Por eso funciona el phishing (ej. www.g00gle.com)
-  * Sus preocupaciones no coinciden con lo que garantiza SSL
-    * Preguntas como "¿este comercio es honesto?"
-  * Los navegadores solían mostrar diálogos confusos
-    * Hoy intentan bloquear más automáticamente
 
 ---
 
@@ -184,42 +209,17 @@ style: |
     * Ej. colocar un nonce en un archivo o en registros DNS
   * Proceso automatizado, rápido y barato (Let's Encrypt)
   * Garantía limitada: solo confirma dueño del dominio
-  * Protocolos estándar como ACME soportan este flujo
 
 ---
 
 # Limitaciones de la validación DV
   * Depende de que DNS y enrutamiento IP funcionen bien
-  * Pero los certificados buscaban resistir cuando un atacante controla la red
-  * Aun así mitigan ataques locales en WiFi o LAN
-  * Buenas CAs DV consultan desde múltiples ubicaciones
+    * Pero los certificados buscaban resistir cuando un atacante controla la red
+    * Mitigan ataques locales en WiFi o LAN
+    * Buenas CAs DV consultan desde múltiples ubicaciones
   * No existe prueba 100% fiable de identidad o propiedad
   * Si aparecen dos certificados (legítimo y atacante) necesitamos detección
 
----
-
-# ¿Cómo ayudan los certificados contra ataques?
-  * Intentas ir a https://amazon.com
-  * El atacante redirige tus paquetes a su servidor
-    * Puede interceptar vía WiFi/LAN o manipular DNS/rutas
-  * El atacante puede mostrar el certificado real, pero no conoce la clave privada
-    * La llave privada no hará match con el certificado.
-  * Si usa un certificado para attacker.com, el navegador lo rechaza
-  * Si envías el certificado de Amazon junto con la llave de Amazon vas a recibir la información, pero no vas a poder desencriptar.
-  * Otros vectores: phishing, forzar HTTP, engañar a una CA descuidada
-    * Pero aquí no te protegen los certificados
-
----
-
-# ¿Qué garantiza realmente el candado?
-  * El navegador muestra la URL actual
-  * El candado significa que la CA cree que ese servidor posee el nombre del URL
-  * Si deseas amazon.com y ves candado + URL correcto, es razonable ingresar tu contraseña
-  * Si no revisas candado ni URL, el beneficio cae
-  * SSL no dice "esta página es segura"
-    * Solo asegura que hablas con el dueño del nombre DNS mostrado
-  * Sitios grandes complican el cuadro (CDN, llaves compartidas)
-  * Se requiere usuario informado y cuidadoso
 
 ---
 
@@ -271,14 +271,6 @@ style: |
 
 
 ---
-<!--
-# Registros CAA
-  * El dueño del dominio le indica a la CA qué reglas seguir al emitir
-  * No ayuda contra CAs corruptas, pero sí evita errores
-  * Puede limitar qué CAs pueden emitir para un dominio
-
----
--->
 
 # Certificate Transparency (CT)
   * Registro público de todos los certificados emitidos

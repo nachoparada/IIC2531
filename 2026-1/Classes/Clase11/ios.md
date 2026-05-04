@@ -125,7 +125,6 @@ style: |
     * Cripto entre unidades
   * Cifrado de datos
     * Ejecutar apps en segundo plano (cuando el teléfono está bloqueado)
-  * Próxima clase: aislamiento y compartir de apps (enfocándose en Android)
 
 ---
 

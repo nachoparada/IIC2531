@@ -370,18 +370,6 @@ style: |
     * El adversario puede hacerse pasar por servidor DHCP para nuevos clientes en la red.
       * Puede elegir sus servidores DNS, dominios DNS, enrutador, etc.
 
----
-
-# Protocolos de enrutamiento (cont.)
-  * BGP: Internet-wide.
-    * El sistema de enrutamiento BGP es enorme; los atacantes controlan ISPs y enrutadores BGP.
-      * Ref: http://web.mit.edu/6.033/www/papers/InterdomainRouting.pdf
-      * Contratos entre ISPs
-      * Ref: https://www.xfinity.com/peering
-    * Cualquier enrutador participante BGP puede anunciar ruta a cualquier dirección IP.
-    * Ataque: anunciar que tienes una ruta a un dominio, la gente enruta a través de ti (BGP leak)
-      * puedes inspeccionar/modificar tráfico, y luego reenviar al dominio.
-      * https://blog.cloudflare.com/bgp-leaks-and-crypto-currencies/
 
 ---
 
