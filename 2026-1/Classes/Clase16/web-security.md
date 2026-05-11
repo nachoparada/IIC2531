@@ -60,6 +60,41 @@ style: |
   * Una mezcla:
     * Principios
     * Compromisos con compatibilidad, conveniencia
+---
+
+# ¿Qué ha hecho que asegurar navegadores sea una historia larga y compleja?
+  * ¡Inicialmente no parecía haber ningún problema de seguridad en absoluto!
+    * La web era texto estático e imágenes, nada sensible
+    * JavaScript fue un gran cambio
+    * Sitios web sensibles (comercio, bancos, email, etc) fue un gran cambio
+  * Evolución rápida en usos y características:
+    * Los riesgos de seguridad a menudo no son aparentes hasta mucho después
+    * Los diseños iniciales a menudo difíciles de asegurar, y difíciles de cambiar
+    * Así que la seguridad a menudo retrofitada
+  * La compatibilidad con sitios web antiguos y navegadores antiguos es importante
+    * Los usuarios se preocupan más por la conveniencia que por la seguridad
+
+---
+
+# ¿Qué ha hecho que asegurar navegadores sea una historia larga y compleja? (cont.)
+  * Compatibilidad y llegada tardía de seguridad ->
+    * A menudo implementado por al lado
+    * Explícito en JS y código de servidor habría sido mejor
+  * Muchos navegadores, mecanismos de estándares débiles
+    * Lento para obtener consenso sobre cómo debería funcionar la seguridad
+  * Mucho compartir entre sitios web, así que el aislamiento estricto no es realista
+    * Mash-ups, APIs, anuncios, botones "Like", etc
+
+---
+
+# Modelo de amenaza / suposiciones
+  * (-) El atacante controla un sitio web, attacker.com
+  * (-) Visitas el sitio web del atacante
+    * Ej. attacker.com == dog-photos.com
+  * (-) Estás usando el navegador para otras cosas (email, banco, etc)
+  * (+) El navegador es confiable, así que podemos diseñarlo para contener ataques
+  * (+) El navegador no tiene errores de implementación (ej., buffer overflows)
+  * (?) Para esta clase, asumir que la red es segura 
 
 ---
 
@@ -86,42 +121,6 @@ style: |
 
 ---
 
-# ¿Qué ha hecho que asegurar navegadores sea una historia larga y compleja?
-  * ¡Inicialmente no parecía haber ningún problema de seguridad en absoluto!
-    * La web era texto estático e imágenes, nada sensible
-    * JavaScript fue un gran cambio
-    * Sitios web sensibles (comercio, bancos, email, etc) fue un gran cambio
-  * Evolución rápida en usos y características:
-    * Los riesgos de seguridad a menudo no son aparentes hasta mucho después
-    * Los diseños iniciales a menudo difíciles de asegurar, y difíciles de cambiar
-    * Así que la seguridad a menudo retrofitada
-  * La compatibilidad con sitios web antiguos y navegadores antiguos es importante
-    * Los usuarios se preocupan más por la conveniencia que por la seguridad
-
----
-
-# ¿Qué ha hecho que asegurar navegadores sea una historia larga y compleja? (cont.)
-  * Compatibilidad y llegada tardía de seguridad ->
-    * A menudo implementado al lado
-    * Explícito en JS y código de servidor habría sido mejor
-  * Muchos navegadores, mecanismos de estándares débiles
-    * Lento para obtener consenso sobre cómo debería funcionar la seguridad
-  * Mucho compartir entre sitios web, así que el aislamiento estricto no es realista
-    * Mash-ups, APIs, anuncios, botones "Like", etc
-
----
-
-# Modelo de amenaza / suposiciones
-  * (-) El atacante controla un sitio web, attacker.com
-  * (-) Visitas el sitio web del atacante
-    * Ej. attacker.com == dog-photos.com
-  * (-) Estás usando el navegador para otras cosas (email, banco, etc)
-  * (+) El navegador es confiable, así que podemos diseñarlo para contener ataques
-  * (+) El navegador no tiene errores de implementación (ej., buffer overflows)
-  * (?) Para esta clase, asumir que la red es segura (hablaremos de HTTPS después)
-
----
-
 # Solución: la Política del Mismo Origen (SOP)
   * SOP es impuesta por el navegador en las páginas web
   * El navegador etiqueta cada script (HTML, JS) con un origen
@@ -141,7 +140,7 @@ style: |
 # Solución: la Política del Mismo Origen (SOP) (cont.)
   * Dos vistas de SOP:
     * Impone aislamiento
-    * Autoriza algo de compartir
+    * Autoriza cierto grado de sharing
 
 ---
 
@@ -171,7 +170,6 @@ style: |
   * ¿Cómo sabe la página que los datos de red son realmente de gmail.com?
     * ¿Y no del servidor del atacante?
     * Respuesta: TLS + certificado con nombre DNS
-    * Profundizaremos en estos temas en próximas clases 
   * ¿Cómo sabe gmail.com que el comando es realmente de tu navegador?
     * ¿Y no de la máquina del atacante con navegador hackeado?
     * Respuesta: cookies
@@ -217,9 +215,10 @@ style: |
 # Algunos problemas de cookies (cont.)
   * Sobrescribir es un problema potencial:
     * ¿Puede attacker.com cambiar una cookie de google.com?
-    * ¿Así que estoy logueado en google.com como atacante, no como yo?
-    * ¿Así que el atacante ve mi historial de búsqueda?
+      * ¿Así que estoy logueado en google.com como atacante, no como yo?
+      * ¿Así que el atacante ve mi historial de búsqueda?
     * La regla de sufijo ayuda aquí
+      * Solo puedes cambiar cookies del mismo sitio "raiz"
     * ¡Pero no podemos permitir que attacker.com establezca una cookie para .com!
       * O cualquier otro dominio de nivel superior, ej. co.uk
       * El navegador debe tener lista de todos los dominios de nivel superior
@@ -227,12 +226,12 @@ style: |
 ---
 
 # ¿Por qué la aplicación estricta de SOP no es el final de la historia?
-  * Los desarrolladores deberían poder crear sitios "mash-up" que
-    * combinen contenido de múltiples lugares
-  * Ejemplo: Un sitio que combina datos de Google Map con datos de bienes raíces
-  * Ejemplo: Anuncios
-  * Ejemplo: Widgets de redes sociales (ej., el botón "like" de Facebook)
-  * También compatibilidad con HTML pre-SOP
+  * Los desarrolladores deberían poder crear sitios "mash-up" que combinen contenido de múltiples lugares
+  * Ejemplo: 
+    * Un sitio que combina datos de Google Map con datos de bienes raíces
+    * Anuncios
+    * Widgets de redes sociales (ej., el botón "like" de Facebook)
+    * También compatibilidad con HTML pre-SOP
 
 ---
 
@@ -269,7 +268,7 @@ style: |
     * \<IMG SRC="https://bank.com/xfer?amount=500&to=attacker">
   * El usuario no ve nada especial, tal vez una pequeña imagen rota
   * ¿Qué pasa si el usuario está logueado en bank.com?
-  * ¡bank.com ve una solicitud de transferencia con una cookie de sesión válida!
+    * ¡bank.com ve una solicitud de transferencia con una cookie de sesión válida!
   * CSRF ha sido una gran fuente de ataques reales
     * Una falla subyacente es la excepción al SOP
     * Otra falla es el envío automático de cookies
@@ -322,7 +321,7 @@ style: |
 # Excepción SOP: Cross Origin Resource Sharing (CORS)
   * Un servidor puede decir al navegador permitir XMLHttpRequest(url) cross-origin
   * Si el navegador ve que la solicitud de una página es cross-origin, pregunta al servidor
-    * primero, le dice al servidor el origen solicitante, el servidor puede decir sí o no
+    * Primero, le dice al servidor el origen solicitante, el servidor puede decir sí o no
   * ¿Por qué esta excepción?
     * Algunos datos de API web son públicos
     * Algunos mash-ups específicos son intencionalmente autorizados
@@ -361,7 +360,7 @@ style: |
   * El servidor podría quitar todo HTML de comentarios
     * Pero a los usuarios les gusta incluir formato, enlaces, etc
   * El servidor podría parsear cuidadosamente comentarios para prohibir ciertas etiquetas
-    * Complicado pero a menudo hecho; ¡use una buena biblioteca!
+    * Complicado pero a menudo hecho; ¡usar una buena biblioteca!
   * Header HTTP Content-Security-Policy, un nuevo mecanismo
     * El servidor dice al navegador prohibir scripts inline
     * Así que el servidor no tiene que adivinar cómo el navegador parsea

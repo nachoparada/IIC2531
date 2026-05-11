@@ -88,7 +88,7 @@ style: |
   * Recuperación
     * ej., usuario pierde el secreto
     * a menudo pasado por alto; puede ser un talón de Aquiles
-  * Muchos desafíos para hacerlo bien
+  * Muchos desafíos para que todo esto funcione bien
 
 ---
 
@@ -113,7 +113,8 @@ style: |
     * Malware/keylogger
   * El atacante puede lanzar un ataque de hombre en el medio
     * ej., atacante graba la contraseña y luego la usa más tarde
-  * Gran problema en la práctica (más abajo)
+  * No entraremos en profundidad en este problema
+    * Soluciones se escapan del scope de esta clase
 
 ---
 
@@ -123,7 +124,7 @@ style: |
     * A la escala de la universidad, podríamos verificar la identidad del usuario al registrarse
   * Típicamente nos conformamos con una garantía más débil
     * Establecer que el usuario que inicia sesión tiene el secreto al registrarse
-    * Si es así, entonces asumimos que es el mismo usuario
+      * Si es así, entonces asumimos que es el mismo usuario
     * Pero, no hay garantía de que conozcamos la verdadera identidad del usuario
     * Para muchos usos eso está bien
       * Ej., a Amazon no le importa realmente quién eres mientras pagues
@@ -141,14 +142,15 @@ style: |
 
 ---
 
-# Enfoques de recuperación
+# Desafío: Enfoques de recuperación
 
-  * "Preguntas de seguridad": política OR
+  * "Preguntas de seguridad"
   * Verificar vía email
   * Probar conocimiento del número de tarjeta de crédito, etc.
   * Crear una nueva cuenta (si no es importante retener el mismo principal/nombre)
   * Llamar al servicio al cliente: puede ser una salida de emergencia sin una política precisa
     * A menudo susceptible a ataques de ingeniería social
+  * Usar 2FA
 
 ---
 
@@ -181,14 +183,15 @@ style: |
 
 # Contraseñas: difíciles por factores humanos
 
-  * 1. Los usuarios eligen contraseñas adivinables
+  * Los usuarios eligen contraseñas adivinables
     * 20% de las cuentas usan el mismo conjunto de 5,000 contraseñas más populares
-    * No se puede permitir que un adversario haga 5,000 intentos de adivinar la contraseña de un usuario
-    * No se puede permitir que un adversario adivine "123456" como la contraseña de cada usuario
-  * 2. Las contraseñas comunes contienen dígitos, mayúsculas y minúsculas, etc.
+      * No se puede permitir que un adversario haga 5,000 intentos de adivinar la contraseña de un usuario
+      * No se puede permitir que un adversario adivine "123456" como la contraseña de cada usuario
+  * Las contraseñas comunes contienen dígitos, mayúsculas y minúsculas, etc.
     * ¿Es "1Password!" una buena contraseña?
     * Lo que importa es la entropía: ¿qué tan común es esa contraseña?
       * Los requisitos de caracteres no son especialmente útiles
+      * Existe el sesgo de lo que el cerebro humano considera "raro"
 
 ---
 
@@ -198,9 +201,9 @@ style: |
     * Una contraseña que ya se conoce tiene cero bits de entropía
     * Una que se adivinaría en el primer intento la mitad del tiempo tiene 1 bit de entropía
     * Una contraseña de 16 bits de entropía requiere 2^16 intentos para probar todas las posibilidades
-  * 3. Las contraseñas a menudo se comparten entre sitios/aplicaciones/sistemas
+  * Las contraseñas a menudo se comparten entre sitios/aplicaciones/sistemas
     * Importante cuando hablamos de cómo usar y almacenar contraseñas
-  * 4. Queremos animar a los usuarios a elegir contraseñas de alta entropía
+  * Queremos animar a los usuarios a elegir contraseñas de alta entropía
 
 ---
 
@@ -234,7 +237,7 @@ style: |
 
 ---
 
-# Defender contra adivinación
+# Desafío: Defender contra adivinación
 
   * Los ataques de adivinación son un problema debido al pequeño espacio de claves
     * El adversario tiene acceso a mucha información sobre distribuciones de contraseñas
@@ -259,8 +262,9 @@ style: |
 
 ---
 
-# Almacenar contraseñas
+# Desafío: Almacenar contraseñas
 
+  * Relacionado con el anterior
   * Plan ingenuo: almacenar una tabla que contenga pares (nombre de usuario, contraseña)
   * Riesgo: adversario que compromete el servidor aprende todas las contraseñas
   * Problema 1: incluso después de la recuperación del compromiso, debe restablecer todas las contraseñas de usuario
@@ -326,15 +330,11 @@ style: |
   * Ventajas: 
     * No hay necesidad de que la red de teléfono celular esté disponible
     * No hay necesidad de confiar en el proveedor de teléfono celular
-  * Desventaja: la configuración del usuario implica instalar aplicación, cargar valor secreto
-
----
-
-# 2FA con contraseñas de un solo uso basadas en tiempo (TOTP) (cont.)
-
-  * Desventajas: 
+  * Desventaja: 
+    * la configuración del usuario implica instalar aplicación, cargar valor secreto
     * Lidiar con el usuario cambiando dispositivos (recargar valor secreto)
     * Aún susceptible a ataques de phishing
+
 
 ---
 
