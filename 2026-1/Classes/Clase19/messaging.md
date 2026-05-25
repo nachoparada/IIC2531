@@ -62,6 +62,14 @@ style: |
 
 ---
 
+# Diferencias!
+  * Los usuarios normalmente están online.
+    * Podemos tener un handshake
+    * Podemos tener secretos que viven por poco tiempo
+  * Mensajería: Los usuarios no están necesariamente online los dos al mismo tiempo!
+
+---
+
 # Propiedades principales
   * Escenario: Alice envía mensaje M a Bob
   * Confidencialidad: solo Alice y Bob leen M
@@ -79,6 +87,18 @@ style: |
 
 ---
 
+# Ejemplo: ruta de un e-mail
+  * Alice escribe desde su computador
+  * Gmail recibe y reenvía
+  * Lista de correo entrega a bob@ibm.com
+  * IBM redirige a bob@puc.cl
+  * PUC procesa el mensaje
+  * Filtro de spam y archivo institucional lo inspeccionan
+  * Bob lo lee en su computador
+  * DNS participa en cada etapa
+
+---
+
 # Historia del e-mail
   * Originalmente sin seguridad criptográfica
   * Se han ido agregando opciones de seguridad gradualmente
@@ -89,11 +109,22 @@ style: |
 
 # Seguridad hop-by-hop desplegada
   * Protege enlaces individuales usuario-servidor y servidor-servidor
-    * Start TLS, pero es oportunista
+    * STARTTLS, pero suele ser oportunista
   * POP/IMAP sobre TLS evita espionaje y robo de buzones
   * DKIM firma mensajes por organización origen
     * Ayuda a detectar suplantaciones, se usa en decisiones de spam
+  * ARC preserva resultados de autenticación al reenviar correos
+    * Útil para listas de correo y forwarding que rompen DKIM
   * BIMI/VMC autentican logos corporativos (certificados de marca)
+
+---
+
+# BIMI/VMC: autenticación visual
+  * BIMI permite mostrar el logo de una organización autenticada
+  * VMC es un certificado emitido por una autoridad certificadora
+  * La CA valida control del logo y marca registrada
+  * Ayuda contra phishing de marcas grandes y reconocibles
+  * Pero no autentica al usuario final ni protege el contenido
 
 ---
 
@@ -147,21 +178,20 @@ style: |
 
 # Mensaje único: preguntas abiertas
   * ¿Es mejor firmar c o m?
+    * O incluir “Alice”, “Bob” y contexto dentro de m
   * El adversario podría reinyectar c y s (replay)
-  * Siempre hay que intentar firmar lo más cercano al mensaje original que se pueda
-  * Tenemos confidencialidad, pero no autenticación
-  * También tenemos potenciales replay attacks
+  * Si Bob conoce PK_Alice, la firma sí da autenticidad
+  * Pero la autenticidad depende del establecimiento de confianza
+  * ¿Tiene secreto hacia adelante? No: SK_Bob descifra grabaciones antiguas
 
 ---
 
-# Canal seguro simplificado
-  * Objetivo: confidencialidad + autenticidad bidireccional
-  * Similar a TLS con claves públicas y secretas
-  * A -> B: E(PK_B, “A” -> “B” || randomA), Sign(SK_A, …)
-  * B -> A: E(PK_A, “A” <- “B” || randomB), Sign(SK_B, …)
-  * Comparten secreto randomA || randomB
-  * Derivan claves Kx = Hash(randomA || randomB || x)
-  * A -> B: E(K1, M), MAC(K2, M)
+# ¿Por qué canales seguros?
+  * A veces queremos comunicación “síncrona”
+    * Chat interactivo, voz, video, colaboración en vivo
+  * Algunos esquemas de seguridad necesitan ida y vuelta
+  * Desventaja: puede requerir que ambas partes estén online
+  * El canal seguro amortiza el costo: luego usa claves simétricas
 
 ---
 
@@ -173,6 +203,17 @@ style: |
   * Comparten secreto randomA || randomB
   * Derivan claves Kx = Hash(randomA || randomB || x)
   * A -> B: E(K1, M), MAC(K2, M)
+
+---
+
+# Canal seguro: preguntas abiertas
+  * ¿Qué pasa si un atacante reinyecta mensajes antiguos?
+  * ¿Por qué incluir identidades “A” y “B” en el handshake?
+    * Evita confusiones de contexto y ataques de reflexión
+  * ¿Tiene secreto hacia adelante?
+    * No necesariamente si solo usa claves públicas de largo plazo
+  * ¿Tiene negabilidad?
+    * Las firmas públicas tienden a dejar evidencia transferible
 
 ---
 
@@ -302,9 +343,11 @@ style: |
   * Cómo proteger mensajes una vez establecidas las claves correctas
   * Metas en tensión:
     * Autenticidad vs negabilidad
-      * Básicamente que no queden pruebas
+      * Básicamente que no queden pruebas transferibles
     * Confidencialidad vs capacidad de denunciar abusos
-      * Porque nadie sabe quien eres!
+      * ¿Cómo reportar spam/acoso si el servidor no ve mensajes?
+  * Message franking: permite denunciar mensajes abusivos
+    * El servidor verifica el abuso sin leer todos los mensajes
   * Grupos presentan retos adicionales
 
 ---
@@ -347,6 +390,15 @@ style: |
 
 ---
 
+# Desafío: múltiples dispositivos
+  * Usuarios quieren mensajes en teléfono, laptop, tablet, etc.
+  * ¿Qué dispositivo guarda las claves de descifrado?
+  * ¿Qué pasa si ese dispositivo está offline?
+  * Agregar dispositivos exige actualizar claves y confianza
+  * Difícil combinar sincronización cómoda con secreto hacia adelante
+
+---
+
 # Privacidad de transporte
   * Busca ocultar metadatos: quién habla con quién, cuándo
   * Costosa de lograr, muchos sistemas la minimizan
@@ -370,12 +422,7 @@ style: |
   * Mejora frente a un servidor único
   * Adversarios globales aún pueden correlacionar tiempos
 
----
 
-# Alternativas más costosas
-  * Difusión (broadcast) a todos los participantes
-  * Mixnets que procesan lotes grandes de mensajes
-  * Ambas tienen mayor latencia y complejidad operativa
 
 ---
 
