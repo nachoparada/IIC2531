@@ -55,6 +55,17 @@ style: |
 
 ---
 
+# ¿Cómo funciona internet normalmente?
+
+* Túnel de cliente a host
+  * Podemos saber tu IP
+  * La hora a la que enviaste el mensaje
+  * Podemos saber la información del servidor
+  * Y un largo etc.
+* Por mucho que la comunicación esté encriptada
+
+---
+
 # ¿Cuál es el objetivo de Tor?
 
 * **Anonimato para clientes** que quieren conectarse a servidores en internet.
@@ -75,6 +86,10 @@ style: |
 * Debe **encriptar tráfico** hacia/desde la persona que quiere ser anónima.
   * De otra forma, el adversario mira los paquetes y descubre qué está pasando.
 * Pero la encriptación **no es suficiente**: aún se podría rastrear a dónde fueron los paquetes encriptados.
+
+---
+
+![](TorSimple.png)
 
 ---
 
@@ -145,6 +160,23 @@ style: |
 
 ---
 
+![](TorTunnel.png)
+
+
+---
+
+# Terminología: Circuitos y Streams
+
+**Circuito:** una ruta a través de una lista de ORs que un cliente construye.
+* Los circuitos existen por algún período de tiempo (quizás unos minutos).
+* Nuevos circuitos se abren periódicamente para frustrar ataques.
+
+**Stream:** efectivamente una conexión TCP.
+* Muchos streams corren sobre el mismo circuito (cada uno con ID de stream separado).
+* Los streams son una optimización importante: no hay necesidad de reconstruir circuito.
+
+---
+
 # ¿A qué nivel debemos retransmitir?
 
 Podríamos hacer cualquier nivel:
@@ -166,20 +198,13 @@ Podríamos hacer cualquier nivel:
 
 # ¿Qué hace Tor?
 
-* **Retransmisión a nivel TCP**, usando SOCKS (intercepta llamadas libc).
+* **Retransmisión a nivel TCP**, usando SOCKS.
 
 **Ejemplos de eficiencia:**
 * No necesita control de flujo TCP, Tor hace retransmisión.
 
 **Ejemplos de generalidad perdida:**
 * UDP no funciona, no se puede hacer traceroute, ...
-
----
-
-# ¿Cómo funciona DNS con Tor?
-
-* SOCKS puede capturar el **hostname** del destino, no solo dirección IP.
-* El exit node realiza el lookup DNS, establece conexión TCP.
 
 ---
 
@@ -193,21 +218,19 @@ Podríamos hacer cualquier nivel:
 
 ---
 
-# Normalización de protocolo
-
-* **"Protocol normalization":** arreglar todos los grados de libertad en el protocolo superior.
-* Difícil de hacer en práctica; proxies específicos de app son útiles (ej., Privoxy).
-
-**Demo de "identificación" de navegador:** https://panopticlick.eff.org/
-
----
-
 # Diseño de Tor
 
 * Malla de ORs: cada OR conectado vía SSL/TLS a cada otro OR.
   * No necesita certificados SSL/TLS firmados por CA.
   * Tor tiene su propio plan de verificación de llave pública usando servidores de directorio.
 * Los ORs mayormente son ejecutados por **voluntarios**: ej., MIT ejecuta varios.
+
+---
+
+# ¿Cómo funciona DNS con Tor?
+
+* SOCKS puede capturar el **hostname** del destino, no solo dirección IP.
+* El exit node realiza el lookup DNS, establece conexión TCP.
 
 ---
 
@@ -220,6 +243,14 @@ Podríamos hacer cualquier nivel:
 
 ---
 
+# Circuitos de Tor
+
+Un circuito es una secuencia de ORs, junto con llaves simétricas (AES) compartidas.
+* ORs: c_1, c_2, .., c_n
+* Llaves: k_1, k_2, .., k_n
+
+---
+
 # Construcción de circuitos
 
 * El cliente descarga lista de ORs del directorio.
@@ -228,6 +259,25 @@ Podríamos hacer cualquier nivel:
 **¿Por qué el cliente construye los circuitos?**
 * Cualquier servidor individual podría estar comprometido, no se puede confiar.
 * Es inevitable confiar en la máquina del cliente.
+
+---
+
+# Multiplexación de circuitos
+
+* Usado para multiplexar muchos circuitos en la misma conexión TLS entre ORs.
+* **Mensajes de control** son "link-local": enviados solo a un vecino inmediato.
+* **Mensajes relay** son "end-to-end": retransmitidos a lo largo del circuito.
+
+**¿Por qué todo el tráfico en celdas de tamaño fijo?**
+* Hace el análisis de tráfico más difícil.
+
+---
+
+# ¿Por qué Tor necesita circuitos?
+
+**¿Qué sale mal si tenemos circuitos de larga duración?**
+* El adversario podría correlacionar múltiples streams en un solo circuito.
+* Vincular conexiones de un solo usuario a diferentes sitios, romper anonimato.
 
 ---
 
@@ -261,32 +311,144 @@ Podríamos hacer cualquier nivel:
 
 ---
 
-# Terminología: Circuitos y Streams
+# Servicios Anónimos (Hidden Services)
 
-**Circuito:** una ruta a través de una lista de ORs que un cliente construye.
-* Los circuitos existen por algún período de tiempo (quizás unos minutos).
-* Nuevos circuitos se abren periódicamente para frustrar ataques.
-
-**Stream:** efectivamente una conexión TCP.
-* Muchos streams corren sobre el mismo circuito (cada uno con ID de stream separado).
-* Los streams son una optimización importante: no hay necesidad de reconstruir circuito.
+* Permiten que un **servidor** sea anónimo, no solo el cliente.
+* Los hidden services se nombran por llaves públicas: `publickey.onion`.
+* Es un **pseudo-DNS**: no hay un registro DNS normal que apunte a una IP.
+  * El nombre `.onion` identifica una llave pública, y Tor busca el descriptor dentro de la red Tor.
 
 ---
 
-# ¿Por qué Tor necesita circuitos?
+# Objetivo de un hidden service
 
-**¿Qué sale mal si tenemos circuitos de larga duración?**
-* El adversario podría correlacionar múltiples streams en un solo circuito.
-* Vincular conexiones de un solo usuario a diferentes sitios, romper anonimato.
+* Queremos que **Alice** se conecte a **Bob** sin conocer su IP real.
+* También queremos que **Bob** no conozca la IP real de Alice.
+* Ambos lados se conectan **hacia Tor**; nadie acepta conexiones directas desde internet.
 
 ---
 
-# Circuitos de Tor
+# Publicación del servicio
 
-Un circuito es una secuencia de ORs, junto con llaves simétricas (AES) compartidas.
-* ORs: c_1, c_2, .., c_n
-* Llaves: k_1, k_2, .., k_n
+1. Bob crea circuitos Tor hacia algunos ORs y los elige como **puntos de introducción**.
+2. Bob publica un descriptor en directorios de hidden services (**HSDirs**):
+   * `publickey.onion → puntos de introducción`.
+3. El descriptor está firmado por la llave del servicio.
+4. Alice usa el nombre `.onion` para encontrar esos HSDirs y descargar el descriptor.
 
+**Importante:** los puntos de introducción saben cómo contactar a Bob, pero no reciben tráfico de la aplicación.
+
+---
+
+# Conexión usando rendezvous
+
+1. Alice descarga el descriptor de Bob.
+2. Alice escoge un OR como **punto de rendezvous (RP)** y crea un circuito hacia él.
+3. Alice envía a Bob, vía punto de introducción, el RP y una **cookie de rendezvous**.
+4. Bob crea su propio circuito hacia el RP y prueba que conoce la cookie.
+5. El RP une ambos circuitos y retransmite celdas entre Alice y Bob.
+
+---
+
+# ¿Qué aprende cada componente?
+
+* **Punto de introducción:** sabe que alguien quiere contactar a Bob, pero no ve los datos.
+* **Punto de rendezvous:** retransmite tráfico, pero no sabe qué servicio `.onion` es.
+* **Alice:** no aprende la IP de Bob.
+* **Bob:** no aprende la IP de Alice.
+
+---
+
+# ¿Por qué la división entre punto de introducción y rendezvous?
+
+**Evitar colocar carga de tráfico en los puntos de introducción.**
+
+**Evitar que el punto de introducción transfiera datos conocidamente ilegales.**
+
+---
+
+# La división previene ambos problemas
+
+1. **Bob (servicio)** tiene un **punto de introducción (IP)**.
+2. **Alice** escoge un **punto de rendezvous (RP)**, le dice al IP de Bob sobre el RP.
+3. El punto de introducción **no retransmite datos**.
+4. El punto de rendezvous **no sabe qué datos está retransmitiendo**.
+
+---
+
+# Estado final del hidden service
+
+* Dos circuitos al RP, con un stream conectado entre ellos.
+* El RP toma celdas relay del stream de un circuito y las envía en un stream del otro circuito.
+* Los datos puenteados están encriptados usando llave compartida entre Alice y Bob.
+* Cada uno puede controlar su propio nivel de anonimato.
+* Ninguno conoce la ruta completa del otro circuito.
+
+---
+
+# ¿Qué tan difícil es bloquear Tor?
+
+* Encontrar lista de IPs de ORs del directorio, bloquear todo el tráfico hacia ellos.
+
+**¿Cómo defenderse contra tal ataque?**
+
+
+---
+
+# Censura y bridges
+
+* **Idea:** nodos "bridge" no tan conocidos que proveen conexión inicial a la red Tor.
+* El servicio de directorio entrega unas pocas direcciones IP de bridges a la vez, no enumeración completa.
+* También **"pluggable transports"** para ayudar a desarrollar rápidamente nuevas formas de bypasear censura.
+
+---
+
+# Debilidades potenciales de Tor
+
+* **Fugas a nivel de aplicación** (Javascript, headers HTTP, DNS, ...)
+  * Usar un proxy de nivel de app (ej., Privoxy elimina muchos headers HTTP).
+* **Fingerprinting** basado en comportamiento del cliente Tor (cada cuánto se abre nuevo circuito).
+* **Análisis de timing/volumen** (defensa parcial es ejecutar tu propio Tor OR).
+
+---
+
+# Más debilidades
+
+* **Fingerprinting de sitios web:** número de requests y tamaños de archivo de sitios populares.
+  * La cuantización de celdas de tamaño fijo ayuda un poco.
+* **ORs maliciosos:** unirse a la red, anunciar mucho ancho de banda, política de salida abierta.
+
+---
+
+# ¿Qué tan activo es Tor?
+
+* Uso mucho más activo ahora que lo que describe el paper.
+* ~3000 ORs públicos, ~1000 exit nodes, ~1000 bridge nodes, ~2GB/s ancho de banda OR.
+* 8-9 servidores de directorio, ~1600 mirrors de directorio.
+* **Problemas difíciles:** distribuir IPs de puntos de entrada, aprobar ORs, ...
+
+---
+
+# Resumen
+
+* **Tor** proporciona anonimato mediante onion routing con múltiples capas de encriptación.
+* Los **circuitos** se construyen incrementalmente, cada OR solo conoce vecinos.
+* **Hidden services** permiten servidores anónimos usando puntos de introducción y rendezvous.
+* **Guard nodes** reducen la probabilidad de compromiso a largo plazo.
+* **Bridges** ayudan a evadir censura.
+
+---
+
+# Referencias
+
+* Paper: "Tor: The Second-Generation Onion Router" - Dingledine, Mathewson, Syverson
+* https://metrics.torproject.org/
+* https://www.torproject.org/
+* https://panopticlick.eff.org/ (fingerprinting de navegador)
+* DC-nets: http://dedis.cs.yale.edu/2010/anon/papers/osdi12.pdf
+
+---
+# Detalles del protocolo
 ---
 
 # Formato de celda
@@ -300,17 +462,6 @@ Un circuito es una secuencia de ORs, junto con llaves simétricas (AES) comparti
 
 * Los campos "Circuit" y "Control/Relay" son como headers de capa de enlace.
 * Los IDs de circuito son **por-enlace** (entre pares de ORs).
-
----
-
-# Multiplexación de circuitos
-
-* Usado para multiplexar muchos circuitos en la misma conexión TLS entre ORs.
-* **Mensajes de control** son "link-local": enviados solo a un vecino inmediato.
-* **Mensajes relay** son "end-to-end": retransmitidos a lo largo del circuito.
-
-**¿Por qué todo el tráfico en celdas de tamaño fijo?**
-* Hace el análisis de tráfico más difícil.
 
 ---
 
@@ -497,158 +648,7 @@ OP calcula K = g^xy.
 * Funciona bien porque el transporte subyacente es confiable (SSL/TLS sobre TCP).
 
 ---
-
-# Servicios Anónimos (Hidden Services)
-
-* Los hidden services se nombran por llaves públicas (pseudo-DNS: `publickey.onion`).
-
----
-
-# ¿Por qué la división entre punto de introducción y rendezvous?
-
-**Evitar colocar carga de tráfico en los puntos de introducción.**
-
-**Evitar que el punto de introducción transfiera datos conocidamente ilegales.**
-
----
-
-# La división previene ambos problemas
-
-1. **Bob (servicio)** tiene un **punto de introducción (IP)**.
-2. **Alice** escoge un **punto de rendezvous (RP)**, le dice al IP de Bob sobre el RP.
-3. El punto de introducción **no retransmite datos**.
-4. El punto de rendezvous **no sabe qué datos está retransmitiendo**.
-
----
-
-# ¿Por qué Bob se conecta de vuelta a Alice?
-
-* Control de admisión, distribuir carga sobre muchos puntos de rendezvous.
-
-**¿Qué es la cookie de rendezvous?**
-* Permite a Bob probar al RP de Alice que es Bob.
-
----
-
-# Cookie de autorización
-
-* Algo que podría obligar a Bob a responder, cuando de otra forma no lo haría.
-* Tal vez una palabra secreta que la mayoría de la gente no conoce.
-* Limita ataques DoS al servidor de Bob (pueden solo enviar muchas cookies).
-* Almacenada en hostname: `cookie.pubkey.onion`.
-
----
-
-# Estado final del hidden service
-
-* Dos circuitos al RP, con un stream conectado entre ellos.
-* El RP toma celdas relay del stream de un circuito y las envía en un stream del otro circuito.
-* Los datos puenteados están encriptados usando llave compartida entre Alice y Bob (DH).
-* Cada uno puede controlar su propio nivel de anonimato.
-* Ninguno conoce la ruta completa del otro circuito.
-
----
-
-# Peligros potenciales al usar Tor
-
-* **Fugas a nivel de aplicación** (Javascript, headers HTTP, DNS, ...)
-  * Usar un proxy de nivel de app (ej., Privoxy elimina muchos headers HTTP).
-* **Fingerprinting** basado en comportamiento del cliente Tor (cada cuánto se abre nuevo circuito).
-* **Análisis de timing/volumen** (defensa parcial es ejecutar tu propio Tor OR).
-
----
-
-# Más peligros
-
-* **Fingerprinting de sitios web:** número de requests y tamaños de archivo de sitios populares.
-  * La cuantización de celdas de tamaño fijo ayuda un poco.
-* **ORs maliciosos:** unirse a la red, anunciar mucho ancho de banda, política de salida abierta.
-
----
-
-# Beneficios y riesgos de ejecutar un OR
-
-**Beneficios:**
-* Más anonimato
-
-**Riesgos:**
-* Uso de recursos
-* Ataques en línea (DoS, break-ins, ...)
-* Ataques offline (ej., máquina confiscada por autoridades)
-
----
-
-# ¿Qué tan difícil es bloquear Tor?
-
-* Encontrar lista de IPs de ORs del directorio, bloquear todo el tráfico hacia ellos.
-
-**¿Cómo defenderse contra tal ataque?**
-
----
-
-# Defensas contra bloqueo
-
-**¿Revelar diferentes ORs a diferentes clientes?**
-* Permite fingerprinting de cliente basado en ORs usados.
-
-**¿Mantener algunos ORs no listados?**
-* Quieres usar ORs no listados solo como primer hop, para evitar fingerprinting.
-* Tor tiene noción de nodo **"bridge"**, que es un OR no listado.
-
----
-
-# ¿Cómo encontrar nodos "bridge"?
-
-* Quieres que el usuario legítimo los encuentre, pero no dejar que el adversario los enumere.
-
-**Enfoque de Tor:** directorio especial de bridges.
-* Revelar 3 bridges a cada IP (via HTTP) o dirección de email (via email).
-* Revelar nuevos bridges a la misma dirección de cliente solo después de 24 horas.
-* Puede rate-limit por IP, encontrar intentos de enumerar base de datos de bridges, etc.
-
----
-
-# Bridges y email
-
-* Para email, es más fácil para el adversario crear identidades falsas (direcciones de email).
-* Tor confía en 3 proveedores de correo para rate-limit de signup (gmail, yahoo, mit).
-
----
-
-# ¿Usarías Tor?
-
-* Podría ser muy lento para usar en todo el tráfico (alta latencia).
-* Pero desafortunadamente eso significa que solo el tráfico sensible iría vía Tor.
-* Existen ataques plausibles, entonces no es ideal contra adversarios muy poderosos.
-* Tal vez una buena forma de evitar ataques de denegación de servicio (descargar a Tor).
-
----
-
-# ¿Qué tan activo es Tor?
-
-* Uso mucho más activo ahora que lo que describe el paper.
-* ~3000 ORs públicos, ~1000 exit nodes, ~1000 bridge nodes, ~2GB/s ancho de banda OR.
-* 8-9 servidores de directorio, ~1600 mirrors de directorio.
-* **Problemas difíciles:** distribuir IPs de puntos de entrada, aprobar ORs, ...
-
----
-
-# Enfoque alternativo: DC-nets
-
-**"Dining cryptographer networks"**
-
-* N participantes, pero supongamos que solo hay un emisor (no se sabe quién).
-* Cada par de participantes comparte un bit secreto.
-* Para transmitir un bit "0", enviar XOR de todos los secretos. De otra forma, enviar lo opuesto.
-* Todas las transmisiones son públicas: para recuperar el bit, XOR las transmisiones de todos.
-
----
-
-# DC-nets (cont.)
-
-* Se puede construir para enviar múltiples bits, usar protocolo de detección de colisión, etc.
-* **Costoso en términos de rendimiento**, pero proporciona seguridad mucho más fuerte que Tor.
-* Ver el paper de Dissent OSDI 2012 para más detalles sobre un sistema basado en DCnet.
+# Problemas de Tor
 
 ---
 
@@ -681,45 +681,22 @@ Supongamos que hay M nodos relay maliciosos, de un total de N nodos.
 * Entonces, a medida que construimos más circuitos, la probabilidad total de compromiso llega a **M/N pero no a 1**.
 
 ---
+# Enfoques alternativos
+---
 
-# Censura y bridges
+# Enfoque alternativo: DC-nets
 
-* El ISP o país podría bloquear relays Tor conocidos.
-* **Idea:** nodos "bridge" no tan conocidos que proveen conexión inicial a la red Tor.
-* El servicio de directorio entrega unas pocas direcciones IP de bridges a la vez, no enumeración completa.
-* También **"pluggable transports"** para ayudar a desarrollar rápidamente nuevas formas de bypasear censura.
+**"Dining cryptographer networks"**
+
+* N participantes, pero supongamos que solo hay un emisor (no se sabe quién).
+* Cada par de participantes comparte un bit secreto.
+* Para transmitir un bit "0", enviar XOR de todos los secretos. De otra forma, enviar lo opuesto.
+* Todas las transmisiones son públicas: para recuperar el bit, XOR las transmisiones de todos.
 
 ---
 
-# Demo: Tor Browser
+# DC-nets (cont.)
 
-```bash
-# pacman -S torbrowser-launcher
-% torbrowser-launcher
-```
-
-* https://web.mit.edu/
-  * [click en el ícono de circuito junto a la barra de URL]
-* http://keybase5wmilwokqirssclfnsqrjdsi7jdir5wy7y7iu3tanwmtp6oid.onion/
-  * [click en el ícono de circuito junto a la barra de URL]
-* https://metrics.torproject.org/
-
----
-
-# Resumen
-
-* **Tor** proporciona anonimato mediante onion routing con múltiples capas de encriptación.
-* Los **circuitos** se construyen incrementalmente, cada OR solo conoce vecinos.
-* **Hidden services** permiten servidores anónimos usando puntos de introducción y rendezvous.
-* **Guard nodes** reducen la probabilidad de compromiso a largo plazo.
-* **Bridges** ayudan a evadir censura.
-
----
-
-# Referencias
-
-* Paper: "Tor: The Second-Generation Onion Router" - Dingledine, Mathewson, Syverson
-* https://metrics.torproject.org/
-* https://www.torproject.org/
-* https://panopticlick.eff.org/ (fingerprinting de navegador)
-* DC-nets: http://dedis.cs.yale.edu/2010/anon/papers/osdi12.pdf
+* Se puede construir para enviar múltiples bits, usar protocolo de detección de colisión, etc.
+* **Costoso en términos de rendimiento**, pero proporciona seguridad mucho más fuerte que Tor.
+* Ver el paper de Dissent OSDI 2012 para más detalles sobre un sistema basado en DCnet.
