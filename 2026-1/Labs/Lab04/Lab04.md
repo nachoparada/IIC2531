@@ -6,7 +6,7 @@ Introducción
 Este laboratorio te presentará ataques basados en el navegador, así como la manera de prevenirlos. El laboratorio tiene varias partes:
 
 * Parte 1: ataque de cross-site scripting
-* Parte 2: ataque de canal lateral y phishing
+* Parte 2: página falsa de inicio de sesión / phishing
 * Parte 3: un gusano de perfil
 
 Cada parte incluye varios ejercicios que te ayudan a construir un ataque. Todos los ataques implicarán explotar debilidades en el sitio de zoobar, pero son representativos de las debilidades que se encuentran en sitios web reales.
@@ -25,7 +25,6 @@ Para usuarios de Mac y Linux: abre una terminal *en tu máquina* (no en tu VM) y
 
 ```
 $ ssh -L localhost:8080:localhost:8080 student@VM-IP-ADDRESS
-student@VM-IP-ADDRESS's password: 6858
 ```
 
 Para usuarios de Windows, esta debería ser una opción en tu cliente SSH.
@@ -38,12 +37,11 @@ El reenvío permanecerá activo mientras la conexión SSH esté abierta.
 Navegador web
 -----------
 
-En este laboratorio, te recomendamos usar la versión actual del navegador [Mozilla Firefox](https://www.mozilla.com/firefox/)
+En este laboratorio, te recomendamos usar la versión actual del navegador [Google Chrome](https://www.google.com/chrome/)
 para desarrollar tus ataques. Existen diferencias sutiles (y no tan sutiles)
-en la forma en que distintos navegadores manejan HTML, JavaScript y cookies, y algunos ataques que funcionan en Internet Explorer o
-Chrome (por ejemplo) pueden no funcionar en Firefox, y viceversa. Sugerimos
-Firefox porque está ampliamente disponible y puede ejecutarse en una variedad de
-sistemas operativos.
+en la forma en que distintos navegadores manejan HTML, JavaScript y cookies, y algunos ataques que funcionan en Internet Explorer
+(por ejemplo) pueden no funcionar en Chrome, y viceversa. El script de calificación
+usará una versión headless de Chrome, llamada [Puppeteer](https://pptr.dev/), para revisar tus soluciones.
 
 Si tienes una extensión de bloqueo de anuncios en tu navegador web, como uBlock,
 puede que quieras desactivarla para evitar que interfiera con los ataques que
@@ -61,16 +59,16 @@ comandos de shell:
 
 
 ```
-student@vm-6858:~$ cd lab
-student@vm-6858:~/lab$ git commit -am 'my solution to lab3'
+student@6566-v26:~$ cd lab
+student@6566-v26:~/lab$ git commit -am 'my solution to lab3'
 [lab3 c54dd4d] my solution to lab3
  1 files changed, 1 insertions(+), 0 deletions(-)
-student@vm-6858:~/lab$ git pull
+student@6566-v26:~/lab$ git pull
 Already up-to-date.
-student@vm-6858:~/lab$ git checkout -b lab4 origin/lab4
+student@6566-v26:~/lab$ git checkout -b lab4 origin/lab4
 Branch lab4 set up to track remote branch lab4 from origin.
 Switched to a new branch 'lab4'
-student@vm-6858:~/lab$ make
+student@6566-v26:~/lab$ make
 ...
 ```
 
@@ -80,7 +78,7 @@ laboratorio 1. No incluye separación de privilegios ni perfiles de Python.
 Ahora puedes iniciar el servidor web `zookws` de la siguiente manera.
 
 ```
-student@vm-6858:~/lab$ ./zookd 8080
+student@6566-v26:~/lab$ ./zookd 8080
 ```
 
 Abre tu navegador y ve a la URL `http://localhost:8080/`.
@@ -102,7 +100,7 @@ Ejecutaremos tus ataques después de limpiar la base de datos de usuarios regist
 (excepto el usuario llamado "attacker"), así que no asumas la presencia
 de otros usuarios en tus ataques enviados.
 
-Puedes ejecutar nuestras pruebas con `make check`; esto ejecutará tus ataques
+Puedes ejecutar nuestras pruebas con `make check-lab4`; esto ejecutará tus ataques
 contra el servidor y te dirá si tus exploits están funcionando correctamente.
 Como en laboratorios anteriores, ten en cuenta que las verificaciones realizadas por `make
 check` no son exhaustivas, especialmente respecto a condiciones de carrera. Podrías
@@ -110,21 +108,16 @@ querer ejecutar las pruebas varias veces para convencerte de que tus exploits
 son robustos.
 
 
-Los ejercicios 5, 13 y 14 requieren que
-el sitio mostrado se vea de cierta manera. El script `make check`
-no es lo suficientemente inteligente como para comparar cómo se ve el sitio con y
-sin tu ataque, así que tendrás que hacer esa comparación tú mismo
-(y nosotros también, durante la calificación). Cuando `make check` se ejecuta,
+Algunos ejercicios requieren que
+el sitio mostrado se vea de cierta manera. Cuando `make check-lab4` se ejecuta,
 genera imágenes de referencia de cómo *se supone* que debe verse la página del ataque
 (`answer-XX.ref.png`) y de lo que tu página de ataque
 realmente muestra (`answer-XX.png`), y las coloca en el
-directorio `lab4-tests/`. Asegúrate de que tus capturas de pantalla `answer-XX.png`
-se parezcan a las imágenes de referencia en `answer-XX.ref.png`.
-Para ver estas imágenes desde `lab4-tests/`, cópialas
+directorio `lab4-tests/`. Para ver estas imágenes desde `lab4-tests/`, cópialas
 a tu máquina local o ejecuta `python3 -m http.server 8080`
 y visualiza las imágenes visitando http://localhost:8080/lab4-tests/.
 *Ten en cuenta que http.server de Python cachea las respuestas*, así que deberías detenerlo
-y reiniciarlo después de ejecutar make check.
+y reiniciarlo después de ejecutar `make check-lab4`.
 
 Parte 1: un ataque de cross-site scripting (XSS)
 -------------------------------------------
@@ -170,10 +163,10 @@ te familiaricen con JavaScript, el DOM, etc.
 >Ejercicio 2: Registrar la cookie.
 >
 >Modifica tu script para que registre la cookie del usuario para el atacante usando
->el [script de registro](https://css.csail.mit.edu/6.858/2022/labs/log.php).
+>el [script de registro](https://css.csail.mit.edu/6.566/2026/labs/log.php).
 >El ataque debe seguir activándose cuando el usuario visite la página "Users".
 >
->Por favor revisa las instrucciones en <https://css.csail.mit.edu/6.858/2022/labs/log.php>
+>Por favor revisa las instrucciones en <https://css.csail.mit.edu/6.566/2026/labs/log.php>
 >y usa esa URL en tus scripts para registrar la cookie robada. Puedes registrar tantas veces
 >como quieras mientras trabajas en el proyecto, pero por favor no ataques ni abuses del
 >script de registro. Ten en cuenta que la cookie tiene caracteres que probablemente necesiten ser codificados
@@ -207,7 +200,7 @@ te familiaricen con JavaScript, el DOM, etc.
 >* Tu ataque no puede depender de la presencia de ninguna cuenta de zoobar que no sea
 > la de la víctima.
 >* Tu solución debe ser una URL que comience con
-> [http://localhost:8080/zoobar/index.cgi/users?](https://css.csail.mit.edu/6.858/2022/#).
+> [http://localhost:8080/zoobar/index.cgi/users?](#).
 >
 >Cuando termines, corta y pega tu URL en la barra de direcciones de un usuario con sesión iniciada,
 >y debería imprimir las cookies de la víctima (no olvides iniciar el servidor de zoobar: `./zookld`). Una vez que funcione, coloca tu URL de ataque en un
@@ -255,7 +248,7 @@ te familiaricen con JavaScript, el DOM, etc.
 >Para este ejercicio, necesitas modificar tu URL para ocultar tus huellas. Excepto por
 >la barra de direcciones del navegador (que puede ser diferente), el calificador debe ver una página
 >que se vea **exactamente** igual a cuando visita
->[http://localhost:8080/zoobar/index.cgi/users](https://css.csail.mit.edu/6.858/2022/#). No deben ser visibles cambios en la
+>[http://localhost:8080/zoobar/index.cgi/users](#). No deben ser visibles cambios en la
 >apariencia del sitio ni texto adicional. Evitar el *texto de advertencia en rojo*
 >es una parte importante de este ataque (está bien si la página
 >se ve rara brevemente antes de corregirse). Tu script aún debe enviar la
@@ -277,49 +270,45 @@ te familiaricen con JavaScript, el DOM, etc.
 >con `display: none`, por lo que podrías preferir usar `visibility:
 >hidden`.
 
-Nota: no hay ejercicios 6-8 en este laboratorio; el siguiente ejercicio empieza
-en el número 9.
+Esto completa la parte 1 de este laboratorio.
+
+Envía tus respuestas a la primera parte de esta tarea de laboratorio ejecutando
+`make handin.zip` y sube el archivo resultante `handin.zip` a Canvas.
 
 Parte 2: Página de inicio de sesión falsa
 -----------------------
 
-Los ataques en línea más sofisticados a menudo explotan múltiples vectores de ataque. En
-esta parte, construirás un ataque que (1) robará los zoobars de una víctima si el usuario ya ha iniciado sesión (usando el ataque del ejercicio 8), o
-(2) robará el nombre de usuario y la contraseña de la víctima si no ha iniciado sesión usando un
-formulario de inicio de sesión falso. Al igual que en la última parte del laboratorio, el escenario del ataque es que
-logramos que el usuario visite alguna página web maliciosa que controlamos. En
-esta parte del laboratorio, primero construiremos el ataque de robo de información de inicio de sesión,
-y luego combinaremos ambos en una sola página maliciosa.
+En esta parte, construirás un ataque que robará el nombre de usuario y la contraseña de la víctima si no ha iniciado sesión, usando un formulario de inicio de sesión falso. El escenario del ataque es que logramos que el usuario visite alguna página web maliciosa que controlamos.
 
->Ejercicio 9: Crear un formulario de inicio de sesión de zoobar
+>Ejercicio 6: Crear un formulario de inicio de sesión de zoobar
 >
 >Copia el formulario de inicio de sesión de zoobar (ya sea viendo el código fuente de la página o usando
->zoobar/templates/login.html) en `answer-9.html`, y haz
+>zoobar/templates/login.html) en `answer-6.html`, y haz
 >que funcione con el sitio existente de zoobar. Gran parte de esto implicará anteponer prefijos a las URL
 >con la dirección del servidor web. Este archivo se usará como punto de partida
 >para el resto de los ejercicios en esta parte, así que asegúrate de poder iniciar sesión correctamente
 >en el sitio web usando tu formulario falso. Ten en cuenta que **no** debes hacer
 >cambios en el código de zoobar. Envía tu HTML en un archivo
->llamado `answer-9.html`.
+>llamado `answer-6.html`.
 
->Ejercicio 10: Interceptar el envío del formulario
+>Ejercicio 7: Interceptar el envío del formulario
 >
 >Para robar las credenciales de la víctima, tenemos que observar los valores del formulario
 >justo cuando el usuario está enviando el formulario. Esto se hace fácilmente adjuntando
 >un event listener (usando `addEventListener()`) o configurando el
 >atributo `onsubmit` de un formulario. Para este ejercicio, usa uno de estos
 >métodos para mostrar la contraseña del usuario cuando se envíe el formulario. Envía tu
->código en un archivo llamado `answer-10.html`.
+>código en un archivo llamado `answer-7.html`.
 
->Ejercicio 11: Robar la contraseña
+>Ejercicio 8: Robar la contraseña
 >
->Modifica `answer-10.html` para registrar el nombre de usuario y la contraseña (separados por una barra) usando el script de registro
+>Modifica `answer-7.html` para registrar el nombre de usuario y la contraseña (separados por una barra) usando el script de registro
 >cuando el usuario envíe el formulario de inicio de sesión. Envía tu código en un archivo llamado
->`answer-11.html`.
+>`answer-8.html`.
 >
 >Ten en cuenta que después de implementar este ejercicio, la página del controlador del atacante
 >ya no redirigirá al usuario para que inicie sesión correctamente. Corregirás
->este problema en el ejercicio 12.
+>este problema en el siguiente ejercicio.
 >
 >**Hint**:
 >Cuando se envía un formulario, las solicitudes pendientes se cancelan mientras el navegador
@@ -329,11 +318,11 @@ y luego combinaremos ambos en una sola página maliciosa.
 >al manejador de envío, y luego usa setTimeout() para enviar el formulario
 >de nuevo un poco más tarde. ¡Recuerda que tu manejador de envío podría invocarse otra vez!
 
->Ejercicio 12: Oculta tus huellas
+>Ejercicio 9: Oculta tus huellas
 >
->Modifica `answer-11.html` para ocultar tus huellas: organiza que, después de
+>Modifica `answer-8.html` para ocultar tus huellas: organiza que, después de
 >robar el nombre de usuario y la contraseña de la víctima, el usuario vea el sitio oficial. Envía
->tu código en un archivo llamado `answer-12.html`.
+>tu código en un archivo llamado `answer-9.html`.
 >
 >**Hint**:
 >La aplicación de zoobar verifica *cómo* se envió el formulario (es decir,
@@ -341,38 +330,26 @@ y luego combinaremos ambos en una sola página maliciosa.
 >de la solicitud contienen submit_login o submit_registration.
 >Ten esto en mente cuando reenvíes el intento de inicio de sesión a la página real.
 
->Ejercicio 13 (opcional): Canales laterales y phishing.
+>Ejercicio desafío (opcional): Phishing con URL oficial.
 >
->Modifica `answer-12.html` para que tu JavaScript robe los
->zoobars de la víctima si el usuario ya ha iniciado sesión,
->o de lo contrario siga el ejercicio 12: pide a la víctima su
->nombre de usuario y contraseña si no ha iniciado sesión y roba la contraseña
->de la víctima. Como en el ejercicio anterior, asegúrate de **no** cargar
->el archivo `answer-13.html` desde `http://localhost:8080/`.
+>Crea un ataque que robe la contraseña de la víctima, incluso si la víctima es cuidadosa y solo ingresa su contraseña cuando la barra de direcciones muestra [http://localhost:8080/zoobar/index.cgi/login](#). Tu solución debe estar contenida en un documento HTML corto llamado `answer-chal.html`.
 >
->El script de calificación ejecutará el código una vez mientras la sesión está iniciada en el sitio de zoobar
->antes de cargar tu página. Luego ejecutará el código una segunda vez mientras
->*no* haya sesión iniciada en el sitio de zoobar antes de cargar tu página.
->En consecuencia, cuando el navegador cargue tu documento, tu documento malicioso
->debe detectar si el usuario ha iniciado sesión en el sitio de zoobar. Envía tu
->documento HTML final en un archivo llamado `answer-13.html`.
+>Al calificar, el calificador abrirá la página con el navegador (sin sesión iniciada en zoobar). Al cargar tu documento, debe ser redirigido inmediatamente a [http://localhost:8080/zoobar/index.cgi/login](#). Luego el calificador ingresará un nombre de usuario y una contraseña, y presionará el botón "Log in".
+>
+>Tu misión, si decides aceptarla, es lograr que cuando se presione el botón "Log in", la contraseña se registre para el atacante usando el [script de registro](https://css.csail.mit.edu/6.566/2026/labs/log.php). El formulario de inicio de sesión debe verse perfectamente normal para el usuario: no debe aparecer texto adicional (por ejemplo, advertencias), y si el nombre de usuario y la contraseña son correctos, el inicio de sesión debe continuar igual que siempre.
 >
 >**Hint**:
->La política del mismo origen generalmente no permite que tu página de ataque acceda al
->contenido de páginas de otro dominio. ¿Qué tipos de archivos puede cargar
->tu página de ataque desde otro dominio? ¿Tiene la aplicación web de zoobar
->archivos de ese tipo? ¿Cómo puedes inferir si el usuario ha iniciado sesión o no,
->basándote en esto?
+>Para este ataque final, puede que `alert()` no te sirva para probar la inyección de scripts; Chrome lo bloquea cuando causa un bucle infinito de cuadros de diálogo. Prueba otras maneras de verificar que tu código se está ejecutando, como `document.loginform.login_username.value=42`.
 
 Parte 3: Gusano de perfiles
 --------------------
 
-Los gusanos en el contexto de la seguridad web son scripts que son inyectados en páginas por un atacante y que se propagan automáticamente una vez que se ejecutan en el navegador de una víctima. El [gusano Samy](https://web.archive.org/web/20130329061059/http://namb.la:80/popular/tech.html) es un excelente ejemplo, que se propagó a más de un millón de usuarios en la red social MySpace en tan solo 20 horas. En esta parte del laboratorio, crearás un gusano similar que, al ejecutarse, transferirá 1 zoobar de la víctima al atacante y luego se propagará al perfil de la víctima. Así, cualquier visita posterior al perfil de la víctima hará que se transfieran zoobars adicionales y que el gusano se propague nuevamente. Construirás tu solución en varias etapas, como en las partes anteriores. Esta vez, sin embargo, no detallaremos los pasos mediante ejercicios.
+Los gusanos en el contexto de la seguridad web son scripts que son inyectados en páginas por un atacante y que se propagan automáticamente una vez que se ejecutan en el navegador de una víctima. El [gusano Samy](https://web.archive.org/web/20130329061059/http://namb.la:80/popular/tech.html) es un excelente ejemplo, que se propagó a más de un millón de usuarios en la red social MySpace en tan solo 20 horas. Un ejemplo más reciente es un gusano que [se propagó por los perfiles de editores de Wikipedia](https://www.bleepingcomputer.com/news/security/wikipedia-hit-by-self-propagating-javascript-worm-that-vandalized-pages/) en 2026. En esta parte del laboratorio, crearás un gusano similar que, al ejecutarse, transferirá 1 zoobar de la víctima al atacante y luego se propagará al perfil de la víctima. Así, cualquier visita posterior al perfil de la víctima hará que se transfieran zoobars adicionales y que el gusano se propague nuevamente. Construirás tu solución en varias etapas, como en las partes anteriores. Esta vez, sin embargo, no detallaremos los pasos mediante ejercicios.
 
->Ejercicio 14: Gusano de perfiles.
+>Ejercicio 10: Gusano de perfiles.
 >
 >Tu gusano de perfil debe enviarse en un archivo llamado
->`answer-14.txt`. Para calificar tu ataque, copiaremos y pegaremos el
+>`answer-10.txt`. Para calificar tu ataque, copiaremos y pegaremos el
 >código del perfil enviado en el perfil del usuario "attacker" y veremos ese
 >perfil usando la cuenta del calificador. Luego veremos el perfil del calificador con
 >más cuentas, verificando tanto la transferencia de zoobars como la replicación del
@@ -392,7 +369,7 @@ Los gusanos en el contexto de la seguridad web son scripts que son inyectados en
 > segundos). Durante ese tiempo, el calificador no hará clic en ninguna parte.
 >* Durante el proceso de transferencia y replicación, la barra de direcciones del navegador
 > debe permanecer en
-> [http://localhost:8080/zoobar/index.cgi/users?user=**<username>**](https://css.csail.mit.edu/6.858/2022/#),
+> [http://localhost:8080/zoobar/index.cgi/users?user=**<username>**](#),
 > donde **<username>** es el usuario cuyo perfil se está
 > viendo. El visitante no debe ver elementos adicionales de interfaz gráfica
 > (por ejemplo, frames), y el usuario cuyo perfil se está
@@ -412,7 +389,7 @@ Los gusanos en el contexto de la seguridad web son scripts que son inyectados en
 >* Oculta cualquier rastro que la víctima pueda observar.
 >* Organiza la replicación del perfil.
 >
->Este [análisis detallado del gusano de MySpace](https://css.csail.mit.edu/6.858/2022/readings/advisory4.5.06.html) puede servirte de inspiración.
+>Este [análisis detallado del gusano de MySpace](readings/advisory4.5.06.html) puede servirte de inspiración.
 >
 >**Note**:
 >No se te calificará por el caso extremo en el que el usuario que ve el perfil
@@ -437,7 +414,7 @@ Los gusanos en el contexto de la seguridad web son scripts que son inyectados en
 >Si eliges usar `iframe`s en tu solución, quizá quieras acceder a
 >campos de formularios dentro de un `iframe`. La manera exacta de hacerlo
 >varía según el navegador, pero dicho acceso siempre está restringido por la política de mismo origen.
->En Firefox, puedes usar
+>En Chrome, puedes usar
 >`iframe.contentDocument.forms[0].some_field_name.value = 1;`.
 
 ### Entregables
@@ -452,19 +429,16 @@ Asegúrate de tener los siguientes archivos:
  `answer-7.html`,
  `answer-8.html`,
  `answer-9.html`,
- `answer-10.html`,
- `answer-11.html`,
- `answer-12.html`,
- `answer-13.html`,
- `answer-14.txt`,
+ `answer-10.txt`,
+ y, si haces el desafío, `answer-chal.html`,
 que contengan cada uno de tus ataques.
 Siéntete libre de incluir cualquier comentario sobre tus soluciones en el
 archivo `answers.txt` (agradeceremos cualquier retroalimentación que puedas tener
 sobre esta tarea).
 
 Envía tus respuestas a la tarea del laboratorio ejecutando
-make prepare-submit y sube el archivo resultante
-lab3-handin.tar.gz a Canvas.
+`make handin.zip` y sube el archivo resultante
+`handin.zip` a Canvas.
 
 Agradecimientos
 ---------------
