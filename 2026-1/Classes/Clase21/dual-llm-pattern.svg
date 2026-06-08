@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="360" viewBox="0 0 1100 360" role="img" aria-labelledby="title desc">
+  <title id="title">Dual LLM pattern</title>
+  <desc id="desc">User request flows to a privileged LLM, which writes code. The code calls tools and a quarantined LLM.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#111827" flood-opacity="0.14" />
+    </filter>
+  </defs>
+
+  <rect width="1100" height="360" rx="22" fill="#ffffff" />
+
+  <g font-family="Inter, Arial, Helvetica, sans-serif" text-anchor="middle">
+    <g filter="url(#shadow)">
+      <rect x="45" y="86" width="210" height="96" rx="14" fill="#e8f4ff" stroke="#2563eb" stroke-width="3" />
+      <rect x="355" y="70" width="260" height="128" rx="14" fill="#ecfdf5" stroke="#059669" stroke-width="3" />
+      <rect x="735" y="86" width="220" height="96" rx="14" fill="#fff7ed" stroke="#ea580c" stroke-width="3" />
+      <rect x="635" y="250" width="360" height="84" rx="14" fill="#f5f3ff" stroke="#7c3aed" stroke-width="3" />
+    </g>
+
+    <text x="150" y="128" font-size="34" font-weight="700" fill="#0f172a">Usuario</text>
+    <text x="150" y="158" font-size="20" fill="#334155">prompt confiable</text>
+
+    <text x="485" y="119" font-size="31" font-weight="700" fill="#0f172a">LLM privilegiado</text>
+    <text x="485" y="152" font-size="20" fill="#334155">solo ve el pedido</text>
+    <text x="485" y="177" font-size="20" fill="#334155">del usuario</text>
+
+    <text x="845" y="128" font-size="34" font-weight="700" fill="#0f172a">Codigo</text>
+    <text x="845" y="158" font-size="20" fill="#334155">plan ejecutable</text>
+
+    <text x="815" y="295" font-size="30" font-weight="700" fill="#0f172a">Herramientas + LLM</text>
+    <text x="815" y="322" font-size="22" fill="#334155">en cuarentena</text>
+  </g>
+
+  <g fill="none" stroke="#1f2937" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)">
+    <path d="M 255 134 H 340" />
+    <path d="M 615 134 H 720" />
+    <path d="M 845 190 V 238" />
+  </g>
+
+  <g font-family="Inter, Arial, Helvetica, sans-serif" fill="#475569" font-size="18" text-anchor="middle">
+    <text x="300" y="116">objetivo</text>
+    <text x="670" y="116">genera</text>
+    <text x="915" y="224">usa</text>
+  </g>
+</svg>
