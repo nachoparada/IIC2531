@@ -6,12 +6,12 @@
 | Clase 2 | Por definir | Threat Models | Introduccion al curso; introduccion a modelos de amenaza. | N/A | |
 | Clase 3 | Por definir | Aislacion de Componentes y Separacion de Privilegios | Diseno arquitectonico con separacion de privilegios usando OKWS como caso base. | Building Secure High-Performance Web Services with OKWS | |
 | Clase 4 | Por definir | Contenedores de Linux y Maquinas Virtuales | Arquitectura enfocada en seguridad: aislamiento, autenticacion, canales seguros y separacion de privilegios. | Links a temas relacionados | |
-| Clase 5 | Por definir | No hay clases | No hay clases. | | Entrega Lab 1 |
+| Clase 5 | Por definir | Por definir | Por definir. | Por definir | Entrega Lab 1 |
 | Clase 6 | Por definir | Aislacion con Firecracker | Resumen de conceptos anteriores usando Firecracker como ejemplo. | Firecracker: Lightweight Virtualization for Serverless Applications | |
 | Clase 7 | Por definir | Buffer Overflow - Lab 2 | Buffer overflows, ejemplos y defensas. | Baggy Bounds Checking: An Efficient and Backwards-Compatible Defense against Out-of-Bounds Errors | |
 | Clase 8 | Por definir | Arquitectura de Seguridad | Arquitectura de seguridad usando Google Cloud como ejemplo. | Links a temas relacionados; Google Infrastructure Security Design Overview, June 2024 | |
 | Clase 9 | Por definir | Arquitectura de Seguridad | Arquitectura de seguridad usando Google Cloud como ejemplo. | Links a temas relacionados; Google Infrastructure Security Design Overview, June 2024 | |
-| Clase 10 | Por definir | OpenSSH | Como OpenSSH usa separacion de privilegios para ser seguro. | Preventing Privilege Escalation | No pueden haber entregas |
+| Clase 10 | Por definir | OpenSSH | Como OpenSSH usa separacion de privilegios para ser seguro. | Preventing Privilege Escalation | |
 | Clase 11 | Por definir | WebAssembly | Como WebAssembly usa SFI para proveer aislacion. | Bringing the Web up to Speed with WebAssembly; Provably-Safe Multilingual Software Sandboxing using WebAssembly | Entrega Lab 2 |
 | Clase 12 | Por definir | RLBox | Aislacion a nivel de librerias; importancia de aislar librerias; interfaces; caso Firefox. | Retrofitting Fine Grain Isolation in the Firefox Renderer | |
 | Clase 13 | Por definir | Hardware Seguro | Como BitLocker provee seguridad al hardware. | AES-CBC + Elephant diffuser: A Disk Encryption Algorithm for Windows Vista | |
