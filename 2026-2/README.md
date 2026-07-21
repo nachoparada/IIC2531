@@ -7,7 +7,7 @@
 | **Codigo** | IIC2531 |
 | **Semestre** | 2026-2 |
 | **Creditos** | 10 |
-| **Horario** | Por definir |
+| **Horario** | 8:20am |
 | **Sala** | Por definir |
 | **Profesor** | Ignacio Parada (yo@ignacioparada.com) |
 
