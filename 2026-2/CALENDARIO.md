@@ -28,7 +28,7 @@
 | Clase 24 | 2026-10-27 | Comunicacion Anonima | Arquitectura de Tor como ejemplo de navegacion anonima. | Tor: The Second-Generation Onion Router | |
 | Clase 25 | 2026-10-29 | Ataques a la Cadena de Suministro | Riesgos en dependencias, paquetes, builds y firmas de codigo. | Por definir | |
 | Clase 26 | 2026-11-03 | Seguridad en IA | Vulnerabilidades en sistemas de IA y estrategias para manejarlas. | Por definir | |
-| Clase 27 | 2026-11-05 | Por definir | Por definir. | Por definir | |
+| Clase 27 | 2026-11-05 | Por definir | Por definir. | Por definir | Entrega Lab 5 |
 | Clase 28 | 2026-11-10 | Por definir | Por definir. | Por definir | |
 | Clase 29 | 2026-11-12 | Por definir | Por definir. | Por definir | |
 | Clase 30 | 2026-11-17 | Por definir | Por definir. | Por definir | |
