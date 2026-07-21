@@ -24,8 +24,8 @@
 | Clase 20 | 2026-10-13 | Ataques Web | Resumen de ataques web importantes. | Links a los ataques web mas importantes | |
 | Clase 21 | 2026-10-15 | Mensajeria Segura | Seguridad en email; cifrado; criptografia y diseno. | A Formal Security Analysis of the Signal Messaging Protocol | Entrega Lab 4 |
 | Clase 22 | 2026-10-20 | Comunicacion Anonima | Arquitectura de Tor como ejemplo de navegacion anonima. | Tor: The Second-Generation Onion Router | |
-| Clase 23 | 2026-10-22 | Seguridad en IA | Vulnerabilidades en sistemas de IA y estrategias para manejarlas. | Por definir | |
-| Clase 24 | 2026-10-27 | Por definir | Por definir. | Por definir | |
+| Clase 23 | 2026-10-22 | Ataques a la Cadena de Suministro | Riesgos en dependencias, paquetes, builds y firmas de codigo. | Por definir | |
+| Clase 24 | 2026-10-27 | Seguridad en IA | Vulnerabilidades en sistemas de IA y estrategias para manejarlas. | Por definir | |
 | Clase 25 | 2026-10-29 | Por definir | Por definir. | Por definir | |
 | Clase 26 | 2026-11-03 | Por definir | Por definir. | Por definir | |
 | Clase 27 | 2026-11-05 | Por definir | Por definir. | Por definir | |
