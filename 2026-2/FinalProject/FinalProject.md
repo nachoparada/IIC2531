@@ -10,20 +10,20 @@ Fomentamos proyectos finales que aprovechen múltiples cursos que puedas estar t
 
 | Entrega | Fecha |
 |---------|-------|
-| Propuesta del proyecto | 29 de Abril, 2026 |
-| Presentación final + Informe | 22 de Junio, 2026 |
+| Propuesta del proyecto | Por definir |
+| Presentación final + Informe | 19 de Noviembre, 2026 |
 
 Hay tres pasos para realizar un proyecto final:
 
-1. **Propuesta del proyecto — 29 de Abril**
+1. **Propuesta del proyecto — fecha por definir**
    Discute tu idea propuesta con el equipo docente para definir el problema exacto que abordarás, cómo lo harás, y qué herramientas podrías necesitar en el proceso. Entrega una propuesta de una a dos páginas describiendo: la lista de miembros de tu grupo, el problema que quieres abordar, cómo planeas abordarlo, y qué propones específicamente diseñar e implementar.
    
    *Esta entrega no es calificada, pero es obligatoria para recibir feedback y asegurar que tu proyecto va por buen camino.*
 
-2. **Presentación del proyecto — 22 de Junio**
+2. **Presentación del proyecto — 19, 24 y 26 de Noviembre**
    Prepara una breve presentación en clase sobre el trabajo que has realizado para tu proyecto final. Dependiendo del número de grupos y los tipos de proyectos que cada grupo elija, podríamos decidir limitar el número total de presentaciones.
 
-3. **Informe y código — 22 de Junio**
+3. **Informe y código — 19 de Noviembre**
    Escribe un documento describiendo el diseño e implementación de tu proyecto, y entrégalo junto con el código de tu proyecto (en caso de que aplique). El documento debe ser de aproximadamente 5-10 páginas de texto que nos ayude a entender qué problema resolviste, y qué hace tu código.
 
 ## Nota sobre proyectos orientados a ataques
