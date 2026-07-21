@@ -8,7 +8,7 @@ El informe está pensado para ser **leído**. Debe incluir el mismo contenido ce
 
 ## Fecha de entrega
 
-La presentación final y el informe deben entregarse el **22 de Junio, 2026 a las 8am**. Las presentaciones serán el 22 y 24 de Junio en horario de clases.
+La presentación final y el informe deben entregarse el **19 de Noviembre, 2026 a las 8am**. Las presentaciones serán el 19, 24 y 26 de Noviembre en horario de clases.
 
 ## Presentación
 
