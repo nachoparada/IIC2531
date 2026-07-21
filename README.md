@@ -1,149 +1,46 @@
-# Marp Presentations - Seguridad Computacional
+# IIC2531 - Seguridad Computacional
 
-Este proyecto contiene presentaciones creadas con Marp para el curso de Seguridad Computacional.
+Materiales del curso IIC2531 Seguridad Computacional.
 
-## ¿Qué es Marp?
+El repositorio esta organizado por semestre. Cada carpeta semestral contiene el programa, clases, laboratorios y proyecto final correspondientes.
 
-Marp es una herramienta que permite crear presentaciones hermosas usando sintaxis Markdown. Puedes escribir tus diapositivas en Markdown y convertirlas a HTML, PDF, PowerPoint y otros formatos.
+## Semestres
 
-## Instalación
+| Semestre | Estado | Notas |
+|---|---|---|
+| `2026-2` | En preparacion | Copia inicial de `2026-1`; fechas y ajustes pendientes |
+| `2026-1` | Cerrado | Material completo del semestre 2026-1 |
+| `2025-2` | Archivo | Material historico |
 
-### Opción 1: Usando Node.js (Recomendado)
+## Estructura
 
-1. Instala Node.js desde [nodejs.org](https://nodejs.org/)
-2. Instala Marp CLI globalmente:
-   ```bash
-   npm install -g @marp-team/marp-cli
-   ```
+```text
+2026-2/
+  README.md              # Informacion del semestre
+  Classes/               # Clases y recursos
+  Labs/                  # Laboratorios
+  FinalProject/          # Enunciado y criterios del proyecto final
+```
 
-### Opción 2: Usando VS Code
+## Flujo de preparacion de un nuevo semestre
 
-1. Instala VS Code desde [code.visualstudio.com](https://code.visualstudio.com/)
-2. Instala la extensión "Marp for VS Code" desde el marketplace
-3. Abre cualquier archivo `.md` y usa `Ctrl+Shift+P` → "Marp: Open Preview"
+1. Copiar el semestre anterior a una nueva carpeta.
+2. Limpiar entregas de estudiantes y materiales invitados que no se reutilizaran.
+3. Actualizar el `README.md` del semestre con fechas, sala, horario y evaluaciones.
+4. Revisar el orden de clases y laboratorios contra el calendario academico.
+5. Registrar cambios importantes en el `CHANGELOG.md` del semestre.
 
-### Opción 3: Usando el Navegador
+## Presentaciones
 
-1. Ve a [marp.app](https://marp.app/)
-2. Sube tu archivo `.md` o escribe directamente en el editor
-
-## Uso
-
-### Ver la Presentación
+Las clases estan escritas principalmente en Markdown compatible con Marp. Para previsualizar o exportar una clase:
 
 ```bash
-# Servidor local con vista previa en tiempo real
-marp --server --watch .
-
-# Generar HTML
-marp --html sample-presentation.md
-
-# Generar PDF
-marp --pdf sample-presentation.md
-
-# Generar PowerPoint
-marp --pptx sample-presentation.md
+npx marp --server --watch 2026-2/Classes
+npx marp --pdf 2026-2/Classes/Clase01/introduction.md
 ```
 
-### Estructura de Archivos
+Tambien puede usarse la extension "Marp for VS Code" para previsualizar archivos individuales.
 
-- `sample-presentation.md` - Presentación de ejemplo sobre Seguridad Computacional
-- `package.json` - Configuración del proyecto
-- `README.md` - Este archivo
+## Licencia y fuentes
 
-## Sintaxis de Marp
-
-### Encabezados de Diapositivas
-
-```markdown
----
-marp: true
-theme: default
-paginate: true
----
-
-# Título de la Diapositiva
-
-Contenido aquí...
-
----
-
-# Nueva Diapositiva
-
-Más contenido...
-```
-
-### Temas Disponibles
-
-- `default` - Tema por defecto
-- `gaia` - Tema Gaia
-- `uncover` - Tema Uncover
-
-### Características Especiales
-
-- **Imágenes**: `![alt](image.jpg)`
-- **Código**: ```javascript`código aquí```
-- **Matemáticas**: `$E = mc^2$`
-- **Notas del orador**: `<!-- speaker: notas aquí -->`
-
-## Personalización
-
-### CSS Personalizado
-
-Crea un archivo `custom-theme.css`:
-
-```css
-/* @theme custom */
-
-section {
-  background-color: #f0f0f0;
-  color: #333;
-  font-size: 30px;
-  padding: 40px;
-}
-
-h1 {
-  color: #2c3e50;
-}
-```
-
-### Usar Tema Personalizado
-
-```markdown
----
-marp: true
-theme: custom
----
-```
-
-## Comandos Útiles
-
-```bash
-# Instalar dependencias
-npm install
-
-# Iniciar servidor de desarrollo
-npm start
-
-# Generar presentación HTML
-npm run build-html
-
-# Generar presentación PDF
-npm run build
-```
-
-## Recursos Adicionales
-
-- [Documentación oficial de Marp](https://marpit.marp.app/)
-- [Marp CLI](https://github.com/marp-team/marp-cli)
-- [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode)
-- [Editor web de Marp](https://marp.app/)
-
-## Próximos Pasos
-
-1. Personaliza `sample-presentation.md` con tu contenido
-2. Crea nuevas presentaciones siguiendo el mismo formato
-3. Experimenta con diferentes temas y estilos
-4. Comparte tus presentaciones con la clase
-
-¡Disfruta creando presentaciones hermosas con Marp! 
+Este curso esta basado parcialmente en materiales de MIT 6.858 / 6.566 Computer Systems Security, utilizados bajo licencia Creative Commons Attribution 3.0, junto con materiales propios y lecturas academicas o de industria citadas en cada clase.
