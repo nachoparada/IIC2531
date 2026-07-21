@@ -73,9 +73,9 @@ Si alguno de estos requisitos no se cumple, la nota final corresponde a la nota 
 
 | Evaluacion | Fecha |
 |------------|-------|
-| I1 | Por definir |
-| I2 | Por definir |
-| Examen | Por definir |
+| I1 | 2026-09-30 |
+| I2 | 2026-11-19 |
+| Examen | 2026-12-10 |
 
 ### Fechas de Laboratorios
 
