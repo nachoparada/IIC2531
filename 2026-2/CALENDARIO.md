@@ -32,6 +32,6 @@
 | Clase 28 | 2026-11-10 | Por definir | Por definir. | Por definir | |
 | Clase 29 | 2026-11-12 | Por definir | Por definir. | Por definir | |
 | Clase 30 | 2026-11-17 | Por definir | Por definir. | Por definir | |
-| Clase 31 | 2026-11-19 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | I2; Entrega Proyecto Final |
+| Clase 31 | 2026-11-19 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | Entrega Proyecto Final |
 | Clase 32 | 2026-11-24 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | |
 | Clase 33 | 2026-11-26 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | |
