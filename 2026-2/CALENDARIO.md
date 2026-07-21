@@ -4,7 +4,7 @@
 |---|---|---|---|---|---|
 | Clase 1 | 2026-08-06 | Threat Models | Introduccion al curso; introduccion a modelos de amenaza. | N/A | |
 | Clase 2 | 2026-08-11 | Threat Models | Introduccion al curso; introduccion a modelos de amenaza. | N/A | |
-| Clase 3 | 2026-08-13 | Aislacion de Componentes y Separacion de Privilegios | Diseno arquitectonico con separacion de privilegios usando OKWS como caso base. | Building Secure High-Performance Web Services with OKWS | |
+| Clase 3 | 2026-08-13 | Aislacion de Componentes y Separacion de Privilegios | Diseno arquitectonico con separacion de privilegios usando OKWS como caso base. | Building Secure High-Performance Web Services with OKWS | Entrega Lab 1 |
 | Clase 4 | 2026-08-18 | Contenedores de Linux y Maquinas Virtuales | Arquitectura enfocada en seguridad: aislamiento, autenticacion, canales seguros y separacion de privilegios. | Links a temas relacionados | No pruebas (semana universitaria) |
 | Clase 5 | 2026-08-20 | ns-exec | Proyecto de contenedores usando namespaces de Linux. | Por definir | No pruebas (semana universitaria) |
 | Clase 6 | 2026-08-25 | Aislacion con Firecracker | Resumen de conceptos anteriores usando Firecracker como ejemplo. | Firecracker: Lightweight Virtualization for Serverless Applications | |
@@ -33,5 +33,5 @@
 | Clase 29 | 2026-11-12 | Por definir | Por definir. | Por definir | |
 | Clase 30 | 2026-11-17 | Por definir | Por definir. | Por definir | |
 | Clase 31 | 2026-11-19 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | Entrega Proyecto Final |
-| Clase 32 | 2026-11-24 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | Entrega Proyecto Final |
-| Clase 33 | 2026-11-26 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | Entrega Proyecto Final |
+| Clase 32 | 2026-11-24 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | |
+| Clase 33 | 2026-11-26 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | |
