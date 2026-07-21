@@ -50,6 +50,12 @@ El curso prioriza **amplitud sobre profundidad**, cubriendo una variedad de tema
 
 El calendario detallado de clases esta disponible en [CALENDARIO.md](CALENDARIO.md).
 
+## Material del Curso
+
+- [Calendario de clases](CALENDARIO.md)
+- [Proyecto final](FinalProject/FinalProject.md)
+- [Entrega final del proyecto](FinalProject/EntregaFinal.md)
+
 ## Evaluacion
 
 La nota final se calcula de la siguiente manera:
@@ -81,16 +87,17 @@ Si alguno de estos requisitos no se cumple, la nota final corresponde a la nota 
 
 | Lab | Tema | Fecha de Entrega |
 |-----|------|------------------|
-| Lab 1 | Modelo de Amenaza | Por definir |
-| Lab 2 | Separacion de Privilegios | Por definir |
-| Lab 3 | Buffer Overflow | Por definir |
-| Lab 4 | Seguridad en Navegadores | Por definir |
-| Lab 5 | Seguridad en Sistemas de IA | Por definir |
+| Lab 1 | Modelo de Amenaza | 2026-08-25 |
+| Lab 2 | Separacion de Privilegios | 2026-09-10 |
+| Lab 3 | Buffer Overflow | 2026-10-01 |
+| Lab 4 | Seguridad en Navegadores | 2026-10-22 |
+| Lab 5 | Seguridad en Sistemas de IA | 2026-11-05 |
 
 ### Proyecto Final
-- **Fecha de entrega:** Por definir
+- **Fecha de entrega:** 2026-11-19
 - Puede ser orientado a ataque o defensa
 - Presentaciones al final del semestre
+- Ver [Proyecto final](FinalProject/FinalProject.md) y [Entrega final del proyecto](FinalProject/EntregaFinal.md)
 
 ## Bibliografia
 
