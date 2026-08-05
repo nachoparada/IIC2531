@@ -91,6 +91,15 @@ style: |
 
 ---
 
+# Estructura del curso - Benjamín Saavedra
+  * Estudio Licenciatura en Inge. de las Ciencias de la Computación.
+  * Juego tenis
+  * Lo que mas me gusto del ramo: Labs y proyecto
+  * Me pueden escribir en benjamon@estudiante.uc.cl o en telegram @benjasaavedra
+![width:550px align-right](foto_benja.jpeg)
+
+---
+
 # Estructura del curso (cont.)
   * Dos Ies y un examen final.
   * Tareas: 5 laboratorios.
