@@ -93,8 +93,8 @@ style: |
 
 # Estructura del curso
   * Las clases serán Martes y Jueves a las 8:20am, en la sala B18.
-    * [Planificación tentativa](https://docs.google.com/spreadsheets/d/1sYUm6cKj_XGOEkRSr8PQgfkNPqWXm_4iK3EZXzTO6PM/edit?usp=sharing) en Canvas.
-    * [Repo del curso](https://github.com/nachoparada/IIC2531).
+    * [Planificación tentativa](https://github.com/nachoparada/IIC2531/blob/main/2026-2/CALENDARIO.md) en el repo del curso.
+    * [Repo del curso](https://github.com/nachoparada/IIC2531/tree/main/2026-2).
     * Un lectura/paper por clase.
       * Lean el paper antes de la clase
       * Algunos papers sobre sistemas de producción, otros sobre ideas de investigación.
@@ -106,11 +106,11 @@ style: |
 # Estructura del curso - Ignacio Parada
   * Ingeniero Civil en Computación.
     * Hace muchos muchos años.
-  * Me dediqué emprender fundando Magnet.
+  * Me dediqué a emprender fundando Magnet.
   * Profesor de **Ingeniería de Software** y **Estructuras de Datos y Algoritmos**.
   * Master en Engineering & Management en MIT.
     * Research Assistant en Cybersecurity at MIT Sloan.
-  * Actualmente Engineering Manager en Zerofox.
+  * Engineering Manager en Zerofox.
   * No tengo oficina en el DCC, pero me pueden contactar en:
     * yo@ignacioparada.com
 
@@ -121,7 +121,7 @@ style: |
   * Juego tenis
   * Lo que mas me gusto del ramo: Labs y proyecto
   * Me pueden escribir en benjamon@estudiante.uc.cl o en telegram @benjasaavedra
-![width:550px align-right](foto_benja.jpeg)
+![width:550px align-center](foto_benja.jpeg)
 
 ---
 
@@ -149,7 +149,7 @@ style: |
   * Tareas: 5 laboratorios.
     * Defensas y/o ataques a sistemas bastante reales.
     * No mucho código, pero mucho pensamiento no estándar.
-    * Ayudantías son para ayudar tareas o responder preguntas antes de una I.
+    * Es posible tener _office hours_ para ayudar en tareas o responder preguntas antes de una I, pero las tienen que pedir ustedes.
   * Para proyectos:
     * Presentaciones al final del semestre.
     * Piensen en proyectos en los que le gustaría trabajar mientras leen artículos.
@@ -239,13 +239,13 @@ $$\text{Si } Proyecto < 4 \Rightarrow NF = Proyecto$$
   * La política y el mecanismo son cómo su sistema trata de lograr la seguridad.
     * Se puede hablar de política+mecanismo logrando algún objetivo / modelo de amenaza.
     * En la práctica, la seguridad se rompe si tiene el modelo de amenaza incorrecto.
-    * Es difícil hablar formalmente sobre que el modelo de amenaza sea correcto, sin embargo.
+    * Es difícil hablar formalmente sobre que el modelo de amenaza sea correcto.
 
 ---
 
 # Construir sistemas seguros es difícil -- ¿por qué?
   * Ejemplo: notas de IIC2531, almacenado en un servidor.
-    * Solo los ayudantes deberían poder leer y escribir el archivo de con las notas.
+    * Solo los ayudantes deberían poder leer y escribir el archivo con las notas.
   * Fácil de implementar el aspecto *positivo* de la política:
     * Solo tiene que haber una ruta de código que permita a un ayudante acceder al archivo.
   * Pero la seguridad es un objetivo *negativo*:
@@ -265,7 +265,7 @@ $$\text{Si } Proyecto < 4 \Rightarrow NF = Proyecto$$
     * Diseñar, observar ataques, actualizar comprensión de amenazas y políticas.
     * Usar componentes, diseños, etc. bien entendidos.
     * Los análisis post-mortem son importantes para entender
-      * Bases de datos públicas de vulnerabilidades (ej., https://cve.mitre.org/)
+      * Bases de datos públicas de vulnerabilidades (ej., [CVE](https://cve.mitre.org/))
       * Animar a las personas a reportar vulnerabilidades (ej., programas de recompensa)
     * Los modelos de amenaza cambian con el tiempo.
   
@@ -279,7 +279,7 @@ $$\text{Si } Proyecto < 4 \Rightarrow NF = Proyecto$$
   * ¡Un atacante determinado generalmente puede ganar!
     * Defensa en profundidad
     * Plan de recuperación (ej., copias de seguridad seguras)
-  * La mayor parte de esta clase trata sobre fallas para que comience a pensar de esta manera
+  * La mayor parte de esta clase trata sobre fallas para que comiencen a pensar de esta manera
 
 ---
 
@@ -335,7 +335,7 @@ $$\text{Si } Proyecto < 4 \Rightarrow NF = Proyecto$$
     * El adversario puede tratar de confundir / engañar al usuario para que dé su código.
         * El usuario no tiene una buena forma de identificar el sitio web legítimo del adversario.
         * Especialmente si el adversario pregunta por teléfono en lugar de por sitio web.
-        * [ Ref: https://www.vice.com/en/article/y3vz5k/booming-underground-market-bots-2fa-otp-paypal-amazon-bank-apple-venmo ]
+        * [Bots de phishing que roban códigos 2FA por teléfono](https://www.vice.com/en/article/y3vz5k/booming-underground-market-bots-2fa-otp-paypal-amazon-bank-apple-venmo)
 
 ---
 
@@ -352,7 +352,7 @@ $$\text{Si } Proyecto < 4 \Rightarrow NF = Proyecto$$
         * Solucionadores humanos de CAPTCHA en países del tercer mundo.
         * Los humanos son mucho mejores resolviendo CAPTCHAs que OCRs o incluso usuarios regulares.
         * El costo es muy bajo (fracción de un centavo por CAPTCHA resuelto).
-    * [ Ref: https://www.cs.uic.edu/pub/Kanich/Publications/re.captchas.pdf ]
+    * [Granjas humanas para resolver CAPTCHAs a bajo costo](https://www.cs.uic.edu/pub/Kanich/Publications/re.captchas.pdf)
 
 ---
 
@@ -362,7 +362,7 @@ Ejemplo: las suposiciones computacionales cambian con el tiempo.
   * El sistema Kerberos del MIT usó claves DES de 56 bits, desde mediados de los 80.
   * En ese momento, parecía bien asumir que el adversario no puede verificar todas las 2^56 claves.
   * Ya no es razonable: ahora cuesta alrededor de $100.
-    * [ Ref: https://www.cloudcracker.com/dictionaries.html ]
+    * [Diccionarios usados para cracking de contraseñas](https://www.cloudcracker.com/dictionaries.html)
 
 ---
 
@@ -378,24 +378,24 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 # Lo que sale mal #1: problemas con el modelo de amenaza / suposiciones. (cont.)
 
 * Ejemplo: asumir que los usuarios pueden entender inequívocamente la UI.
-  * [ Ref: https://en.wikipedia.org/wiki/IDN_homograph_attack ]
-  * [ Ref: https://www.trojansource.codes/trojan-source.pdf ]
+  * [Ataques homográficos con nombres de dominio internacionalizados](https://en.wikipedia.org/wiki/IDN_homograph_attack)
+  * [Trojan Source: vulnerabilidades invisibles en el código](https://www.trojansource.codes/trojan-source.pdf)
 
 * Ejemplo: discos decomisionados.
   * Muchas laptops, desktops, servidores se tiran sin borrar datos sensibles.
   * Un estudio reporta grandes cantidades de datos confidenciales en discos comprados via ebay, etc.
-  * [ Ref: https://simson.net/page/Real_Data_Corpus ]
+  * [Datos recuperados desde discos usados y mal borrados](https://simson.net/page/Real_Data_Corpus)
 
 ---
 # Lo que sale mal #1: problemas con el modelo de amenaza / suposiciones. (cont.)
 
 * Ejemplo: actualizaciones de software.
   * Actualizaciones de software de iPhone de Apple vs FBI.
-    * [ Ref: https://www.apple.com/customer-letter/ ]
+    * [Carta de Apple sobre el iPhone y el FBI](https://www.apple.com/customer-letter/)
   * Extensiones de Chrome compradas por vendedores de malware/adware.
-    * [ Ref: https://arstechnica.com/security/2014/01/malware-vendors-buy-chrome-extensions-to-send-adware-filled-updates/ ]
+    * [Extensiones de Chrome compradas para distribuir adware](https://arstechnica.com/security/2014/01/malware-vendors-buy-chrome-extensions-to-send-adware-filled-updates/)
   * Biblioteca de Node.js actualizada para incluir código que roba claves de Bitcoin.
-    * [ Ref: https://www.theregister.co.uk/2018/11/26/npm_repo_bitcoin_stealer/ ]
+    * [Paquete npm actualizado para robar Bitcoin](https://www.theregister.co.uk/2018/11/26/npm_repo_bitcoin_stealer/)
 
 * Ejemplo: ¿las máquinas desconectadas de Internet son seguras?
   * El gusano Stuxnet se propagó via archivos especialmente construidos en unidades USB.
@@ -441,7 +441,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 # Lo que sale mal #2: problemas con la política. (cont.)
 
   * Ejemplo: Sistema escolar del condado de Fairfax, VA.
-    * [ Ref: https://catless.ncl.ac.uk/Risks/26.02.html#subj7.1 ]
+    * [Falla de política en el sistema escolar de Fairfax County](https://catless.ncl.ac.uk/Risks/26.02.html#subj7.1)
     * Políticas
         * El estudiante puede acceder solo a sus propios archivos en el sistema escolar.
         * El superintendente tiene acceso a los archivos de todos.
@@ -458,7 +458,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 # Lo que sale mal #2: problemas con la política. (cont.)
 
 * Ejemplo: Cuentas de Mat Honan en Amazon, Apple, Google, etc.
-    * [ Ref: https://www.wired.com/gadgetlab/2012/08/apple-amazon-mat-honan-hacking/all/ ]
+    * [El ataque encadenado contra las cuentas de Mat Honan](https://www.wired.com/gadgetlab/2012/08/apple-amazon-mat-honan-hacking/all/)
     * Honan es editor en wired.com; alguien quería entrar en su cuenta de gmail.
     * Restablecimiento de contraseña de Gmail: enviar un enlace de verificación a una dirección de email de respaldo.
         * Google amablemente imprime parte de la dirección de email de respaldo.
@@ -502,7 +502,8 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 * Ejemplo: Tiempo de vida de las cuentas.
   * Las direcciones de email pueden ser reutilizadas.
   * Otros sistemas asumen que la cuenta aún pertenece al mismo propietario de la dirección de email.
-  * [ Ref: https://www.gruss.cc/files/uafmail.pdf ]
+  * [Use-after-free mail: reutilización de direcciones de email](https://www.gruss.cc/files/uafmail.pdf)
+  * Venmo!!
 
 ---
 # Lo que sale mal #2: problemas con la política. (cont.)
@@ -518,7 +519,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 # Lo que sale mal #2: problemas con la política. (cont.)
 
 * Ejemplo: Cuenta de email de Sarah Palin.
-  * [ Ref: https://en.wikipedia.org/wiki/Sarah_Palin_email_hack ]
+  * [Hackeo al email de Sarah Palin mediante preguntas de seguridad](https://en.wikipedia.org/wiki/Sarah_Palin_email_hack)
   * Las cuentas de email de Yahoo tienen un nombre de usuario, contraseña y preguntas de seguridad.
   * El usuario puede iniciar sesión proporcionando nombre de usuario y contraseña.
   * Si el usuario olvida la contraseña, puede restablecerla respondiendo las preguntas de seguridad.
@@ -551,7 +552,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 # Lo que sale mal #3: problemas con el mecanismo (cont.)
 
   * Ejemplo: límites de adivinación de contraseña de iCloud de Apple.
-    * [ Ref: https://github.com/hackappcom/ibrute ]
+    * [iBrute: bypass de rate limits en iCloud](https://github.com/hackappcom/ibrute)
     * Las personas a menudo eligen contraseñas débiles; a menudo se pueden adivinar con pocos intentos (1K-1M).
     * La mayoría de servicios, incluyendo iCloud de Apple, limitan la tasa de intentos de login.
     * El servicio iCloud de Apple tiene muchas APIs.
@@ -564,7 +565,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 # Lo que sale mal #3: problemas con el mecanismo (cont.)
 
   * Ejemplo: Verificaciones de control de acceso faltantes en el sitio web de tarjetas de crédito de Citigroup.
-    * [ Ref: https://www.nytimes.com/2011/06/14/technology/14security.html ]
+    * [Brecha de Citigroup por controles de acceso faltantes](https://www.nytimes.com/2011/06/14/technology/14security.html)
     * Citigroup permitía a los usuarios de tarjetas de crédito acceder a sus cuentas en línea.
     * La página de login pide nombre de usuario y contraseña.
     * La URL de la página de información de cuenta incluía algunos números.
@@ -581,7 +582,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 * Ejemplo: mala aleatoriedad para criptografía.
   * Necesita aleatoriedad de alta calidad para generar las claves que no se pueden adivinar.
   * Debian accidentalmente "deshabilitó" la aleatoriedad en la biblioteca OpenSSL.
-    * [ Ref: https://www.debian.org/security/2008/dsa-1571 ]
+    * [Debian OpenSSL y claves criptográficas predecibles](https://www.debian.org/security/2008/dsa-1571)
     * La aleatoriedad se inicializó usando código C que no era estrictamente correcto.
     * Una herramienta de análisis de programa marcó esto como un problema.
     * Los desarrolladores de Debian arreglaron la advertencia removiendo las líneas ofensivas.
@@ -597,8 +598,8 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 
 * Ejemplo: mala aleatoriedad para criptografía.
   * La debilidad de Java SecureRandom de Android lleva al robo de Bitcoin.
-    * [ Ref: https://bitcoin.org/en/alert/2013-08-11-android ]
-    * [ Ref: https://www.nilsschneider.net/2013/01/28/recovering-bitcoin-private-keys.html ]
+    * [Alerta Bitcoin por debilidad en Android SecureRandom](https://bitcoin.org/en/alert/2013-08-11-android)
+    * [Recuperar claves privadas desde nonces ECDSA repetidos](https://www.nilsschneider.net/2013/01/28/recovering-bitcoin-private-keys.html)
     * Los Bitcoins pueden ser gastados por cualquiera que conozca la clave privada del propietario.
     * Muchas aplicaciones de wallet de Bitcoin en Android usaron la API SecureRandom de Java.
     * Resulta que ¡el sistema a veces olvidó sembrar el PRNG!
@@ -613,8 +614,20 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 
 # Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
 
+* Ejemplo: mala aleatoriedad para criptografía en una hardware wallet.
+  * Coldcard generaba claves usando una fuente de entropía que podía ser más débil de lo esperado.
+    * [Coldcard RNG vulnerability / AI-assisted security review](https://x.com/i/status/2083682712108269713)
+  * La interfaz seguía pareciendo correcta: la wallet producía claves y direcciones.
+  * El riesgo estaba en una suposición escondida del mecanismo:
+    * que la fuente de aleatoriedad era impredecible para el adversario.
+  * Buen ejemplo moderno de revisión de código, criptografía y el uso de IA para romper sistemas.
+
+---
+
+# Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
+
 * Ejemplo: eliminación de datos.
-  * [ Ref: https://www.da.vidbuchanan.co.uk/blog/exploiting-acropalypse.html ]
+  * [Acropalypse: datos no truncados en capturas recortadas](https://www.da.vidbuchanan.co.uk/blog/exploiting-acropalypse.html)
   * El editor de capturas de pantalla de Android soportaba recorte.
   * Pero olvidó truncar el archivo de imagen al sobrescribirlo.
     * Pasó modo de apertura "w" (O_RDWR) y no "wt" (O_RDWR | O_TRUNC).
@@ -626,7 +639,7 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
 # Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
 
 * Ejemplo: codificación/decodificación ambigua, Android Master Key.
-  * [ Ref: https://www.usenix.org/system/files/usenixsecurity25-you.pdf ]
+  * [Android Master Key y parsing ambiguo de ZIP/APK](https://www.usenix.org/system/files/usenixsecurity25-you.pdf)
   * Los archivos ZIP tienen información redundante sobre qué archivos están presentes.
     * Nombre de archivo junto a cada registro de archivo.
     * Directorio de nombres de archivo en un directorio central al final del archivo ZIP.
@@ -645,16 +658,16 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
   * Los dispositivos embebidos generan claves predecibles.
     * Problema: dispositivos embebidos, máquinas virtuales pueden no tener mucha aleatoriedad.
     * Como resultado, muchas claves son similares o susceptibles a ataques de adivinación.
-    * [ Ref: https://factorable.net/weakkeys12.extended.pdf ]
+    * [Mining your Ps and Qs: claves RSA débiles en dispositivos](https://factorable.net/weakkeys12.extended.pdf)
   * Máquinas tragamonedas de casino.
-    * [ Ref: https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/ ]
+    * [Máquinas tragamonedas predecibles por fallas de PRNG](https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/)
 
 ---
 
 # Lo que sale mal #3: problemas con el mecanismo -- errores. (cont.)
 
 * Ejemplo: Error de verificación de nombre de certificado SSL de Moxie.
-  * [ Ref: https://www.wired.com/2009/07/kaminsky/ ]
+  * [El bug SSL de Moxie y strings con byte nulo](https://www.wired.com/2009/07/kaminsky/)
   * Los certificados usan strings codificados por longitud, pero el código C a menudo usa terminación null.
   * Las CAs otorgarían certificado para amazon.com\0.nickolai.org
   * Los navegadores vieron el \0 e interpretaron como un certificado para amazon.com
@@ -666,10 +679,10 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
   * Los ataques sofisticados a menudo combinan muchas debilidades.
   * Ej., un adversario obtuvo la clave criptográfica de Microsoft para autenticación de usuarios.
     * Múltiples pasos salieron mal para permitir al adversario acceso a esta clave.
-    * [ Ref: https://msrc.microsoft.com/blog/2023/09/results-of-major-technical-investigations-for-storm-0558-key-acquisition/ ]
+    * [Investigación de Microsoft sobre la clave robada en Storm-0558](https://msrc.microsoft.com/blog/2023/09/results-of-major-technical-investigations-for-storm-0558-key-acquisition/)
   * De manera similar, muchos errores a menudo se encadenan en ataques serios.
-    * [ Ref: https://googleprojectzero.blogspot.com/2023/09/analyzing-modern-in-wild-android-exploit.html ]
-    * [ Ref: https://googleprojectzero.blogspot.com/2023/10/an-analysis-of-an-in-the-wild-ios-safari-sandbox-escape.html ]
+    * [Project Zero: cadena de exploits Android en uso real](https://googleprojectzero.blogspot.com/2023/09/analyzing-modern-in-wild-android-exploit.html)
+    * [Project Zero: escape de sandbox en Safari iOS](https://googleprojectzero.blogspot.com/2023/10/an-analysis-of-an-in-the-wild-ios-safari-sandbox-escape.html)
 
 ---
 
