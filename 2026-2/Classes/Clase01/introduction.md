@@ -141,7 +141,7 @@ style: |
   * Segunda vez siendo ayudante del ramo.
   * Tengo un viejito de 15 años que merecía aparecer.
   * Me pueden escribir en:
-    * myllaraymontoya@uc.cl o telegram @Myllaray
+    * myllaray.montoya@uc.cl o telegram @Myllaray
 
 ![width:230px align-right myllaray-photo](myllaray_montoya.jpg)
 ![width:230px align-right viejito-photo](viejito_15.jpg)
