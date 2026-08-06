@@ -24,13 +24,17 @@ style: |
     transform: translateX(-50%);
   }
 
+  img[alt~="align-center"][alt~="align-lower"] {
+    transform: translate(-50%, 24px);
+  }
+
   section.myllaray-slide {
     position: relative;
   }
 
   section.myllaray-slide ul {
     max-width: 430px;
-    font-size: 0.78em;
+    font-size: 0.88em;
     line-height: 1.18;
   }
 
@@ -121,7 +125,7 @@ style: |
   * Juego tenis
   * Lo que mas me gusto del ramo: Labs y proyecto
   * Me pueden escribir en benjamon@estudiante.uc.cl o en telegram @benjasaavedra
-![width:550px align-center](foto_benja.jpeg)
+![width:515px align-center align-lower](foto_benja.jpeg)
 
 ---
 
