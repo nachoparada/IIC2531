@@ -67,7 +67,7 @@ style: |
 ---
 
 # Estructura del curso
-  * Las clases serán Lunes y Miércoles a las 8:20am, en la sala A4.
+  * Las clases serán Martes y Jueves a las 8:20am, en la sala B18.
     * [Planificación tentativa](https://docs.google.com/spreadsheets/d/1sYUm6cKj_XGOEkRSr8PQgfkNPqWXm_4iK3EZXzTO6PM/edit?usp=sharing) en Canvas.
     * [Repo del curso](https://github.com/nachoparada/IIC2531).
     * Un lectura/paper por clase.
@@ -700,4 +700,3 @@ Ejemplo: la disponibilidad de información cambia con el tiempo.
   * Operar sobre la red, y sobre Internet, introduce nuevas amenazas.
   * Grandes ideas: criptografía, certificados, confianza.
   * Cuarto módulo cubrirá muchos temas de seguridad de red / sistemas distribuidos.
-
