@@ -102,114 +102,108 @@ Sé específico. No escribas generalidades como "el sistema debe ser seguro". En
 
 ---
 
-## Escenario 1: Tienda Online de Barrio
+## Escenario 1: Clínica Dental Pequeña
 
-**Contexto:** Don Carlos tiene una ferretería en Providencia y quiere vender sus productos por internet. Tiene un catálogo de ~500 productos, espera 10-20 pedidos diarios, y quiere que los clientes puedan pagar con tarjeta de crédito o transferencia bancaria. Don Carlos administrará el sitio él mismo desde su computador en la tienda.
+**Contexto:** Una clínica dental de barrio quiere digitalizar su operación. Los pacientes pueden reservar horas, recibir recordatorios por correo o WhatsApp, subir formularios médicos previos a la atención, y revisar presupuestos de tratamientos. La recepcionista administra la agenda y los pagos, mientras que los dentistas registran diagnósticos, notas clínicas y tratamientos realizados.
 
 **Consideraciones adicionales:**
-- Los clientes deben poder crear cuentas para ver su historial de pedidos
-- Don Carlos necesita poder actualizar precios e inventario
-- El sitio debe mostrar si un producto está disponible o agotado
-- Los pedidos pueden ser con despacho a domicilio o retiro en tienda
+- Los pacientes deben poder ver y modificar sus propias reservas
+- La recepcionista necesita mover horas, registrar pagos y contactar pacientes
+- Los dentistas necesitan acceder al historial clínico de sus pacientes
+- Algunos pacientes son menores de edad y sus apoderados gestionan las reservas
+- El sistema es administrado por personas sin formación técnica
 
 **Preguntas guía:**
 - ¿Qué información es sensible en este sistema?
-- ¿Quiénes son los usuarios legítimos y qué necesitan hacer?
-- ¿Qué pasa si un atacante obtiene acceso al panel de administración?
-- ¿Qué pasa si un atacante puede modificar los precios?
-- ¿Cómo afecta que Don Carlos no sea experto en tecnología?
+- ¿Qué debería poder hacer un paciente, una recepcionista y un dentista?
+- ¿Qué pasa si un paciente puede ver fichas clínicas de otros pacientes?
+- ¿Qué pasa si alguien modifica o elimina una reserva?
+- ¿Cómo cambia el modelo de amenaza cuando hay datos médicos y menores de edad?
+- ¿Cómo afecta que el sistema sea usado por personas no expertas en tecnología?
 
 ---
 
-## Escenario 2: Marketplace de Retail
+## Escenario 2: Plataforma de Payroll para Pymes
 
-**Contexto:** MegaStore es una cadena de retail que opera en 5 países de Latinoamérica. Su plataforma e-commerce procesa 50,000 transacciones diarias, tiene 2 millones de usuarios registrados, y permite que vendedores externos (marketplace) publiquen productos junto al inventario propio de MegaStore. La empresa tiene un equipo de 20 desarrolladores y un equipo de seguridad de 3 personas.
+**Contexto:** SueldoSimple es una plataforma SaaS que ayuda a pequeñas y medianas empresas a calcular sueldos, cotizaciones, impuestos, liquidaciones y archivos de transferencia bancaria. La plataforma atiende a 800 empresas, cada una con entre 10 y 300 empleados. En cada empresa hay administradores de RR.HH., contadores externos y empleados que consultan sus liquidaciones.
 
 **Consideraciones adicionales:**
-- Los vendedores del marketplace reciben pagos semanales por sus ventas
-- Existe un programa de puntos/fidelización para clientes frecuentes
-- La plataforma tiene una app móvil además del sitio web
-- Hay un call center que puede acceder a información de clientes para resolver problemas
-- Se integra con múltiples proveedores de pago y empresas de logística
+- Cada empresa solo debe acceder a sus propios empleados y liquidaciones
+- Los administradores pueden modificar sueldos, bonos, descuentos y cuentas bancarias
+- Los empleados pueden descargar sus propias liquidaciones históricas
+- El equipo de soporte de SueldoSimple puede ayudar a clientes con problemas de configuración
+- La plataforma genera archivos para pagos bancarios mensuales
 
 **Preguntas guía:**
-- ¿Cómo difiere el modelo de amenaza respecto al Escenario 1?
-- ¿Qué nuevos actores (vendedores, call center) introducen nuevos riesgos?
-- ¿Qué pasa si un vendedor del marketplace es malicioso?
-- ¿Cómo se protege el dinero de los vendedores legítimos?
-- ¿Qué información puede ver el call center y qué no debería poder ver?
-- ¿Cómo afecta la escala al modelo de amenaza?
+- ¿Qué información es sensible en este sistema?
+- ¿Qué pasa si una empresa puede ver la información de otra empresa?
+- ¿Qué pasa si un administrador malicioso cambia la cuenta bancaria de un empleado?
+- ¿Qué información debería poder ver soporte y qué debería estar fuera de su alcance?
+- ¿Cómo se auditan cambios en sueldos, bonos y cuentas bancarias?
+- ¿Cómo afecta que el sistema maneje dinero y datos laborales?
 
 ---
 
-## Escenario 3: Portal de Gobierno
+## Escenario 3: Portal de Resultados Médicos
 
-**Contexto:** El Servicio de Registro Civil necesita un portal donde los ciudadanos puedan:
-- Descargar certificados de nacimiento, matrimonio y defunción
-- Actualizar su dirección registrada
-- Solicitar hora para trámites presenciales
-- Consultar el estado de trámites en curso
-
-El portal debe integrarse con ClaveÚnica (el sistema de autenticación del gobierno chileno). Aproximadamente 100,000 ciudadanos usan el portal mensualmente.
+**Contexto:** RedLab es una red de laboratorios clínicos que permite a pacientes descargar resultados de exámenes, a médicos revisar resultados de sus pacientes, y a técnicos de laboratorio subir informes validados. El sistema procesa exámenes de sangre, imágenes y otros resultados clínicos para varias clínicas asociadas. Aproximadamente 60,000 pacientes usan el portal mensualmente.
 
 **Consideraciones adicionales:**
-- Los certificados tienen validez legal y pueden usarse para trámites bancarios, notariales, etc.
-- Existe información sensible como estado civil, filiación, y datos de menores de edad
-- Algunos trámites requieren pago de aranceles
-- Los funcionarios del Registro Civil deben poder procesar solicitudes y emitir documentos
-- El sistema debe cumplir con la Ley de Protección de Datos Personales
+- Los resultados pueden contener diagnósticos o información de salud altamente sensible
+- Algunos resultados deben ser revisados por un médico antes de liberarse al paciente
+- Los médicos solo deberían ver resultados de pacientes bajo su atención
+- Los técnicos de laboratorio pueden cargar resultados, pero no deberían modificarlos después de validados
+- El sistema debe mantener un registro de quién accedió a cada resultado
 
 **Preguntas guía:**
-- ¿Qué hace diferente la seguridad de un sistema gubernamental?
-- ¿Qué consecuencias tiene la emisión de un certificado fraudulento?
-- ¿Cómo se verifica que quien solicita un certificado tiene derecho a obtenerlo?
-- ¿Qué información debería poder ver un funcionario vs. un ciudadano?
-- ¿Cómo se auditan las acciones de los funcionarios?
-- ¿Qué pasa si ClaveÚnica es comprometida?
+- ¿Qué consecuencias tiene filtrar resultados médicos?
+- ¿Qué consecuencias tiene publicar un resultado incorrecto o incompleto?
+- ¿Cómo se verifica que un médico tiene derecho a ver los resultados de un paciente?
+- ¿Qué acciones deberían requerir registro de auditoría?
+- ¿Qué pasa si una cuenta de médico es comprometida?
+- ¿Cómo se equilibra confidencialidad con disponibilidad en casos urgentes?
 
 ---
 
-## Escenario 4: Sistema de Votación Estudiantil
+## Escenario 4: Sistema de Tickets QR para Conciertos
 
-**Contexto:** El Centro de Alumnos de Ingeniería (CAi) necesita un sistema de votación online para las elecciones anuales. Participan aproximadamente 1,500 estudiantes habilitados para votar, y la votación estará abierta por 48 horas. Hay 4 listas compitiendo. El proceso es administrado por un Tricel (Tribunal Calificador de Elecciones) compuesto por 3 estudiantes.
+**Contexto:** TicketSur vende entradas para conciertos y eventos masivos. Los usuarios compran entradas en línea, reciben un código QR, pueden transferir entradas a otros usuarios y, en algunos eventos, revenderlas dentro de la misma plataforma. En la entrada del recinto, guardias usan teléfonos con una app de validación para escanear los QR. Algunos recintos tienen conexión inestable durante eventos grandes.
 
 **Consideraciones adicionales:**
-- Solo pueden votar estudiantes con matrícula vigente en Ingeniería
-- Cada estudiante puede votar exactamente una vez
-- El voto debe ser secreto (nadie puede saber por quién votó un estudiante específico)
-- Los resultados deben ser verificables y transparentes una vez cerrada la votación
-- El Tricel tiene acceso administrativo al sistema para resolver problemas técnicos
-- Los candidatos y sus apoderados quieren asegurarse de que el proceso sea justo
+- Cada ticket debe permitir el ingreso de una sola persona
+- Los usuarios pueden transferir tickets antes del evento
+- La plataforma debe resistir alta demanda cuando se abre la venta de eventos populares
+- Los guardias necesitan validar entradas rápidamente en la puerta
+- Puede haber reembolsos, contracargos y disputas por tickets revendidos
 
 **Preguntas guía:**
-- ¿Cómo se verifica que alguien es estudiante habilitado sin comprometer el secreto del voto?
-- ¿Qué pasa si un miembro del Tricel quiere favorecer a una lista?
-- ¿Cómo pueden los candidatos verificar que los resultados son correctos?
-- ¿Qué pasa si el sistema cae durante las 48 horas de votación?
-- ¿Es posible demostrar que votaste de cierta manera? ¿Eso es bueno o malo?
-- ¿Cómo se diferencia este sistema de uno de encuestas anónimas?
+- ¿Qué pasa si un ticket QR se copia y se comparte muchas veces?
+- ¿Qué pasa si un atacante compra miles de entradas usando bots?
+- ¿Cómo se asegura que una transferencia de ticket sea válida?
+- ¿Cómo debería funcionar la validación si el recinto pierde conexión?
+- ¿Qué información necesita ver un guardia al escanear un ticket?
+- ¿Cómo se protegen compradores legítimos frente a fraudes de reventa?
 
 ---
 
-## Escenario 5: Cajero Automático (ATM)
+## Escenario 5: Bicicletas Compartidas
 
-**Contexto:** Un banco necesita diseñar la seguridad de sus cajeros automáticos. Cada ATM está ubicado en un lugar público (mall, estación de metro, sucursal), opera 24/7, y se conecta a los servidores del banco a través de una red privada. Los clientes pueden retirar efectivo, consultar saldo, y hacer transferencias usando su tarjeta y PIN.
+**Contexto:** BikeCity opera bicicletas compartidas en Santiago. Los usuarios instalan una app, registran un medio de pago, encuentran bicicletas cercanas, escanean un código QR para desbloquearlas y pagan según los minutos de uso. El equipo de operaciones puede ver la ubicación de las bicicletas, bloquear unidades con fallas y reasignar bicicletas entre estaciones. Las bicicletas tienen candados electrónicos y se comunican con el servidor mediante red móvil.
 
 **Consideraciones adicionales:**
-- El cajero contiene efectivo físico (típicamente $10-30 millones CLP)
-- Componentes de hardware: lector de tarjetas, teclado PIN, dispensador de billetes, impresora de comprobantes, cámara
-- Una empresa externa se encarga del mantenimiento y la carga de efectivo
-- El cajero debe seguir operando si pierde conexión temporalmente con el banco
-- Los clientes esperan que sus transacciones se reflejen inmediatamente en su cuenta
+- Los usuarios deben poder iniciar y terminar viajes desde la app
+- La empresa cobra automáticamente según la duración del viaje
+- Las bicicletas reportan ubicación, batería y estado del candado
+- Técnicos de mantenimiento pueden desbloquear bicicletas para reparación
+- Algunas zonas tienen mala conectividad móvil
 
 **Preguntas guía:**
-- ¿Qué es más valioso para un atacante: el efectivo dentro del cajero o los datos de las tarjetas?
-- ¿Cómo se asegura el banco de que el técnico de mantenimiento no robe efectivo o instale un skimmer?
-- ¿Qué pasa si alguien instala un dispositivo falso sobre el lector de tarjetas?
-- ¿Cómo debería comportarse el cajero si pierde conexión con el banco a mitad de una transacción?
-- ¿Qué información debe guardar el cajero localmente y cuál nunca debería almacenar?
-- ¿Cómo se protege el PIN durante todo el proceso (teclado → cajero → banco)?
-- ¿Qué ataques físicos existen y cómo se mitigan?
+- ¿Qué pasa si alguien logra desbloquear bicicletas sin pagar?
+- ¿Qué información de ubicación de usuarios es sensible?
+- ¿Qué pasa si un atacante falsifica el término de un viaje?
+- ¿Qué puede hacer un técnico de mantenimiento y cómo se limita ese poder?
+- ¿Cómo debería comportarse una bicicleta si pierde conexión con el servidor?
+- ¿Qué ataques combinan software, hardware y acceso físico a la bicicleta?
 
 ---
 
@@ -293,4 +287,3 @@ que no están cubiertos por ninguna política?]
 - STRIDE Threat Model: https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-threats
 
 ---
-
