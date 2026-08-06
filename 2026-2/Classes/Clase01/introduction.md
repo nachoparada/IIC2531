@@ -23,6 +23,31 @@ style: |
     left: 50%;
     transform: translateX(-50%);
   }
+
+  section.myllaray-slide {
+    position: relative;
+  }
+
+  section.myllaray-slide ul {
+    max-width: 430px;
+    font-size: 0.78em;
+    line-height: 1.18;
+  }
+
+  section.myllaray-slide img[src$="myllaray_montoya.jpg"],
+  section.myllaray-slide img[src$="viejito_15.jpg"] {
+    position: absolute;
+    top: 128px;
+    margin-left: 0;
+  }
+
+  section.myllaray-slide img[src$="myllaray_montoya.jpg"] {
+    right: 318px;
+  }
+
+  section.myllaray-slide img[src$="viejito_15.jpg"] {
+    right: 70px;
+  }
   
   /* Right-align terminal commands */
   .terminal-commands {
@@ -97,6 +122,25 @@ style: |
   * Lo que mas me gusto del ramo: Labs y proyecto
   * Me pueden escribir en benjamon@estudiante.uc.cl o en telegram @benjasaavedra
 ![width:550px align-right](foto_benja.jpeg)
+
+---
+
+<!-- _class: myllaray-slide -->
+
+# Estructura del curso - Myllaray Montoya
+  * Licenciatura en Inge. de las Ciencias de la Computación.
+  * Ex organizadora de RMC.
+    * Desde 2023-2 hasta 2025-2.
+  * Creadora de la charla de toma de ramos y acompañamiento de novatos.
+    * Desde 2024-1 hasta 2026-1.
+  * Me entretiene la ciberseguridad y a veces hago hacking ético.
+  * Segunda vez siendo ayudante del ramo.
+  * Tengo un viejito de 15 años que merecía aparecer.
+  * Me pueden escribir en:
+    * myllaraymontoya@uc.cl o telegram @Myllaray
+
+![width:230px align-right](myllaray_montoya.jpg)
+![width:230px align-right](viejito_15.jpg)
 
 ---
 
