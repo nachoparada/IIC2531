@@ -123,15 +123,15 @@ No se hacen descuentos por inconsistencias menores en este laboratorio introduct
 Los 6 escenarios tienen diferentes niveles de complejidad:
 
 ### Escenarios Más Simples (buenos para empezar)
-- **Escenario 1 (Tienda de Don Carlos):** Sistema pequeño, pocos actores
-- **Escenario 4 (Votación estudiantil):** Objetivos claros, contexto familiar
+- **Escenario 1 (Clínica Dental Pequeña):** Sistema pequeño, pocos actores, contexto familiar
 
 ### Escenarios de Complejidad Media
-- **Escenario 2 (Marketplace):** Múltiples actores, mayor escala
-- **Escenario 3 (Portal gobierno):** Implicaciones legales, datos sensibles
+- **Escenario 2 (Payroll para Pymes):** Múltiples empresas (multi-tenancy), datos financieros sensibles
+- **Escenario 3 (Portal de Resultados Médicos):** Datos médicos sensibles, flujo de validación por médicos
 
 ### Escenarios Más Complejos
-- **Escenario 5 (Cajero automático):** Combina seguridad física y digital
+- **Escenario 4 (Tickets QR para Conciertos):** Combina fraude, bots, transferencias y validación offline
+- **Escenario 5 (Bicicletas Compartidas):** Combina seguridad física y digital, hardware con conectividad intermitente
 - **Escenario 6 (Tu propio sistema):** Requiere describir el contexto además del análisis
 
 **Recomendación:** Si tienes dudas, comienza con los escenarios más simples para familiarizarte con la estructura del análisis.
