@@ -24,10 +24,6 @@ style: |
     transform: translateX(-50%);
   }
 
-  img[alt~="align-center"][alt~="align-lower"] {
-    transform: translate(-50%, 24px);
-  }
-
   section.myllaray-slide {
     position: relative;
   }
@@ -145,6 +141,25 @@ style: |
 
 ![width:230px align-right myllaray-photo](myllaray_montoya.jpg)
 ![width:230px align-right viejito-photo](viejito_15.jpg)
+
+---
+
+<!-- _class: myllaray-slide -->
+
+# Estructura del curso - Myllaray Montoya
+  * Licenciatura en Inge. de las Ciencias de la Computación.
+  * Ex organizadora de RMC.
+    * Desde 2023-2 hasta 2025-2.
+  * Creadora de la charla de toma de ramos y acompañamiento de novatos.
+    * Desde 2024-1 hasta 2026-1.
+  * Me entretiene la ciberseguridad y a veces hago hacking ético.
+  * Segunda vez siendo ayudante del ramo.
+  * Tengo un viejito de 15 años que merecía aparecer.
+  * Me pueden escribir en:
+    * myllaraymontoya@uc.cl o telegram @Myllaray
+
+![width:230px align-right](myllaray_montoya.jpg)
+![width:230px align-right](viejito_15.jpg)
 
 ---
 
