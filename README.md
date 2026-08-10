@@ -4,14 +4,6 @@ Materiales del curso IIC2531 Seguridad Computacional.
 
 El repositorio esta organizado por semestre. Cada carpeta semestral contiene el programa, clases, laboratorios y proyecto final correspondientes.
 
-## Semestres
-
-| Semestre | Estado | Notas |
-|---|---|---|
-| `2026-2` | En preparacion | Copia inicial de `2026-1`; fechas y ajustes pendientes |
-| `2026-1` | Cerrado | Material completo del semestre 2026-1 |
-| `2025-2` | Archivo | Material historico |
-
 ## Estructura
 
 ```text

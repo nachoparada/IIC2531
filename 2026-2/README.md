@@ -8,7 +8,7 @@
 | **Semestre** | 2026-2 |
 | **Creditos** | 10 |
 | **Horario** | 8:20am |
-| **Sala** | Por definir |
+| **Sala** | B18 |
 | **Profesor** | Ignacio Parada (yo@ignacioparada.com) |
 
 ## Descripcion
