@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Máquinas virtuales y contenedores: kernels versus vistas</title>
+  <desc id="desc">A la izquierda, tres máquinas virtuales tienen un kernel invitado cada una. A la derecha, tres contenedores tienen vistas aisladas pero comparten un único kernel del host.</desc>
+  <defs>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #0f172a; }
+      .heading { font-size: 30px; font-weight: 700; text-anchor: middle; }
+      .tagline { font-size: 22px; font-weight: 700; text-anchor: middle; }
+      .box-title { font-size: 20px; font-weight: 700; text-anchor: middle; }
+      .box-sub { font-size: 16px; text-anchor: middle; fill: #475569; }
+      .layer { stroke-width: 2.5; }
+      .connector { fill: none; stroke: #64748b; stroke-width: 2.5; }
+      .divider { stroke: #cbd5e1; stroke-width: 2; stroke-dasharray: 9 9; }
+    </style>
+  </defs>
+
+  <!-- Central divider -->
+  <line class="divider" x1="600" y1="24" x2="600" y2="590"/>
+
+  <!-- Headings -->
+  <text class="heading" x="300" y="45">Máquinas virtuales</text>
+  <text class="tagline" x="300" y="77" fill="#7c3aed">Muchos kernels</text>
+  <text class="heading" x="900" y="45">Contenedores</text>
+  <text class="tagline" x="900" y="77" fill="#0284c7">Un kernel, muchas vistas</text>
+
+  <!-- VM connectors behind boxes -->
+  <path class="connector" d="M300 450 L300 418 M300 418 L105 418 L105 390 M300 418 L300 390 M300 418 L495 418 L495 390"/>
+
+  <!-- VM cards -->
+  <g>
+    <rect class="layer" x="20" y="112" width="170" height="278" rx="18" fill="#faf5ff" stroke="#8b5cf6"/>
+    <text class="box-title" x="105" y="145">VM A</text>
+    <rect class="layer" x="35" y="170" width="140" height="65" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+    <text class="box-title" x="105" y="199">Aplicación</text>
+    <text class="box-sub" x="105" y="220">espacio de usuario</text>
+    <rect class="layer" x="35" y="257" width="140" height="92" rx="10" fill="#ede9fe" stroke="#7c3aed"/>
+    <text class="box-title" x="105" y="294">Kernel</text>
+    <text class="box-title" x="105" y="319">invitado A</text>
+  </g>
+
+  <g>
+    <rect class="layer" x="215" y="112" width="170" height="278" rx="18" fill="#faf5ff" stroke="#8b5cf6"/>
+    <text class="box-title" x="300" y="145">VM B</text>
+    <rect class="layer" x="230" y="170" width="140" height="65" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+    <text class="box-title" x="300" y="199">Aplicación</text>
+    <text class="box-sub" x="300" y="220">espacio de usuario</text>
+    <rect class="layer" x="230" y="257" width="140" height="92" rx="10" fill="#ede9fe" stroke="#7c3aed"/>
+    <text class="box-title" x="300" y="294">Kernel</text>
+    <text class="box-title" x="300" y="319">invitado B</text>
+  </g>
+
+  <g>
+    <rect class="layer" x="410" y="112" width="170" height="278" rx="18" fill="#faf5ff" stroke="#8b5cf6"/>
+    <text class="box-title" x="495" y="145">VM C</text>
+    <rect class="layer" x="425" y="170" width="140" height="65" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+    <text class="box-title" x="495" y="199">Aplicación</text>
+    <text class="box-sub" x="495" y="220">espacio de usuario</text>
+    <rect class="layer" x="425" y="257" width="140" height="92" rx="10" fill="#ede9fe" stroke="#7c3aed"/>
+    <text class="box-title" x="495" y="294">Kernel</text>
+    <text class="box-title" x="495" y="319">invitado C</text>
+  </g>
+
+  <rect class="layer" x="70" y="450" width="460" height="65" rx="12" fill="#ffedd5" stroke="#ea580c"/>
+  <text class="box-title" x="300" y="478">Hipervisor / VMM</text>
+  <text class="box-sub" x="300" y="499">presenta hardware virtual a cada VM</text>
+
+  <rect class="layer" x="70" y="535" width="460" height="55" rx="10" fill="#334155" stroke="#0f172a"/>
+  <text x="300" y="570" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">HARDWARE FÍSICO</text>
+
+  <!-- Container connectors behind boxes -->
+  <path class="connector" d="M900 405 L900 385 M900 385 L705 385 L705 365 M900 385 L900 365 M900 385 L1095 385 L1095 365"/>
+
+  <!-- Container cards: isolated views -->
+  <g>
+    <rect class="layer" x="620" y="112" width="170" height="253" rx="18" fill="#f0f9ff" stroke="#0284c7"/>
+    <text class="box-title" x="705" y="145">Contenedor A</text>
+    <rect class="layer" x="635" y="170" width="140" height="65" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+    <text class="box-title" x="705" y="199">Aplicación</text>
+    <text class="box-sub" x="705" y="220">procesos del host</text>
+    <rect class="layer" x="635" y="257" width="140" height="75" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-dasharray="7 5"/>
+    <text class="box-title" x="705" y="286">Vista A</text>
+    <text class="box-sub" x="705" y="309">PID · red · mounts</text>
+  </g>
+
+  <g>
+    <rect class="layer" x="815" y="112" width="170" height="253" rx="18" fill="#f0f9ff" stroke="#0284c7"/>
+    <text class="box-title" x="900" y="145">Contenedor B</text>
+    <rect class="layer" x="830" y="170" width="140" height="65" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+    <text class="box-title" x="900" y="199">Aplicación</text>
+    <text class="box-sub" x="900" y="220">procesos del host</text>
+    <rect class="layer" x="830" y="257" width="140" height="75" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-dasharray="7 5"/>
+    <text class="box-title" x="900" y="286">Vista B</text>
+    <text class="box-sub" x="900" y="309">PID · red · mounts</text>
+  </g>
+
+  <g>
+    <rect class="layer" x="1010" y="112" width="170" height="253" rx="18" fill="#f0f9ff" stroke="#0284c7"/>
+    <text class="box-title" x="1095" y="145">Contenedor C</text>
+    <rect class="layer" x="1025" y="170" width="140" height="65" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+    <text class="box-title" x="1095" y="199">Aplicación</text>
+    <text class="box-sub" x="1095" y="220">procesos del host</text>
+    <rect class="layer" x="1025" y="257" width="140" height="75" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-dasharray="7 5"/>
+    <text class="box-title" x="1095" y="286">Vista C</text>
+    <text class="box-sub" x="1095" y="309">PID · red · mounts</text>
+  </g>
+
+  <rect class="layer" x="670" y="405" width="460" height="110" rx="12" fill="#e0e7ff" stroke="#4f46e5"/>
+  <text class="box-title" x="900" y="444">Un único kernel del host</text>
+  <text class="box-sub" x="900" y="472">todos los procesos entran al mismo kernel</text>
+  <text class="box-sub" x="900" y="495">namespaces cambian la vista que recibe cada grupo</text>
+
+  <rect class="layer" x="670" y="535" width="460" height="55" rx="10" fill="#334155" stroke="#0f172a"/>
+  <text x="900" y="570" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">HARDWARE FÍSICO</text>
+</svg>

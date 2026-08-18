@@ -8,14 +8,14 @@
 | Clase 4 | 2026-08-18 | Contenedores de Linux y Maquinas Virtuales | Arquitectura enfocada en seguridad: aislamiento, autenticacion, canales seguros y separacion de privilegios. | Links a temas relacionados | No pruebas (semana universitaria) |
 | Clase 5 | 2026-08-20 | ns-exec | Proyecto de contenedores usando namespaces de Linux. | Por definir | No pruebas (semana universitaria) |
 | Clase 6 | 2026-08-25 | Aislacion con Firecracker | Resumen de conceptos anteriores usando Firecracker como ejemplo. | Firecracker: Lightweight Virtualization for Serverless Applications | Entrega Lab 1 |
-| Clase 7 | 2026-08-27 | Buffer Overflow - Lab 2 | Buffer overflows, ejemplos y defensas. | Baggy Bounds Checking: An Efficient and Backwards-Compatible Defense against Out-of-Bounds Errors | |
-| Clase 8 | 2026-09-01 | Arquitectura de Seguridad | Arquitectura de seguridad usando Google Cloud como ejemplo. | Links a temas relacionados; Google Infrastructure Security Design Overview, June 2024 | |
-| Clase 9 | 2026-09-03 | Tectopia | Proyecto de arquitectura de seguridad aplicado a sistemas reales. | Por definir | |
-| Clase 10 | 2026-09-08 | OpenSSH | Como OpenSSH usa separacion de privilegios para ser seguro. | Preventing Privilege Escalation | |
-| Clase 11 | 2026-09-10 | WebAssembly | Como WebAssembly usa SFI para proveer aislacion. | Bringing the Web up to Speed with WebAssembly; Provably-Safe Multilingual Software Sandboxing using WebAssembly | Entrega Lab 2 |
+| Clase 7 | 2026-08-27 | Arquitectura de Seguridad | Arquitectura de seguridad usando Google Cloud como ejemplo. | Links a temas relacionados; Google Infrastructure Security Design Overview, June 2024 | |
+| Clase 8 | 2026-09-01 | Tectopia | Proyecto de arquitectura de seguridad aplicado a sistemas reales. | Por definir | |
+| Clase 9 | 2026-09-03 | OpenSSH | Como OpenSSH usa separacion de privilegios para ser seguro. | Preventing Privilege Escalation | |
+| Clase 10 | 2026-09-08 | WebAssembly | Como WebAssembly usa SFI para proveer aislacion. | Bringing the Web up to Speed with WebAssembly; Provably-Safe Multilingual Software Sandboxing using WebAssembly | |
+| Clase 11 | 2026-09-10 | RLBox | Aislacion a nivel de librerias; importancia de aislar librerias; interfaces; caso Firefox. | Retrofitting Fine Grain Isolation in the Firefox Renderer | Entrega Lab 2 |
 | Clase 12 | 2026-09-15 | No hay clases | Universidad cerrada. | | |
 | Clase 13 | 2026-09-17 | No hay clases | Universidad cerrada. | | |
-| Clase 14 | 2026-09-22 | RLBox | Aislacion a nivel de librerias; importancia de aislar librerias; interfaces; caso Firefox. | Retrofitting Fine Grain Isolation in the Firefox Renderer | |
+| Clase 14 | 2026-09-22 | Buffer Overflow - Lab 2 | Buffer overflows, ejemplos y defensas. | Baggy Bounds Checking: An Efficient and Backwards-Compatible Defense against Out-of-Bounds Errors | |
 | Clase 15 | 2026-09-24 | Hardware Seguro | Como BitLocker provee seguridad al hardware. | AES-CBC + Elephant diffuser: A Disk Encryption Algorithm for Windows Vista | |
 | Clase 16 | 2026-09-29 | Seguridad en iOS | Analisis de la filosofia de seguridad de iPhone. | iOS Security | |
 | Clase 17 | 2026-10-01 | Seguridad en Redes | Vulnerabilidades de TCP/IP, DoS y protocolos de ruteo. | A Look Back at Security Problems in the TCP/IP Protocol Suite | Entrega Lab 3 |

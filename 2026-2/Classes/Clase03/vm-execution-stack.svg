@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="570" viewBox="0 0 1200 570" role="img" aria-labelledby="title desc">
+  <title id="title">Flujo de ejecución de una máquina virtual</title>
+  <desc id="desc">Las aplicaciones realizan llamadas al sistema al kernel invitado, que interactúa con hardware virtual presentado por el hipervisor, el cual controla el acceso al hardware físico.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .label { font-family: Arial, Helvetica, sans-serif; fill: #0f172a; text-anchor: middle; }
+      .title { font-size: 30px; font-weight: 700; }
+      .sub { font-size: 20px; fill: #475569; }
+      .arrow-label { font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 600; fill: #475569; text-anchor: start; }
+      .box { stroke-width: 2.5; rx: 16; }
+      .arrow { fill: none; stroke: #475569; stroke-width: 3; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <!-- Connectors behind nodes -->
+  <path class="arrow" d="M600 112 L600 148"/>
+  <path class="arrow" d="M600 242 L600 278"/>
+  <path class="arrow" d="M600 372 L600 408"/>
+  <path class="arrow" d="M600 502 L600 538"/>
+
+  <text class="arrow-label" x="626" y="139">syscalls</text>
+  <text class="arrow-label" x="626" y="269">drivers y dispositivos</text>
+  <text class="arrow-label" x="626" y="399">operaciones privilegiadas</text>
+  <text class="arrow-label" x="626" y="529">acceso controlado</text>
+
+  <!-- Guest/application layer -->
+  <rect class="box" x="250" y="20" width="700" height="92" fill="#dbeafe" stroke="#2563eb"/>
+  <text class="label title" x="600" y="60">Aplicaciones de la VM</text>
+  <text class="label sub" x="600" y="89">Procesos que creen ejecutarse en una máquina independiente</text>
+
+  <!-- Guest kernel -->
+  <rect class="box" x="250" y="150" width="700" height="92" fill="#e0e7ff" stroke="#4f46e5"/>
+  <text class="label title" x="600" y="190">Kernel invitado</text>
+  <text class="label sub" x="600" y="219">Administra procesos, memoria, red y filesystem de la VM</text>
+
+  <!-- Virtual hardware -->
+  <rect class="box" x="250" y="280" width="700" height="92" fill="#f1f5f9" stroke="#64748b" stroke-dasharray="9 7"/>
+  <text class="label title" x="600" y="320">Hardware virtual</text>
+  <text class="label sub" x="600" y="349">vCPU · memoria · disco · red · otros dispositivos</text>
+
+  <!-- Hypervisor -->
+  <rect class="box" x="250" y="410" width="700" height="92" fill="#ffedd5" stroke="#ea580c"/>
+  <text class="label title" x="600" y="450">Hipervisor / VMM</text>
+  <text class="label sub" x="600" y="479">Presenta la máquina virtual y media el acceso al host</text>
+
+  <!-- Physical hardware baseline -->
+  <rect class="box" x="140" y="540" width="920" height="28" fill="#334155" stroke="#0f172a" rx="8"/>
+  <text x="600" y="561" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">CPU · MEMORIA · DISPOSITIVOS FÍSICOS</text>
+</svg>
