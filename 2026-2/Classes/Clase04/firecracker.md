@@ -122,8 +122,9 @@ style: |
 ---
 
 # Cgroups de Linux
-  * Limitar / programar para uso de recursos
-  * Memoria, CPU, I/O de disco, I/O de red, etc
+  * Limitar / programar el uso de recursos
+  * Memoria, CPU e I/O de disco, entre otros
+  * El tráfico de red puede clasificarse mediante cgroups, pero normalmente se limita usando mecanismos como tc
   * Se aplica a procesos, similar a namespaces
     * Los nuevos procesos heredan el cgroup del proceso padre
   * No es un límite de seguridad, pero importante para prevenir ataques DoS
@@ -133,8 +134,8 @@ style: |
 
 # Contenedores usando namespaces + cgroups
   * Desempaquetar archivos del contenedor en algún lugar del sistema de archivos
-  * Asignar nuevo namespace para ejecutar contenedor
-  * Apuntar el directorio raíz del namespace del contenedor al árbol de archivos del contenedor
+  * Crear namespaces para aislar recursos, incluyendo un mount namespace
+  * Usar pivot_root/chroot para establecer el árbol de archivos del contenedor como su raíz
   * Configurar cgroup para el contenedor basado en cualquier política de programación
   * Configurar una interfaz de red virtual para el contenedor
   * Ejecutar procesos en este contenedor
@@ -145,7 +146,8 @@ style: |
 
 # ¿Por qué los namespaces no son suficientes para Lambda?
   * Kernel Linux compartido
-  * Superficie de ataque amplia: 300+ llamadas al sistema, muchas funciones especializadas bajo ioctl...
+  * Superficie de ataque amplia: cientos de llamadas al sistema, además de muchas operaciones especializadas mediante ioctl
+    * El número exacto depende de la arquitectura y versión del kernel
   * Gran cantidad de código, escrito en C
     * Los errores (buffer overflows, use-after-free, ...) continúan siendo descubiertos
     * No hay aislamiento dentro del kernel Linux mismo
@@ -182,8 +184,11 @@ style: |
 # Enfoque más pesado: VMs
   * Ejecutar Linux en una VM guest
   * ¿Por qué esto es mejor que Linux?
-    * Superficie de ataque más pequeña: no hay syscalls complejos, solo x86 + dispositivos virtuales
-    * Menos errores / vulnerabilidades: errores de escape de VM descubiertos menos de una vez al año
+    * Superficie de ataque más pequeña: no hay syscalls complejos, solo instrucciones de CPU y dispositivos virtuales
+      * El paper se enfoca en x86_64; las versiones actuales de Firecracker también soportan ARM de 64 bits (aarch64)
+    * Históricamente, menos vulnerabilidades de escape que en un kernel compartido
+      * Según los datos citados por el paper, se descubrían errores de escape de VM menos de una vez al año
+      * Es una observación histórica, no una garantía de seguridad
   * ¿Por qué estos tampoco son suficientes para Lambda?
     * Alto costo de inicio: toma mucho tiempo arrancar la VM
     * Alto overhead: gran costo de memoria para cada VM en ejecución
@@ -216,23 +221,26 @@ style: |
 ---
 
 # QEMU
-  * Implementa dispositivos virtuales, similar a lo que tendría el hardware real
+  * Implementa dispositivos virtuales similares al hardware real
   * También implementa dispositivos puramente virtuales (virtio)
-    * Interfaz bien definida a través de regiones de memoria compartida
-  * También implementa emulación de instrucciones de CPU
-    * Principalmente no necesario cuando se usa soporte de hardware
-    * Pero aún usado para instrucciones que el hardware no soporta nativamente
-    * Ej., CPUID, INVD, ..
-    * [VM Exits, Interrupts & CPUID Emulation](https://revers.engineering/day-5-vmexits-interrupts-cpuid-emulation/)
-  * También proporciona alguna implementación de BIOS para comenzar a ejecutar la VM
+    * Interfaces estandarizadas basadas en memoria compartida
+  * Puede ejecutar la CPU guest de dos maneras:
+    * Emulación por software (TCG): traduce instrucciones y permite ejecutar una arquitectura distinta a la del host
+    * Virtualización por hardware (KVM): la mayoría de las instrucciones se ejecutan directamente en la CPU
+      * Operaciones sensibles producen un VM exit y son manejadas por KVM o QEMU
+  * Proporciona mecanismos para iniciar la VM
+    * Puede cargar firmware como SeaBIOS u OVMF, o iniciar un kernel directamente
+      * SeaBIOS implementa el BIOS tradicional; OVMF implementa UEFI
 
 ---
 
 # Diseño de Firecracker
   * Usar KVM para CPU virtual y memoria
   * Re-implementar QEMU
-  * Soportar conjunto mínimo de dispositivos
-    * virtio network, virtio block (disco), teclado, serie
+  * Soportar un conjunto mínimo de dispositivos
+    * Inicialmente: virtio network, virtio block (disco), teclado y puerto serie
+    * Versiones posteriores agregaron otros dispositivos, como vsock, balloon y virtio-rng, pero mantienen una superficie de dispositivos deliberadamente limitada
+      * Permiten comunicación host–guest, gestión dinámica de memoria y acceso seguro a entropía, respectivamente
   * Dispositivos de bloque en lugar de sistema de archivos: límite de aislamiento más fuerte
     * El sistema de archivos tiene estado complejo
       * Directorios, archivos de longitud variable, symlinks / hardlinks
@@ -255,18 +263,22 @@ style: |
 
 # Implementación de Firecracker: Rust
   * Lenguaje memory-safe (módulo código "unsafe")
-  * 50K líneas de código: mucho más pequeño que QEMU
+  * Al momento del paper: aproximadamente 50K líneas de código, mucho menos que QEMU
+  * Actualmente supera las 120K líneas de Rust; QEMU supera los 2.4M de líneas de C y headers
   * Hace improbable que la implementación VMM tenga errores como buffer overflows
   * [Repositorio de Firecracker en GitHub](https://github.com/firecracker-microvm/firecracker)
 
 ---
 
-# El VMM de Firecracker se ejecuta en un proceso "encarcelado"
-  * chroot para limitar archivos que el VMM puede acceder
-  * namespaces para limitar el VMM de acceder a otros procesos y red
-  * ejecutándose como un ID de usuario separado
-  * seccomp-bpf para limitar qué llamadas al sistema puede invocar el VMM
-  * Todo para asegurar que, si se explotan errores en el VMM, es difícil escalar el ataque
+# Aislamiento del proceso VMM: el jailer
+  * Firecracker incluye un programa separado llamado jailer
+    * Configura el aislamiento antes de ejecutar el proceso VMM
+  * Crea un mount namespace y usa pivot_root/chroot para restringir el sistema de archivos visible
+  * Ejecuta el VMM con un usuario y grupo sin privilegios
+  * Puede configurar cgroups y límites de recursos
+  * Los namespaces de red y PID son opcionales
+  * Firecracker instala filtros seccomp-bpf para limitar las llamadas al sistema permitidas
+  * Defensa en profundidad: si se explota un error del VMM, estas capas dificultan escalar el ataque
 
 ---
 
@@ -279,26 +291,27 @@ style: |
 
 ---
 
-# ¿Qué tan bien logra Firecracker sus objetivos?
-  * El overhead parece bastante bajo
-    * 3MB overhead de memoria por VM inactiva
-    * 125msec tiempo de arranque
-  * El rendimiento parece OK
-    * El rendimiento de CPU es básicamente KVM (así que, sin cambios)
-    * El rendimiento de I/O de dispositivos no es tan bueno
-      * Disco virtual lento: necesita concurrencia
-      * Red virtual lenta: necesita PCI pass-through
+# Evaluación de Firecracker en el paper (2020)
+  * Overhead bajo
+    * 3MB de overhead de memoria por VM inactiva
+    * 125ms de tiempo de arranque
+  * Rendimiento de CPU cercano a KVM
+  * Limitaciones de I/O observadas en la versión evaluada
+    * El disco virtual requería mayor concurrencia para mejorar su rendimiento
+    * La red virtual era más lenta; el paper menciona PCI passthrough como posible optimización
+  * Versiones posteriores agregaron soporte opcional para virtio-pci
+    * Mejora el transporte de dispositivos virtuales, pero no entrega un dispositivo físico directamente a la VM
 
 ---
 
 # ¿Qué tan bien logra Firecracker sus objetivos? (cont.)
   * Seguridad probablemente bastante buena
-    * Implementación Rust: menos propenso a errores
-    * Mucho menos código en el VMM
-    * Proceso VMM encarcelado
-    * Linux KVM aún parte del TCB, pero mucho más pequeño que QEMU
-    * Aún así, los errores de KVM socavarían el aislamiento de Firecracker
-      * [Google Project Zero: An EPYC Escape - KVM Vulnerability Case Study](https://googleprojectzero.blogspot.com/2021/06/an-epyc-escape-case-study-of-kvm.html)
+    * Implementación en Rust: menos propensa a errores de memoria
+    * VMM y modelo de dispositivos mucho más pequeños que los de QEMU
+    * Capas adicionales de aislamiento mediante el jailer
+  * KVM y el kernel del host todavía forman parte del Trusted Computing Base (TCB)
+    * Una vulnerabilidad en KVM podría romper el aislamiento de Firecracker
+    * [Google Project Zero: An EPYC Escape - KVM Vulnerability Case Study](https://googleprojectzero.blogspot.com/2021/06/an-epyc-escape-case-study-of-kvm.html)
 
 ---
 
