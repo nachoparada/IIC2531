@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="360" viewBox="0 0 1120 360" role="img" aria-labelledby="title desc">
+  <title id="title">Matriz de acceso: ACLs por fila y capacidades por columna</title>
+  <desc id="desc">Matriz de permisos con tres recursos en filas, tres principales en columnas, y contornos que muestran que una ACL corresponde a una fila y una capacidad corresponde a una columna.</desc>
+  <defs>
+    <filter id="soft-shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="1120" height="360" rx="18" fill="#f8fafc"/>
+
+  <g filter="url(#soft-shadow)">
+    <rect x="70" y="40" width="980" height="218" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <rect x="70" y="40" width="980" height="56" rx="12" fill="#e0f2fe"/>
+    <rect x="70" y="82" width="980" height="14" fill="#e0f2fe"/>
+    <rect x="70" y="96" width="260" height="162" fill="#f1f5f9"/>
+
+    <g stroke="#cbd5e1" stroke-width="1.5">
+      <line x1="330" y1="40" x2="330" y2="258"/>
+      <line x1="570" y1="40" x2="570" y2="258"/>
+      <line x1="810" y1="40" x2="810" y2="258"/>
+      <line x1="70" y1="96" x2="1050" y2="96"/>
+      <line x1="70" y1="150" x2="1050" y2="150"/>
+      <line x1="70" y1="204" x2="1050" y2="204"/>
+    </g>
+
+    <rect x="70" y="150" width="980" height="54" fill="#f8fbff"/>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" fill="#0f172a">
+    <text x="200" y="74" text-anchor="middle" font-size="22" font-weight="700">Recurso / Principal</text>
+    <text x="450" y="74" text-anchor="middle" font-size="24" font-weight="700">Alice</text>
+    <text x="690" y="74" text-anchor="middle" font-size="24" font-weight="700">Bob</text>
+    <text x="930" y="74" text-anchor="middle" font-size="24" font-weight="700">Servicio A</text>
+
+    <g font-size="22" font-weight="700">
+      <text x="96" y="130">Documento</text>
+      <text x="96" y="184">Repositorio</text>
+      <text x="96" y="238">Servicio de pagos</text>
+    </g>
+
+    <g font-size="23" text-anchor="middle">
+      <text x="450" y="130">Leer</text>
+      <text x="690" y="130">Escribir</text>
+
+      <text x="450" y="184">Escribir</text>
+      <text x="690" y="184">Leer</text>
+      <text x="930" y="184">Leer</text>
+
+      <text x="690" y="238">Leer</text>
+      <text x="930" y="238">Escribir</text>
+    </g>
+  </g>
+
+  <g fill="none" stroke-linejoin="round">
+    <rect x="76" y="154" width="968" height="46" rx="8" stroke="#1d4ed8" stroke-width="5"/>
+    <rect x="576" y="46" width="228" height="206" rx="8" stroke="#047857" stroke-width="5"/>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">
+    <rect x="94" y="285" width="322" height="40" rx="20" fill="#ffffff" stroke="#1d4ed8" stroke-width="3"/>
+    <text x="255" y="313" text-anchor="middle" fill="#1e3a8a">ACL = fila / recurso</text>
+
+    <rect x="653" y="285" width="398" height="40" rx="20" fill="#ffffff" stroke="#047857" stroke-width="3"/>
+    <text x="852" y="313" text-anchor="middle" fill="#065f46">Capacidad = columna / principal</text>
+  </g>
+</svg>

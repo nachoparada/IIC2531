@@ -6,7 +6,7 @@ backgroundColor: #fff
 backgroundImage: url('https://marp.app/assets/hero-background.svg')
 style: |
   section {
-    font-size: 28px;
+    font-size: 24px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -14,38 +14,178 @@ style: |
     padding-top: 50px;
   }
 
-  img[alt~="align-right"] {
-    margin-left: 400px;
+  section h1 {
+    margin-bottom: 12px;
   }
 
-  img[alt~="align-center"] {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+  section > ul,
+  section > ol {
+    margin-top: 0;
+    margin-bottom: 8px;
+    padding-left: 34px;
   }
-  
-  /* Right-align terminal commands */
-  .terminal-commands {
-    text-align: right;
-    margin-left: 400px;
+
+  section > ul > li,
+  section > ol > li {
+    margin: 7px 0;
   }
-  
-  /* Make sub-bullets lighter and smaller */
-  ul ul li, ol ol li {
+
+  section ul ul,
+  section ol ol {
+    margin-top: 3px;
+    margin-bottom: 3px;
+    opacity: 0.8;
+  }
+
+  section ul ul li,
+  section ol ol li {
     color: #666666;
     font-size: 0.9em;
   }
-  
-  /* Make nested sub-bullets even lighter, italic, and smaller */
-  ul ul ul li, ol ol ol li {
+
+  section ul ul ul li,
+  section ol ol ol li {
     color: #666666;
     font-style: italic;
     font-size: 0.8em;
   }
-  
-  /* Alternative: Use opacity for a more subtle effect */
-  ul ul, ol ol {
-    opacity: 0.8;
+
+  /* Callouts are semantic: comparison/table conclusions and explicit takeaways. */
+  section:has(> table) > p:not(:has(img)),
+  section.takeaway > p:not(:has(img)) {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 12px;
+    padding: 11px 16px;
+    border-left: 5px solid #2e90fa;
+    background: #eef4ff;
+    font-size: 0.92em;
+  }
+
+  section table {
+    width: 100%;
+    font-size: 0.86em;
+  }
+
+  /* High-level learning objective: one thesis plus three outcome cards. */
+  section.objective-slide {
+    justify-content: center;
+    padding: 48px 66px;
+  }
+
+  section.objective-slide h1 {
+    margin-bottom: 20px;
+    font-size: 46px;
+  }
+
+  section.objective-slide > p:first-of-type {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 20px 24px;
+    border-left: 7px solid #2e90fa;
+    background: #eef4ff;
+    font-size: 28px;
+    line-height: 1.3;
+  }
+
+  section.objective-slide > p:nth-of-type(2) {
+    margin: 22px 0 10px;
+    color: #475467;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  section.objective-slide > ul {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  section.objective-slide > ul > li {
+    min-height: 94px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 15px 17px;
+    border-top: 4px solid #2e90fa;
+    border-radius: 4px;
+    background: #f8fafc;
+    color: #344054;
+    font-size: 18px;
+    line-height: 1.3;
+  }
+
+  section th,
+  section td {
+    padding: 9px 12px;
+    vertical-align: middle;
+  }
+
+  section:has(> h1:only-child) {
+    font-size: 28px;
+    justify-content: center;
+    padding-bottom: 50px;
+  }
+
+  section:has(> p:only-child img) {
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 50px;
+  }
+
+  section:has(> p:only-child img) > p {
+    width: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  section:has(> p:only-child img) img {
+    max-width: 100%;
+    max-height: 600px;
+    object-fit: contain;
+  }
+
+  img[alt~="align-right"] {
+    display: block;
+    margin-left: auto;
+  }
+
+  img[alt~="align-center"] {
+    display: block;
+    position: static;
+    max-width: 100%;
+    max-height: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    object-fit: contain;
+  }
+
+  section.google-auth-controls {
+    font-size: 22px;
+  }
+
+  section.google-auth-controls table {
+    table-layout: fixed;
+  }
+
+  section.google-auth-controls th,
+  section.google-auth-controls td {
+    width: 50%;
+    padding: 11px 12px;
+  }
+
+  section.google-auth-controls > p {
+    margin-top: 18px;
+    font-size: 28px;
   }
 
 ---
@@ -54,73 +194,118 @@ style: |
 
 ---
 
-# ¿Qué es "arquitectura de seguridad"?
-  * Estructuración de sistemas completos para:
-    * Defender contra grandes clases de ataques (conocidos)
-    * Prevenir ataques aún desconocidos
-    * Contener daños de ataques exitosos
-  * Queremos adelantarnos a los atacantes
-    * Y no solo reaccionar aplicando parches
+<!-- _class: objective-slide -->
+
+# Objetivo de la clase
+
+Comprender cómo una arquitectura de seguridad combina aislamiento, autenticación, autorización y control de recursos para contener fallas y compromisos.
+
+Al finalizar esta clase, podremos:
+
+* Razonar sobre seguridad a nivel de arquitectura
+* Explicar cómo las fronteras de confianza, identidades y permisos contienen el daño
+* Analizar cómo Google aplica estos principios a escala y sus límites ante DoS
+
+---
+# 1. El problema de seguridad
+---
+
+# ¿Qué es la arquitectura de seguridad?
+
+* Diseño de sistemas completos para:
+  * Defender contra clases conocidas de ataques
+  * Resistir ataques que aún no conocemos
+  * Contener el daño cuando un ataque tiene éxito
+* El objetivo es adelantarnos a los atacantes
+  * No limitarnos a reaccionar aplicando parches
 
 ---
 
-# La arquitectura de seguridad consiste en:
-  * Formas de analizar la situación de seguridad
-    * ¿Qué estamos defendiendo? ¿Tarjetas de crédito? ¿Claves criptográficas? ¿Secretos comerciales? ¿Todo?
-    * ¿Quién es el atacante? ¿Spammers? ¿Empleados? ¿Vendedores? ¿Clientes? ¿Competidores?
-    * ¿Qué poderes asumimos que el ataque tiene/no tiene?
-    * (todo esto se llama generalmente el Modelo de Amenaza)
-  * Principios
-    * Minimizar confianza
-  * Técnicas
-    * Aislamiento, autenticación, separación de privilegios, canales seguros, etc.
+# ¿Cómo diseñamos una arquitectura de seguridad?
+
+* Definimos un **modelo de amenaza**
+  * ¿Qué activos protegemos?
+    * Datos personales, claves criptográficas
+  * ¿De quién los protegemos?
+    * Atacantes externos, empleados maliciosos
+  * ¿Qué capacidades suponemos que tiene el atacante?
+    * Control de la red, credenciales robadas
+
+* Elegimos principios de diseño
+  * Por ejemplo: minimizar la confianza
+
+* Aplicamos mecanismos concretos
+  * Aislamiento, autenticación, autorización
+  * Separación de privilegios y canales seguros
 
 ---
 
-# Caso de estudio: Paper de Arquitectura de Seguridad de Google
-  * El paper se enfoca en la oferta de plataforma en la nube de Google.
-  * No describe todos los aspectos de seguridad de todos los servicios de Google.
-  * El paper toca muchos temas interesantes y complejos.
-  * Buena visión general de cómo puede verse una arquitectura de seguridad.
-  * Ver la charla de Butler Lampson para discusión de principios.
-    * [[ Ref: http://css.csail.mit.edu/6.858/2015/lec/lampson.pdf ]]
+# Caso de estudio: arquitectura de seguridad de Google
+
+* **Google Infrastructure Security Design Overview**
+  * Google, junio de 2024
+* Describe la infraestructura compartida que sustenta:
+  * Servicios de Google y Google Workspace
+  * Google Cloud
+* No pretende describir todos los controles de todos los servicios
+* Ofrece un caso real de arquitectura de seguridad a gran escala
+* Referencia conceptual:
+  * [Perspectives on Security — Butler Lampson, SOSP 2015 (PDF)](http://css.csail.mit.edu/6.858/2015/lec/lampson.pdf)
 
 ---
 
 # ¿Cuáles son los objetivos de seguridad en el paper de Google?
-  * Evitar la divulgación de datos del cliente (ej., email).
-  * Asegurar la disponibilidad de las aplicaciones de Google.
-  * Rastrear qué salió mal si ocurre un compromiso.
-  * Ayudar a los ingenieros de Google a construir aplicaciones seguras.
-  * En general, asegurar que los clientes confíen en Google.
+
+* Evitar la divulgación de datos de los clientes
+  * Por ejemplo, correos electrónicos
+* Mantener disponibles las aplicaciones y servicios de Google
+* Permitir investigar qué ocurrió después de un incidente
+* Ayudar a los ingenieros a construir aplicaciones seguras
+* Explicar estas protecciones para mantener la confianza de los clientes
 
 ---
 
 # Preocupados por muchas amenazas; ejemplos:
+
+* **Software y redes**
   * Errores en el software de Google
-  * Redes comprometidas (cliente, Internet, interna de Google)
-  * Contraseñas de empleados robadas
-  * Malware en estaciones de trabajo/smartphones de empleados
-  * Ataques internos (sobornar a un ingeniero u operador del centro de datos)
-  * Hardware de servidor malicioso
-  * Datos en discos descartados
+  * Redes comprometidas: cliente, Internet o red interna
+
+* **Identidades y dispositivos**
+  * Credenciales de empleados robadas
+  * Malware en sus computadores o smartphones
+
+* **Personas y cadena de suministro**
+  * Ingenieros u operadores internos maliciosos
+  * Hardware de servidor comprometido
+
+* **Ciclo de vida de los datos**
+  * Información remanente en discos descartados
 
 ---
 
-# ¿Cuál es el entorno de servidor de Google?
-  * Centros de datos.
-  * Máquinas físicas.
-  * Máquinas virtuales.
-  * Servicios en VMs.
-  * Aplicaciones (tanto de Google como del cliente) en VMs.
-  * RPC entre aplicaciones y servicios.
-  * Los servidores front-end convierten HTTP/HTTPS en RPC.
+# Entorno de servidor: piezas principales
+
+* Centros de datos
+  * Miles de máquinas físicas conectadas
+    * Cargas de trabajo aisladas mediante:
+      * Usuarios de Linux, sandboxes, contenedores o VMs
+    * Servicios y aplicaciones se ejecutan dentro de estas cargas
+
+* **Borg** distribuye y ejecuta las cargas entre las máquinas
+  * Es el precursor de Kubernetes
+
+* Los servicios se comunican principalmente mediante RPC
+* Los Google Front Ends reciben HTTP/HTTPS y encaminan las solicitudes
 
 ---
 
-# ¿Cuál es el entorno de servidor de Google?
-  ![width:500px  align-center](GoogleCloudEnvironment.png) 
+# Entorno de servidor: mapa de comunicación
 
+![width:1050px align-center](GoogleCloudEnvironment-v2.png)
+
+---
+# 2. Primer requisito: aislar componentes
 ---
 
 # Aislamiento: el punto de partida para la seguridad
@@ -132,279 +317,416 @@ style: |
 
 ---
 
-# ¿Ejemplos de aislamiento en el diseño de Google?
-  
-  * Separación de usuarios de Linux.
-  * Sandboxes de lenguaje.
-  * Sandboxes de kernel.
-  * Máquinas virtuales.
-  * Máquinas dedicadas, para servicios particularmente sensibles.
-  * **Service Identity, Integrity, and Isolation**
+# Aislamiento por software
+
+* **Separación de usuarios de Linux**
+  * Ejemplo: un UID distinto para cada servicio
+  * El kernel utiliza estos identificadores para controlar el acceso entre procesos
+
+* **Sandboxes basados en lenguajes**
+  * Ejemplo: Sandboxed API
+  * Ejecuta una biblioteca en un proceso aislado y expone una interfaz limitada
+
+* **Sandboxes de kernel**
+  * Ejemplo: gVisor
+  * Intercepta las llamadas del contenedor antes de que lleguen al kernel del host
 
 ---
 
-# ¿Qué está haciendo el aislamiento para Google?
-  * Veamos las máquinas virtuales.
-  * Cada máquina física tiene un VMM host, que supervisa muchas VMs guest.
-  * Cada VM guest ejecuta un S.O. etc.
-  * Permite compartir máquinas entre actividades no relacionadas.
-    * Muchas actividades solo necesitan una fracción de una máquina.
-  * Un punto: VMM ayuda a mantener fuera a los atacantes en otras VMs guest.
-    * Servidor de almacenamiento de Google en una VM, cliente en otra VM, o
-    * Almacenamiento en una VM, servicio de Contactos de Google comprometido en otra VM.
+# Aislamiento por hardware
+
+* **Máquinas virtuales**
+  * Ejemplo: KVM
+  * Usa virtualización de hardware para aislar el sistema operativo guest del host
+
+* **Máquinas físicas dedicadas**
+  * Ejemplo: Borg y algunos servicios de gestión de claves
+  * Eliminan el riesgo de compartir el host con cargas menos sensibles
+
+Google utiliza más capas de aislamiento para las cargas de mayor riesgo.
 
 ---
 
-# ¿Qué está haciendo el aislamiento para Google? (cont.)
-  * Otro punto: VMM ayuda a mantener a los atacantes *dentro* -- confinamiento.
-    * Es seguro ejecutar casi cualquier código en una VM guest, incluso en el kernel guest.
-    * Mientras podamos controlar con quién habla por la red.
-  * ¿Las VMs proporcionan aislamiento perfecto entre guests?
+# ¿Qué aporta el aislamiento mediante VMs?
+
+* Una máquina física ejecuta un **VMM** o hipervisor
+  * El VMM administra varias máquinas virtuales guest
+* Cada VM ejecuta su propio sistema operativo y aplicaciones
+
+* Esto permite compartir eficientemente una máquina física
+  * Cada carga puede utilizar solo una fracción de sus recursos
+
+* El VMM establece una frontera de seguridad entre las VMs
+  * Una VM comprometida no debería poder acceder directamente a otra
 
 ---
 
-# Compartir: Monitor de Referencia.
-  * 100% de aislamiento generalmente no es lo que queremos
-  * Necesitamos compartir/interacción controlada también
-  * Aquí hay un modelo para eso:
+# Las VMs también proporcionan confinamiento
 
-  ![width:500px  align-center](sharing_reference_model_diagram.png) 
+* El VMM intenta mantener al atacante dentro de la VM comprometida
+  * Incluso si controla el sistema operativo guest
+
+* Esto permite ejecutar código altamente riesgoso
+  * Sin entregarle acceso directo al host ni a otras VMs
+
+* El aislamiento no controla todas las interacciones
+  * También debemos controlar con quién puede comunicarse cada VM
+
+**Si algunos componentes necesitan comunicarse, ¿dónde controlamos esa interacción?**
+
+---
+# 3. Interacción controlada: el Monitor de Referencia
+---
+
+# Compartir de forma controlada: Monitor de Referencia
+
+* El aislamiento absoluto impediría toda colaboración
+* Los componentes necesitan interactuar y compartir recursos
+* Estas interacciones deben pasar por un punto de control
+
+El **Monitor de Referencia** es un modelo para decidir qué interacciones permitir.
 
 ---
 
-# Este modelo ha sido muy influyente
-
-* ¿Principales?
-  * Persona, dispositivo, programa, servicio, etc.
-
-* ¿Recursos?
-  * Servicios, como el servicio interno de Contactos de Google.
-  * Elementos dentro de servicios, como archivos en un servicio de almacenamiento.
-
-* ¿Qué hace el guardia?
-  * ¡Autenticar!
-  * ¡Autorizar!
-  * ¡Auditar!
-
-
-
-
----
-# Autenticar: ¿quién/qué está emitiendo la solicitud?
-
-* ¿Cómo autenticar a una persona?
-  * Contraseñas.
-    * ¿Qué aprende el Guardia de una contraseña correcta?
-    * ¿Podemos hacerlo mejor?
-  * Autenticación de dos factores, ej. enviar número al usuario vía SMS.
-    * ¿Qué aprende el Guardia de la autenticación de dos factores SMS correcta?
-    * ¿Podemos hacerlo mejor?
-    * Ej. usuario hizo clic en g00gle.com, propiedad del atacante?
-      * ¿Y g00gle.com luego reenvía la contraseña del usuario a google.com?
-  * Llaves públicas y privadas.
+![width:1150px align-center](reference-monitor-v2.png)
 
 ---
 
-# Autorizar: determinar si la solicitud debe ser permitida.
-  * Función de política: permisos = POLÍTICA(principal, recurso).
-  * Equivalente: matriz de acceso.
+# Elementos del Monitor de Referencia
 
-    ```
-          Alice Bob ...
-    File1   Y    N
-    File2   Y    Y
-    ...
-    ```
-  * Dos formas típicas de almacenar política.
-    * Access Control Lists (ACLs): almacenar una fila (cortar por recurso).
-    * Capacidades: almacenar una columna (cortar por principal).
-        * Básicamente qué puede hacer un principal
-        * Short term
+* **Principal:** quien solicita una operación
+  * Persona, dispositivo, programa o servicio
+
+* **Recurso:** aquello que queremos proteger
+  * Servicio, método, archivo o dato
+
+* **Monitor:** intercepta cada solicitud
+  * Autentica al principal
+  * Autoriza la operación
+  * Registra la decisión en los logs
+
 
 ---
 
-# Autorizar: determinar si la solicitud debe ser permitida. (cont.)
-  * ACLs ampliamente usados para política a largo plazo.
-    * Permisos de archivo, lista de usuarios con acceso a un documento compartido, ...
-    * Típicamente almacenados con el objeto protegido.
-    * Buenos para responder "¿quién puede acceder a este recurso?"
-  * Capacidades útiles para política a corto plazo.
-    * Descriptores de archivo en un S.O.; referencias de objeto en lenguajes;
-      tokens criptográficos en protocolos distribuidos.
-    * Típicamente almacenados con el principal.
-    * Flexibles, ya que típicamente las aplicaciones pueden otorgarse capacidades entre sí.
+# ¿Por qué separar política, monitor y recurso?
+
+* Cada componente tiene una responsabilidad clara
+  * La política define quién puede hacer qué
+  * El monitor aplica la política
+  * El recurso implementa la operación
+
+* **Implicancia:** evitar incrustar verificaciones de política en el recurso
+  * Aunque hacerlo sea conveniente
+  * Mezclar política e implementación dificulta razonar sobre la seguridad
+
+* Esta separación facilita modificar y auditar la política
+
+* Requiere **mediación completa**
+  * No debe existir un camino alternativo hacia el recurso
 
 ---
 
-# Autorizar: determinar si la solicitud debe ser permitida. (cont.)
-  * Capacidades no son buenas para política a largo plazo:
-    * No pueden responder "¿quién tiene acceso?"
-    * La revocación es complicada.
+# ¿El Monitor de Referencia siempre es suficiente?
+
+* Algunas decisiones dependen del estado interno del recurso
+  * Ejemplo: puedo ver una oferta solo después de realizar una más alta
+  * Estas verificaciones deben permanecer cerca de la lógica del recurso
+
+* No todos los ataques consisten en accesos no autorizados
+  * Un ataque DoS busca agotar recursos y afectar la disponibilidad
+
+* En sistemas distribuidos puede ser difícil identificar un único monitor
+  * Existen múltiples máquinas, servicios y caminos de comunicación
+
+El Monitor de Referencia es un modelo útil, pero no una arquitectura completa.
+
+---
+# 4. Establecer identidad: autenticación en cada nivel
+---
+# Del Monitor de Referencia a la autenticación
+
+* El monitor recibe una solicitud de un **principal**
+* Antes de aplicar la política debe responder:
+  * ¿Quién está realizando la solicitud?
+
+* No basta con declarar una identidad
+  * El principal debe demostrar que realmente la controla
+
+Este proceso se llama **autenticación**.
+
+Debemos autenticar distintos tipos de principales:
+* Personas
+* Servicios
+* Máquinas
 
 ---
 
-# Granularidad
-  * A nivel de Data Center
-    * Confiamos en lo que está adentro -> Firewall
-  * A nivel de Servicio
-    * Nivel mínimo de privilegios
-  * A nivel de Usuario
-    * Autorización (lo que ya vimos)
+# Autenticar: ¿cómo demuestra su identidad una persona?
+
+* **Contraseña:** demuestra conocer un secreto
+  * Puede ser robada, reutilizada o entregada mediante phishing
+* **Segundo factor:** exige una prueba adicional, como un código o dispositivo
+  * Reduce el daño de una contraseña robada, pero un atacante aún puede retransmitir códigos mediante phishing
+* **Clave pública:** demuestra posesión de una clave privada sin compartirla
+  * Puede vincular la prueba al servicio correcto y resistir mejor el phishing
+
+Distintos principales requieren mecanismos distintos. A continuación veremos cómo Google autentica **servicios y máquinas**.
+
+*Estudiaremos criptografía de clave pública con mayor profundidad más adelante en el curso.*
 
 ---
 
-# ¿Ejemplos de planes de autorización en el diseño de Google?
-  * [[ "Inter-Service Access Management" ]]
-  * ACL: administrador white-lista quién puede usar cada servicio.
-    * Principales = otros servicios, ingenieros.
-    * Guardia = aplicación automática por la infraestructura RPC.
-  * Capacidad: "ticket de permiso de usuario final" (ej., para acceder al servicio de Contactos).
-    * Capacidad para realizar operaciones en nombre de un usuario final.
-    * El ticket es de corta duración para limitar daños si es robado.
+
+# ¿Cómo autentica Google a sus servicios?
+
+* Cada servicio tiene una **identidad de servicio**
+  * Recibe credenciales criptográficas para demostrarla
+
+* Cuando dos servicios se comunican mediante RPC:
+  * El cliente demuestra su identidad al servidor
+  * El cliente también verifica la identidad del servidor
+
+* Google utiliza **ALTS** (*Application Layer Transport Security*)
+  * Sistema interno para crear un canal seguro entre servicios
+  * Proporciona autenticación mutua, integridad y cifrado
+
+* La infraestructura administra las credenciales
+  * Las emite, rota y revoca cuando es necesario
+
+**Pero ¿cómo decide Google qué máquinas pueden recibir estas credenciales?**
 
 ---
 
-# ¿Por qué la estructura específica del Monitor de Referencia?
-  * Separa la política de la implementación del recurso
-    * Para facilitar el razonamiento
-    * Para facilitar la evolución de la política
-  * Implicación: evitar incrustar verificaciones de seguridad en el código del recurso
-    * ¡Aunque incrustar sea a menudo conveniente!
-  * Nota: depende del aislamiento, es decir, no hay acceso excepto a través del guardia
+# ¿Cómo sabe Google si puede confiar en una máquina?
+
+* Una máquina de producción recibe acceso a:
+  * Datos sensibles
+  * Credenciales criptográficas
+  * La red y los servicios internos
+
+* Pero la identidad física de la máquina no es suficiente:
+  * Un atacante podría reemplazarla por otra
+  * Su sistema operativo o firmware podría haber sido modificado
+  * Un proveedor podría entregar componentes comprometidos
+
+Antes de entregarle credenciales, Google debe verificar su **identidad** e **integridad**.
 
 ---
 
-# ¿El Monitor de Referencia es siempre el mejor modelo?
-  * A veces las decisiones dependen de datos.
-    * Deben ser tomadas por el recurso, no por política+guardia separados.
-    * Ej. puedo ver tu oferta solo después de que haga una oferta más alta.
-  * A veces los ataques no son sobre acceso a datos.
-    * Ej. ataques DoS.
-  * A veces no está claro cómo aplicar el modelo de manera directa.
-    * Ej. dentro de centros de datos.
+# Primera defensa: raíz de confianza y arranque verificado
+
+* Google diseña sus propias placas y el chip de seguridad **Titan**
+
+* Titan funciona como una **raíz de confianza**
+  * Componente mínimo que el sistema asume que no ha sido alterado
+  * A partir de él se verifica la identidad e integridad del resto del sistema
+
+* Durante el arranque, cada etapa verifica la siguiente
+  * Solo deberían ejecutarse firmware y software aprobados por Google
+
+* Mediante **atestación**, la máquina demuestra qué software y firmware ejecuta
+
+Una máquina que no supera estas verificaciones no recibe credenciales de producción.
+
+*Estudiaremos seguridad de hardware en detalle más adelante en el curso.*
+
+---
+# 5. Decidir qué puede hacer una identidad: autorización
+---
+
+# De la autenticación a la autorización
+
+Ya podemos verificar la identidad de distintos principales:
+
+* Una persona
+* Un servicio
+* Una máquina
+
+Pero conocer su identidad no significa confiar en todo lo que haga.
+
+Para cada solicitud, el Monitor de Referencia debe preguntar:
+
+* ¿Qué operación quiere realizar?
+* ¿Sobre qué recurso?
+* ¿Tiene este principal permiso para hacerlo?
+
+Este proceso se llama **autorización**.
 
 ---
 
-# ¿Cómo aplicar la idea del Monitor de Referencia a todo un conjunto de máquinas?
-  * Ej. ¿cómo aplicarlo a las computadoras de una empresa?
-  * Idea antigua: defensa perimetral.
-    * Aislar "dentro de la empresa" de "fuera de la empresa".
-    * Solo una conexión (lógica) a Internet.
-    * El firewall actúa como guardia, detiene ataques, remueve malware, etc.
-    * Acceso completo permitido dentro del firewall.
-  * La defensa perimetral con firewalls funcionó bien durante muchos años.
+# Dos formas de representar permisos
+
+Función de política:
+
+`permisos = POLÍTICA(principal, recurso)`
+
+Equivalente: una **matriz de acceso**.
+
+![width:880px](access-matrix-acl-capabilities-v2.svg)
+
+* **ACL:** fila por recurso; **capacidad:** columna por principal.
+* En sistemas reales pueden definirse permisos adicionales.
 
 ---
 
-# Gran parte del paper de Google es una reacción a las debilidades de la defensa perimetral.
-  * No hay historia para nada que salga mal dentro.
-  * Es decir, no hay segunda línea de defensa si hay penetración exitosa.
+# ACLs y capacidades: ¿qué pregunta responde cada una?
 
-  * El paper esencialmente aplica Monitor de Referencia por servicio.
-    * Guardia = aceptar RPCs solo de servicios cliente aprobados.
-    * Ej. GMail puede hablar con Contactos, pero otros servicios no pueden.
-    
-  * Esto es un ejemplo de Privilegio Mínimo.
-    * Dividir las actividades, aislarlas.
-    * Dar a cada actividad solo los privilegios que necesita.
+| ACL: archivo | Capacidad: API key |
+| --- | --- |
+| ¿Quién puede acceder a este archivo? | ¿Qué puede hacer quien posee esta clave? |
+| El archivo mantiene una lista de usuarios y permisos: `Alice: leer`, `Bob: escribir`. | La API key permite ejecutar operaciones concretas, por ejemplo leer datos o enviar mensajes. |
+| Para cambiar el acceso, se modifica la ACL del archivo. | Para delegar acceso, se entrega una clave con permisos limitados. |
+
+Una API key con permisos acotados puede funcionar como una **capacidad portadora**: quien la posee puede ejercer esos permisos.
 
 ---
 
-# Los tickets de permiso de usuario final de Google reducen el privilegio aún más.
-  * RPC debe ser de servicio aprobado, ¡el usuario debe estar realmente logueado!
-  * Motivación: limitar daños de servicios solicitantes con errores pidiendo datos incorrectos.
-  * Motivación: limitar la capacidad de los internos de acceder a datos arbitrarios del usuario.
-  * ¡Quizás los tickets también están atados al cifrado de datos en la arquitectura de Google!
+# El costo de delegar capacidades
+
+Las capacidades son fáciles de delegar: basta entregar el descriptor, referencia o token.
+
+El problema aparece después:
+
+* Enumerar todos los tenedores puede ser difícil.
+* Revocar acceso requiere indirección, expiración u otro mecanismo.
+
+Las ACL favorecen la auditabilidad y la revocación; las capacidades favorecen la delegación y la mínima autoridad.
 
 ---
 
-# ¿Cómo un servicio autentica la solicitud de otro?
-  * Necesitamos "canales seguros" sobre la red.
-  * Criptografía: cifrar/descifrar, firmar/verificar.
-  * Las firmas prueban quién envió un mensaje (integridad).
-  * El cifrado asegura que solo el destinatario previsto pueda leer (confidencialidad).
-  * Así:
-    * Los servidores de Google (probablemente) firman RPCs a otros servidores.
-      * El sistema RPC automáticamente limita quién puede hablar con quién.
-    * Los RPCs están cifrados entre centros de datos, sobre internet.
-    * Quizás también cifrados dentro del centro de datos (¿por qué?).
+<!-- _class: google-auth-controls -->
+
+# Dos controles complementarios en Google
+
+| ACL entre servicios | Ticket de usuario final |
+| --- | --- |
+| **Identifica:** al servicio que realiza la RPC. | **Representa:** a un usuario autenticado. |
+| **Autoriza:** qué servicios pueden invocar al servicio de destino. | **Autoriza:** operaciones específicas en nombre del usuario. |
+| **Aplicación:** la infraestructura RPC comprueba automáticamente la ACL. | **Alcance:** permisos acotados y corta duración. |
+| **Ejemplo:** Gmail puede invocar Contactos; un servicio no autorizado, no. | **Ejemplo:** un token OAuth de Google con alcance `Calendar.readonly` permite a una aplicación consultar el calendario del usuario, pero no modificarlo ni acceder a Gmail. |
+
+La solicitud debe satisfacer **ambos controles**: servicio autorizado y ticket de usuario válido.
+
+---
+# 6. Aplicar el modelo a toda la infraestructura
+---
+
+# De una solicitud a toda la infraestructura
+
+Hasta ahora analizamos una solicitud individual:
+
+**Principal → solicitud → Monitor de Referencia → recurso**
+
+A escala de Google, la misma decisión debe repetirse entre:
+
+* Miles de máquinas y servicios
+* Millones de RPCs
+* Múltiples fronteras de confianza
+
+La pregunta arquitectónica es:
+
+> **¿Ubicamos el Monitor de Referencia solo en el perímetro de la red o frente a cada servicio?**
 
 ---
 
-# La criptografía cambia los desafíos a la gestión de claves.
-  * Ej. cuando el servicio GMail habla con el servicio de Contactos.
-  * El remitente RPC necesita saber qué clave usar para cifrar.
-  * El receptor RPC necesita saber quién corresponde a la clave de firma.
-  * Google claramente ejecuta un servicio de nombres, mapeando nombres de servicio a claves públicas.
+
+# ¿Por qué no basta el perímetro?
+
+**Modelo clásico:** Internet → **Firewall** → Red interna “confiable”
+
+Sus supuestos:
+
+* Existe una frontera clara entre el exterior y el interior.
+* El firewall controla qué tráfico puede cruzarla.
+* Una máquina dentro de la red recibe confianza amplia.
+
+Pero el firewall solo protege la entrada: si un atacante compromete una máquina interna, puede intentar moverse lateralmente hacia las demás.
+
+**Problema:** cruzar una defensa no debería otorgar acceso al resto de la infraestructura.
 
 ---
 
-# ¿Cómo sabe Google que es seguro usar una computadora particular como servidor?
-  * Usar un servidor significa que Google tiene que confiar en su hardware/BIOS/etc:
-    * Datos sensibles, claves cripto, autorización RPC.
-  * ¿Por qué podría haber un problema -- qué ataques?
-    * El atacante físicamente intercambia su propio servidor por uno de Google.
-    * El atacante irrumpe en un buen servidor, cambia el S.O. en disco.
-    * El vendedor envía a Google una máquina con BIOS corrupto.
-    * El atacante irrumpe en un buen servidor, "actualiza" BIOS a algo malo.
+
+# Un Monitor de Referencia por servicio
+
+| Pregunta | Aplicación en la infraestructura de Google |
+| --- | --- |
+| **¿Quién llama?** | Cada RPC identifica y autentica al servicio solicitante. |
+| **¿Puede llamar?** | La infraestructura comprueba la ACL del servicio de destino. |
+| **¿Cuánto acceso recibe?** | Cada servicio obtiene únicamente las RPC necesarias para su función. |
+| **¿Qué ocurre si se compromete?** | Sus permisos limitados contienen el daño y protegen a los demás servicios. |
+
+* **Importante:** el Monitor de Referencia es una abstracción o patrón de diseño, no necesariamente un programa independiente. Aquí se materializa en el sistema RPC: identidades de servicio, ACLs y aplicación de permisos.
+
+Así, la confianza no depende de estar “dentro” de la red: **cada solicitud vuelve a comprobarse**.
+
+---
+# 7. Disponibilidad: límites del control de acceso
+---
+
+# ¿Cuáles son los límites del Monitor de Referencia?
+
+Un Monitor de Referencia puede decidir:
+
+* ¿Quién realiza la solicitud?
+* ¿Qué operación intenta ejecutar?
+* ¿Está autorizado para realizarla?
+
+Pero autorizar correctamente una solicitud no garantiza que el sistema pueda atenderla.
+
+El Monitor de Referencia no resuelve por sí solo:
+
+* El agotamiento de recursos finitos
+* La sobrecarga causada por demasiadas solicitudes
+* La dificultad de distinguir demanda legítima de un ataque
+
+El siguiente problema es la **disponibilidad**.
 
 ---
 
-# ¿Cuál es la estrategia de defensa de Google?
-  * (Muchas conjeturas aquí, veremos diseños reales más tarde)
-  * Diseñan sus propias placas base, y su propio "chip de seguridad".
-  * El chip de seguridad interviene durante el proceso de arranque.
-  * El chip de seguridad verifica que BIOS y S.O. estén firmados por la clave privada de Google.
-  * El chip de seguridad tiene una clave privada única atada a una máquina particular.
-  * El chip de seguridad está dispuesto a firmar declaraciones cuando se le pide por el software.
-    * La declaración incluye identidad (hash) del BIOS y S.O. arrancados.
+
+# DoS: agotar recursos para negar servicio
+
+**Escenario típico:** un atacante reúne una botnet de miles de máquinas y envía suficientes solicitudes para sacar un servicio del aire o extorsionar a su operador.
+
+| Recurso atacado | Ejemplo |
+| --- | --- |
+| **Ancho de banda** | Saturar el enlace con grandes volúmenes de tráfico. |
+| **CPU o memoria del router** | Paquetes pequeños, opciones inusuales o abuso de protocolos de enrutamiento. |
+| **Memoria del servidor** | Mantener estado de protocolo, como en un SYN flood. |
+| **CPU del servidor** | Provocar operaciones de aplicación costosas. |
+
+El ataque no necesita vulnerar la autorización: basta con consumir un recurso finito.
 
 ---
 
-# ¿Cuál es la estrategia de defensa de Google? (cont.)
-  * Los servicios de Google requieren autenticación incluyendo declaración firmada por chip.
-  * Los servicios de Google pueden verificar la declaración firmada de un cliente:
-    * Google tiene BD de claves públicas del chip de seguridad para todas las máquinas que compró.
-    * Google tiene una BD de hashes aceptables de BIOS y S.O.
-  * Entonces: ¿qué pasa si un empleado del centro de datos inserta máquina con dirección IP correcta?
-  * Entonces: ¿qué pasa si el vendedor envía a Google una máquina con BIOS que espía?
+
+# DoS: principios de mitigación
+
+**Desafío central:** distinguir tráfico de ataque de demanda legítima.
+
+| Momento | Principio | Ejemplo |
+| --- | --- | --- |
+| **A escala global** | Absorber y distribuir carga. | Capacidad masiva y balanceo de carga. |
+| **Antes de autenticar** | Minimizar trabajo y estado; autenticar cuanto antes. | Reducir estado de conexiones TCP; concentrar esta fase en GFE y login. |
+| **Después de autenticar** | Limitar y priorizar el consumo. | Dar prioridad a usuarios legítimos autenticados. |
+
+La defensa combina capacidad, autenticación temprana y control explícito de recursos.
 
 ---
 
-# Disponibilidad: Ataques DoS.
-  * El problema:
-    * El atacante quiere sacar tu sitio web del aire, o chantajearte.
-    * Ensamblan un "botnet" de 10,000 máquinas aleatorias de Internet.
-    * Envían vastas cantidades de solicitudes a tu sitio web.
 
-  * Muchos tipos de recursos podrían ser el objetivo de un ataque DoS.
-    * Ancho de banda de red.
-    * CPU/memoria del router.
-      * Paquetes pequeños, opciones de paquete inusuales, protocolos de enrutamiento.
-    * Memoria del servidor.
-      * Estado del protocolo (SYN floods, etc.)
-    * CPU del servidor.
-      * Acciones de aplicación costosas.
+# DoS: defensa en varias capas en Google
 
----
+| Capa | Ejemplo descrito por Google |
+| --- | --- |
+| **Balanceadores de red** | Reportan telemetría a un servicio central de defensa DoS, que puede ordenar descartar o limitar el tráfico asociado al ataque. |
+| **Google Front End (GFE)** | Aporta información de las solicitudes a nivel de aplicación; el servicio central puede configurar los GFE para descartar o limitar patrones de ataque. |
+| **Mitigación para usuarios reales** | Ante fuentes sospechosas, Google puede limitar las IP más activas o presentar desafíos JavaScript/CAPTCHA en vez de bloquear indiscriminadamente. |
 
-# Disponibilidad: Ataques DoS. (cont.)
-  * Un problema central DoS: difícil distinguir tráfico de ataque del tráfico real.
+Estas defensas combinan señales de red y aplicación antes de que el tráfico alcance al servicio final.
 
-  * Algunos principios amplios para mitigar ataques DoS.
-    * Recursos masivos del lado del servidor, con distribución/balance de carga.
-    * Autenticar lo antes posible.
-    * Minimizar consumo de recursos antes de la autenticación.
-      * Ej. minimizar estado de configuración de conexión TCP del lado del servidor.
-    * Factorizar componentes que manejan solicitudes antes de la autenticación.
-      * Google: GFE, servicio de login.
-    * Limitar/priorizar uso de recursos después de la autenticación.
-      * Los usuarios legítimos autenticados deben obtener prioridad.
-
----
-
-# Disponibilidad: Ataques DoS. (cont.)
-  * Google también implementa varias heurísticas para filtrar solicitudes en GFE.
+*Profundizaremos en ataques DoS, rate limiting y defensas por capas en futuras clases.*
 
 <!--
 ---
@@ -432,15 +754,22 @@ style: |
 -->
 ---
 
-# Resumen de arquitectura de seguridad.
-  * Aislamiento.
-  * Modelo de Monitor de Referencia.
-  * Autorizar/Autenticar/Auditar.
-  * Canales seguros.
-  * Separación de privilegios, privilegio mínimo.
-  * TCB pequeño, verificación/búsqueda de errores.
 
-  * Simplicidad.
-  * Perfecto es el enemigo de lo bueno.
-  * Aspiraciones más bajas.
-  * Seguridad vs inconveniencia.
+# Resumen: construir una arquitectura segura
+
+* La **arquitectura de seguridad** define principales, recursos, fronteras de confianza y mecanismos de aplicación.
+* El **aislamiento**, los **canales seguros** y la **separación de privilegios** reducen la superficie de ataque y contienen fallas.
+* El **Monitor de Referencia** media cada solicitud: autentica al principal, aplica la política de autorización y permite auditar el resultado.
+
+---
+
+
+<!-- _class: takeaway -->
+
+# Resumen: aplicar y contener
+
+* En Google, identidades de máquinas, servicios y usuarios se combinan con ACLs, tokens acotados y controles integrados en la infraestructura RPC.
+* El **privilegio mínimo** y la simplicidad reducen cuánto debemos confiar y cuánto daño puede causar un componente comprometido.
+* El control de acceso no garantiza **disponibilidad**: los ataques DoS requieren capacidad, priorización, rate limiting y defensas por capas.
+
+**Idea central:** no confiar por ubicación; verificar cada solicitud y diseñar para contener el daño.
