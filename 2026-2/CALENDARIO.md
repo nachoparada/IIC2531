@@ -19,7 +19,7 @@
 | Clase 15 | 2026-09-24 | Hardware Seguro | Como BitLocker provee seguridad al hardware. | AES-CBC + Elephant diffuser: A Disk Encryption Algorithm for Windows Vista | |
 | Clase 16 | 2026-09-29 | Seguridad en iOS | Analisis de la filosofia de seguridad de iPhone. | iOS Security | |
 | Clase 17 | 2026-10-01 | Seguridad en Redes | Vulnerabilidades de TCP/IP, DoS y protocolos de ruteo. | A Look Back at Security Problems in the TCP/IP Protocol Suite | Entrega Lab 3 |
-| Clase 18 | 2026-10-06 | Canales Seguros | Criptografia de llave publica y privada; SSL. | Link asociado al tema | |
+| Clase 18 | 2026-10-06 | Canales Seguros | Criptografia de llave publica y privada; SSL. | Link asociado al tema | Entrega Propuesta Proyecto Final |
 | Clase 19 | 2026-10-08 | Certificados | Utilidad, funcionamiento, ventajas y desventajas de certificados. | Let's Encrypt: An Automated Certificate Authority to Encrypt the Entire Web | |
 | Clase 20 | 2026-10-13 | Modelo de Seguridad en la Web | Problemas en navegadores web; SOP. | Links a temas relacionados | |
 | Clase 21 | 2026-10-15 | Autenticacion | Complejidades de autenticacion de usuarios; politicas de passwords; introduccion a criptografia. | Security Keys: Practical Cryptographic Second Factors for the Modern Web | |
@@ -35,3 +35,5 @@
 | Clase 31 | 2026-11-19 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | Entrega Proyecto Final |
 | Clase 32 | 2026-11-24 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | |
 | Clase 33 | 2026-11-26 | Presentaciones Proyecto Final | Presentaciones de proyecto final. | | |
+| Hito académico | 2026-11-27 | Finalización del período de clases | Último día del período de clases del segundo período académico. | | |
+| Hito académico | 2026-12-16 | Término del semestre | Término del segundo período académico. | | |
