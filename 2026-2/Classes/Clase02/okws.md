@@ -116,7 +116,7 @@ style: |
   * Veremos varias de estas ideas en futuras clases:
     * La Arquitectura de Seguridad de Google hace gran cosa de separar servicios
     * U2F separa autenticación en un dispositivo físicamente separado
-    * Ahora profundizaremos en un caso de estudio detallado, el servidor web OKWS de OkCupid
+  * Ahora profundizaremos en un caso de estudio detallado, el servidor web OKWS de OkCupid
 
 ---
 
