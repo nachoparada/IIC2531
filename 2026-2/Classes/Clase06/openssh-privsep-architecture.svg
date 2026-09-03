@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">Arquitectura histórica de OpenSSH con separación de privilegios</title>
+  <desc id="desc">El listener root acepta la conexión y hace fork de un monitor root por conexión. El monitor hace fork de un worker pre-autenticación sin privilegios, que hereda la conexión. Worker y monitor se comunican mediante IPC validada. Después de autenticar, el monitor crea el worker con identidad del usuario y la sesión.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L11,5.5 L0,11 Z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L11,5.5 L0,11 Z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .box{fill:#fff;stroke:#64748b;stroke-width:2.5}.root{fill:#fff7ed;stroke:#ea580c;stroke-width:2.5}
+      .worker{fill:#eff6ff;stroke:#2563eb;stroke-width:3}.user{fill:#f0fdf4;stroke:#16a34a;stroke-width:2.5}
+      .t{font-family:Arial,sans-serif;fill:#0f172a;text-anchor:middle}.h{font-size:23px;font-weight:700}.b{font-size:19px}.s{font-size:18px}.tag{font-size:16px;font-weight:700;letter-spacing:.8px}
+      .line{fill:none;stroke:#475569;stroke-width:3;marker-end:url(#arrow)}.ipc{fill:none;stroke:#2563eb;stroke-width:3;marker-end:url(#arrow-blue)}
+    </style>
+  </defs>
+
+  <rect x="175" y="38" width="570" height="404" rx="22" class="root" opacity="0.5"/>
+  <text x="205" y="69" class="t tag" text-anchor="start">PRIVILEGIADO · ROOT</text>
+  <rect x="795" y="38" width="240" height="404" rx="22" fill="#eff6ff" stroke="#2563eb" stroke-width="2" opacity="0.45"/>
+  <text x="835" y="69" class="t tag" text-anchor="start">MENOS PRIVILEGIOS</text>
+
+  <!-- Creation chain -->
+  <path d="M155 209 H230" class="line"/>
+  <text x="192" y="193" class="t s">1 · TCP</text>
+  <path d="M420 209 H480" class="line"/>
+  <text x="450" y="185" class="t s">2 · fork</text>
+  <path d="M680 209 H825" class="line"/>
+  <text x="752" y="183" class="t s">3 · fork</text>
+  <path d="M825 305 C770 305, 735 305, 680 305" class="ipc"/>
+  <text x="752" y="278" class="t s" fill="#1d4ed8">solicitud IPC</text>
+  <path d="M680 350 C735 350, 770 350, 825 350" class="ipc"/>
+  <text x="752" y="384" class="t s" fill="#1d4ed8">respuesta</text>
+  <path d="M1005 231 H1080" class="line"/>
+
+  <!-- Nodes -->
+  <rect x="18" y="154" width="137" height="110" rx="15" class="box"/>
+  <text x="86" y="187" class="t tag">NO CONFIABLE</text>
+  <text x="86" y="221" class="t h">Cliente</text>
+  <text x="86" y="248" class="t b">SSH</text>
+
+  <rect x="230" y="137" width="190" height="144" rx="16" class="box"/>
+  <text x="325" y="170" class="t tag">LARGA VIDA</text>
+  <text x="325" y="207" class="t h">Listener</text>
+  <text x="325" y="239" class="t b">accept TCP</text>
+  <text x="325" y="264" class="t s">no procesa SSH</text>
+
+  <rect x="480" y="111" width="200" height="196" rx="16" class="box"/>
+  <text x="580" y="145" class="t tag">POR CONEXIÓN</text>
+  <text x="580" y="181" class="t h">Monitor</text>
+  <text x="580" y="216" class="t b">Autenticación</text>
+  <text x="580" y="247" class="t b">Llaves · PTY</text>
+  <text x="580" y="278" class="t b">setuid · validación</text>
+
+  <rect x="825" y="100" width="180" height="262" rx="17" class="worker"/>
+  <text x="915" y="134" class="t tag" fill="#1d4ed8">PRE-AUTH</text>
+  <text x="915" y="169" class="t h">Worker</text>
+  <text x="915" y="201" class="t b">TCP heredado</text>
+  <text x="915" y="231" class="t b">Parsing · KEX</text>
+  <text x="915" y="261" class="t b">Cripto · red</text>
+  <line x1="850" y1="278" x2="980" y2="278" stroke="#bfdbfe" stroke-width="2"/>
+  <text x="915" y="305" class="t s">sin privilegios · chroot</text>
+  <text x="915" y="335" class="t s">re-creado post-auth</text>
+
+  <rect x="1080" y="174" width="96" height="114" rx="14" class="user"/>
+  <text x="1128" y="207" class="t tag">UID</text>
+  <text x="1128" y="239" class="t h">Shell</text>
+  <text x="1128" y="265" class="t s">sesión</text>
+
+  <rect x="274" y="462" width="664" height="42" rx="21" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+  <text x="606" y="489" class="t b">Cadena correcta: listener → fork monitor → fork worker.</text>
+</svg>

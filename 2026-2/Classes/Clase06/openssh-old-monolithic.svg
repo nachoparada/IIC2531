@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="500" viewBox="0 0 1100 500" role="img" aria-labelledby="title desc">
+  <title id="title">Arquitectura histórica de OpenSSH antes de separación de privilegios</title>
+  <desc id="desc">Un listener root de larga vida acepta conexiones TCP. Por cada conexión, hace fork de un hijo que también conserva root. El hijo procesa el protocolo, autentica y crea la sesión, por lo que es el proceso peligroso expuesto a datos de red no confiables.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L11,5.5 L0,11 Z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L11,5.5 L0,11 Z" fill="#dc2626"/>
+    </marker>
+    <style>
+      .box{fill:#fff;stroke:#64748b;stroke-width:2.5}
+      .root{fill:#fff7ed;stroke:#ea580c;stroke-width:2.5}
+      .risk{fill:#fff1f2;stroke:#dc2626;stroke-width:3}
+      .user{fill:#f0fdf4;stroke:#16a34a;stroke-width:2.5}
+      .t{font-family:Arial,sans-serif;fill:#0f172a;text-anchor:middle}
+      .h{font-size:23px;font-weight:700}.b{font-size:19px}.s{font-size:17px}.tag{font-size:16px;font-weight:700;letter-spacing:.8px}
+      .line{fill:none;stroke:#475569;stroke-width:3;marker-end:url(#arrow)}
+      .dash{fill:none;stroke:#dc2626;stroke-width:3;stroke-dasharray:8 7;marker-end:url(#arrow-red)}
+    </style>
+  </defs>
+
+  <rect x="238" y="42" width="675" height="382" rx="22" class="root" opacity="0.55"/>
+  <text x="270" y="72" class="t tag" text-anchor="start">FRONTERA PRIVILEGIADA · TODO ROOT</text>
+
+  <!-- Connectors behind nodes -->
+  <path d="M170 229 H300" class="line"/>
+  <text x="235" y="214" class="t s">1 · acepta TCP</text>
+  <path d="M520 229 H610" class="line"/>
+  <text x="565" y="214" class="t s">2 · fork</text>
+  <path d="M170 285 C345 390, 520 375, 635 320" class="dash"/>
+  <text x="405" y="390" class="t s" fill="#b91c1c">mensajes SSH no confiables</text>
+  <path d="M890 229 H958" class="line"/>
+
+  <!-- Nodes -->
+  <rect x="25" y="165" width="145" height="128" rx="16" class="box"/>
+  <text x="97" y="203" class="t tag">NO CONFIABLE</text>
+  <text x="97" y="237" class="t h">Cliente SSH</text>
+  <text x="97" y="267" class="t b">Internet</text>
+
+  <rect x="300" y="142" width="220" height="174" rx="17" class="box"/>
+  <text x="410" y="178" class="t tag">LARGA VIDA · ROOT</text>
+  <text x="410" y="215" class="t h">Listener sshd</text>
+  <text x="410" y="249" class="t b">bind :22 · listen</text>
+  <text x="410" y="280" class="t b">accept · fork</text>
+
+  <rect x="610" y="105" width="280" height="248" rx="18" class="risk"/>
+  <text x="750" y="142" class="t tag" fill="#b91c1c">POR CONEXIÓN · ROOT</text>
+  <text x="750" y="180" class="t h">Hijo privilegiado</text>
+  <line x1="645" y1="198" x2="855" y2="198" stroke="#fecdd3" stroke-width="2"/>
+  <text x="750" y="231" class="t b">Protocolo y parsing</text>
+  <text x="750" y="264" class="t b">Autenticación</text>
+  <text x="750" y="297" class="t b">Sesión / shell</text>
+  <text x="750" y="329" class="t s" fill="#b91c1c">Proceso peligroso expuesto</text>
+
+  <rect x="958" y="176" width="118" height="106" rx="15" class="user"/>
+  <text x="1017" y="215" class="t h">Sesión</text>
+  <text x="1017" y="249" class="t b">usuario</text>
+
+  <rect x="318" y="444" width="540" height="40" rx="20" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="588" y="470" class="t b" fill="#991b1b">Un bug remoto en el hijo por conexión se ejecuta con root.</text>
+</svg>

@@ -24,26 +24,26 @@ style: |
     left: 50%;
     transform: translateX(-50%);
   }
-  
+
   /* Right-align terminal commands */
   .terminal-commands {
     text-align: right;
     margin-left: 400px;
   }
-  
+
   /* Make sub-bullets lighter and smaller */
   ul ul li, ol ol li {
     color: #666666;
     font-size: 0.9em;
   }
-  
+
   /* Make nested sub-bullets even lighter, italic, and smaller */
   ul ul ul li, ol ol ol li {
     color: #666666;
     font-style: italic;
     font-size: 0.8em;
   }
-  
+
   /* Alternative: Use opacity for a more subtle effect */
   ul ul, ol ol {
     opacity: 0.8;
@@ -58,36 +58,82 @@ Comenzamos un nuevo módulo: **casos de estudio de separación de privilegios en
 
 ---
 
+# 1. El problema
+
+---
+
 # El Problema: Bugs Explotables en Software
 
 * El software es complejo → bugs → exploits.
 * ¿Qué hacer al respecto?
 
 **Plan A:** Encontrarlos, arreglarlos, evitar crear nuevos.
-  * Hablaremos de varias técnicas así en el próximo módulo.
   * Mucho progreso aquí, pero para sistemas grandes, no es suficiente.
 
----
+**Plan B: Construir sistemas seguros incluso con bugs**
 
-# Ejemplo: OpenSSH (antes de separación de privilegios)
+¿Podemos hacer algo así?
 
-* Proceso que escucha corre como **root**, acepta conexiones en puerto 22.
-  * Necesita privilegio root para bind al puerto 22.
-  * Necesita privilegio root para operaciones posteriores.
-* Crea un nuevo proceso (fork) para cada conexión entrante.
-  * Procesa mensajes de red arbitrarios.
-  * Pero sigue corriendo como root (necesitará verificar contraseña, iniciar shell, etc.).
+**Meta: Principio de Mínimo Privilegio**
+  * Cada componente debería tener los mínimos privilegios necesarios para hacer su trabajo.
 
 ---
 
-# Mucho código potencialmente con bugs
+# 2. ¿Qué es SSH?
+
+---
+
+# ¿Qué es SSH?
+
+* **SSH (Secure Shell)** es un protocolo para iniciar sesiones remotas y ejecutar comandos de forma segura sobre una red no confiable.
+* Usa un modelo **cliente-servidor** y establece un canal **cifrado y autenticado**.
+* Usos comunes: administración remota, transferencia de archivos y túneles de red.
+* **SSH es el protocolo**, no una implementación específica.
+
+---
+
+# ¿Qué es OpenSSH?
+
+* Es una implementación de código abierto de SSH, ampliamente utilizada.
+* Se originó en **OpenBSD**.
+* Incluye cliente (`ssh`), servidor (`sshd`) y herramientas relacionadas como `scp`, `sftp` y `ssh-keygen`.
+* En esta clase estudiamos su diseño de **separación de privilegios** para limitar el daño de bugs.
+
+---
+
+# 3. OpenSSH antes de la separación de privilegios
+
+---
+
+# Ejemplo: OpenSSH antes de separación de privilegios
+
+* Un **listener de larga vida** corre como root, hace `bind` al puerto 22 y acepta conexiones.
+* Por cada conexión aceptada, el listener hace `fork` de un **hijo privilegiado**.
+* Ese hijo sigue como root y maneja toda la conexión:
+  * protocolo y mensajes de red no confiables;
+  * autenticación;
+  * creación y mantenimiento de la sesión.
+
+**Riesgo:** un bug remoto en el hijo por conexión expone directamente privilegios de root.
+
+---
+
+# Arquitectura antigua de OpenSSH
+
+![align-center height:530px](./openssh-old-monolithic.svg)
+
+---
+
+# ADEMÁS: Mucho código potencialmente con bugs
 
 * zlib para compresión sobre la red.
 * Parsing de paquetes de red.
-* Encriptación, intercambio de llaves.
-* Autenticación: verificar contraseña, challenge-response, etc.
-* Iniciar un shell.
+* Cifrado e intercambio de llaves.
+* Autenticación: contraseñas, llaves públicas, challenge-response, etc.
+* Creación de la sesión y de la shell.
 * Re-negociación de llaves después de cierto tiempo.
+
+**Antes de privsep, el hijo root por conexión ejecutaba toda esta superficie expuesta.**
 
 ---
 
@@ -101,12 +147,7 @@ Comenzamos un nuevo módulo: **casos de estudio de separación de privilegios en
 
 ---
 
-# Plan B: Construir sistemas seguros incluso con bugs
-
-¿Podemos hacer algo así?
-
-**Meta: Principio de Mínimo Privilegio**
-  * Cada componente debería tener los mínimos privilegios necesarios para hacer su trabajo.
+# 4. Gran Idea: Separación de Privilegios
 
 ---
 
@@ -115,8 +156,10 @@ Comenzamos un nuevo módulo: **casos de estudio de separación de privilegios en
 Dividir el software y los datos para limitar el daño de los bugs.
 
 **Dos beneficios relacionados:**
-  * Limitar daño de exploit exitoso → "mínimo privilegio"
-  * Limitar acceso del atacante a código con bugs → "superficie de ataque"
+  * Limitar daño de un exploit exitoso → **mínimo privilegio**.
+  * Limitar el código privilegiado alcanzable por el atacante → menor **superficie de ataque**.
+
+**No evita el bug: reduce lo que el atacante obtiene al explotarlo.**
 
 ---
 
@@ -143,167 +186,187 @@ Posibles criterios:
 
 ---
 
+# 5. OpenSSH con separación de privilegios
+
+## Cómo implementa la separación de privilegios
+
+---
+
 # ¿Cómo hace OpenSSH la separación de privilegios?
 
-* **Proceso listener privilegiado** (corre como root) acepta conexiones entrantes.
-* **Proceso monitor privilegiado** (corre como root) por conexión.
-* **Proceso worker no privilegiado** para hacer la mayor parte del trabajo de conexión.
-  * Parsing de mensajes de red, protocolo crypto, intercambio de llaves, compresión...
-  * La conexión TCP se pasa al proceso worker no privilegiado.
+* El **listener privilegiado** acepta la conexión y hace `fork` de un **monitor privilegiado por conexión**.
+* El monitor hace `fork` de un **worker pre-auth no privilegiado**, que hereda la conexión TCP.
+  * El worker procesa paquetes, protocolo criptográfico, intercambio de llaves y compresión.
+* El worker pide por IPC solo las operaciones sensibles que expone el monitor.
+* Tras autenticar, el worker pre-auth exporta estado y termina; el monitor crea un **worker post-auth** con el UID/GID del usuario.
+* Finalmente se crea la shell o sesión del usuario; el worker continúa manejando el canal cifrado.
 
 ---
 
-# Arquitectura de OpenSSH (cont.)
+# Arquitectura de OpenSSH con separación de privilegios
 
-* El proceso worker se **re-crea** después de la autenticación.
-  * Mayormente un detalle debido a cómo se puede establecer el user ID de un proceso.
-* Eventualmente crea un **proceso shell del usuario**.
-  * El proceso worker permanece, manejando la sesión de red encriptada.
+![align-center height:500px](./openssh-privsep-architecture.svg)
 
 ---
 
-# ¿Qué operaciones privilegiadas necesitan ocurrir por conexión?
+# ¿Qué debe quedar detrás de la frontera privilegiada?
 
-* El protocolo requiere **firmar un mensaje** con la llave privada del servidor.
-* Necesita **verificar la contraseña** del usuario.
-* Necesita **autenticar** al usuario con public-key auth (challenge-response).
-* Necesita **asignar un pseudo-terminal** para la sesión de login del usuario.
-* Necesita **iniciar shell** con el UID del usuario.
+**Capacidades que históricamente requieren root**
+* Leer la llave privada del host protegida por permisos del sistema.
+* Crear y limpiar pseudo-terminales (PTY).
+* Crear un proceso con el UID/GID del usuario autenticado.
 
----
+**Decisiones confiables u operaciones con secretos**
+* Verificar contraseñas contra el backend protegido.
+* Decidir si una cuenta o llave pública está autorizada y validar la prueba.
+* Firmar el intercambio de llaves sin revelar la llave privada del host.
 
-# ¿Por qué estas operaciones requieren root?
-
-La mayoría de estas operaciones privilegiadas requieren privilegio root en Unix:
-  * El archivo de llave privada del host solo es legible por root.
-  * Por eso OpenSSH solía correr completamente como root.
+> No toda decisión de autenticación es un *syscall* exclusivo de root; debe quedar fuera del worker comprometible porque su **resultado es de seguridad**.
 
 ---
 
-# ¿Cómo hace el worker no privilegiado estas operaciones?
+# ¿Cómo pide operaciones el worker no privilegiado?
 
-La separación de privilegios define una **nueva interfaz** entre worker y monitor.
+La separación introduce una **API IPC explícita** entre worker y monitor.
 
-* Lista enumerada de operaciones que pueden ser solicitadas.
-  * [Ver lista de operaciones en monitor.h](https://github.com/openssh/openssh-portable/blob/master/monitor.h)
-* El proceso monitor realizará **solo estas operaciones** correspondientes.
-  * [Ver implementación del monitor en monitor.c](https://github.com/openssh/openssh-portable/blob/master/monitor.c)
+* Mensajes estructurados: tipo de solicitud, longitud y argumentos serializados.
+* Lista cerrada de operaciones y handlers permitidos.
+* El monitor valida solicitud **y estado del protocolo** antes de ejecutar.
+* Para estas operaciones, el worker recibe un resultado o recurso acotado — no la llave privada del host ni la base de autenticación.
+
+Código: [`monitor.h`](https://github.com/openssh/openssh-portable/blob/master/monitor.h), [`monitor.c`](https://github.com/openssh/openssh-portable/blob/master/monitor.c) y [`monitor_wrap.c`](https://github.com/openssh/openssh-portable/blob/master/monitor_wrap.c).
 
 ---
 
-# Control estricto sobre operaciones permitidas
+# Ejemplos de la API del monitor: autenticación
 
-* Control estricto sobre qué operaciones están permitidas en qué momento.
-  * Ej., flags `MON_ONCE` y `MON_AUTH`.
-  * Solo puede hacer ciertas operaciones **una vez** (firmar con llave privada del servidor).
-  * Solo puede hacer ciertas operaciones **después de proveer username válido** (verificar pw).
+* **Contraseña:** el worker solicita verificarla; el monitor consulta el backend protegido y devuelve **sí/no**.
+* **Llave pública:** primero pregunta si la llave está autorizada; luego solicita verificar la firma sobre los datos correctos.
+* **Challenge-response:** el monitor genera u obtiene el challenge y valida la respuesta; el worker no puede inventar un transcript ganador.
+
+**Son flujos distintos:** autenticación por llave pública no es challenge-response. En todos, el monitor conserva la decisión confiable.
+
+---
+
+# Secuencia de una conexión: dos workers
+
+![align-center height:530px](./openssh-new-connection-two-workers-sequence.svg)
+
+---
+
+# El monitor controla qué se puede pedir y cuándo
+
+**Una API pequeña no basta:** el monitor también valida orden, contexto y frecuencia.
+
+### `Conexión nueva` → `Usuario identificado` → `Autenticado`
+
+* **Solo una vez:** firmar el intercambio con la llave del host (`MON_ONCE`).
+* **Solo en fase de autenticación:** verificar una credencial (`MON_AUTH`).
+* **Fuera del estado esperado:** rechazar la solicitud o terminar el worker.
+
+> Aunque controle el worker, el atacante no puede invocar operaciones privilegiadas arbitrariamente.
 
 ---
 
 # Frontera de seguridad significativa
 
-Frontera de seguridad significativa entre proceso hijo worker y proceso padre monitor.
+El diseño parte de una hipótesis deliberadamente hostil:
 
-* **Asumir que el proceso hijo worker está comprometido.**
-  * El adversario puede emitir solicitudes arbitrarias al monitor.
-* El proceso monitor tiene **privilegios completos de root**.
-* Pero las operaciones que exporta son **mucho menos dañinas**.
+* **Asumir comprometido al worker** que procesa la red.
+* El adversario puede emitir cualquier solicitud IPC que el worker pueda construir.
+* El monitor sigue como root, pero solo acepta una interfaz estrecha y dependiente del estado.
+
+**La frontera no es “root vs. no root” por sí sola: la seguridad depende de validar correctamente cada cruce.**
 
 ---
 
 # Operaciones limitadas del monitor
 
-El worker comprometido:
-  * No puede obtener la llave privada, solo puede **firmar** con ella.
-  * No puede obtener la lista de usuarios, solo puede **verificar** un nombre de usuario particular.
-  * No puede obtener el archivo de contraseñas, solo puede **verificar** la contraseña de un usuario.
-  * Etc.
+Un worker comprometido:
+
+* No obtiene la llave privada: solicita una **firma ligada a esta conexión**.
+* No enumera usuarios: consulta si **un nombre específico** es válido.
+* No lee la base de contraseñas: solicita verificar **una credencial concreta**.
+* No recibe autoridad general: obtiene respuestas o file descriptors acotados.
+
+**Patrón:** exponer una operación mínima, no el recurso privilegiado subyacente.
 
 ---
 
-# Superficie de Ataque: Proceso Worker
+# Superficie de ataque: worker
 
-* Mensajes de red arbitrarios.
-* Parsing, compresión.
-* Implementaciones de encriptación e intercambio de llaves.
+* Recibe mensajes de red arbitrarios antes de autenticar.
+* Ejecuta parsing de paquetes, negociación, criptografía y —históricamente— compresión.
+* Por eso concentra gran parte del código más propenso a bugs remotos.
 
-**Alta exposición a ataques externos.**
-
----
-
-# Superficie de Ataque: Proceso Monitor
-
-* Aceptar una conexión de red.
-* Solicitudes del monitor (monitor.h).
-
-**Exposición limitada y controlada.**
+**Alta exposición, bajos privilegios:** el worker está diseñado como un dominio sacrificable y reemplazable.
 
 ---
 
-# Superficie de Ataque: Proceso Listener
+# Superficie de ataque: monitor
 
-* Casi nada: nueva conexión TCP entrando.
-* Sin datos, solo crea un nuevo proceso monitor por cada conexión aceptada.
+* **No acepta la conexión:** esa función pertenece al listener.
+* Recibe solicitudes IPC estructuradas **desde su worker**.
+* Valida tipo, longitud, argumentos, fase y frecuencia de cada solicitud.
+* Ejecuta solo operaciones privilegiadas estrechas y devuelve resultados acotados.
 
-**Mínima exposición.**
-
----
-
-# ¿Qué daño si el worker se compromete?
-
-* Podría intentar iniciar sesión como usuario.
-  * Pero podría haber hecho eso intentando iniciar sesión via ssh normalmente.
-* Podría firmar mensajes usando la llave privada del servidor.
-  * Ligeramente preocupante: podría suplantar al servidor para otra conexión.
-  * Pero no para conexiones futuras: necesitaría firmar futuros mensajes aleatorios.
+**Exposición menor, no nula:** el parser IPC y la lógica de validación son código crítico.
 
 ---
 
-# ¿Qué daño si el worker se compromete? (cont.)
+# ¿Qué daño causa comprometer el worker pre-autenticación?
 
-* Post-autenticación: podría acceder al estado de ese usuario.
-  * Pero podría haber hecho eso solo iniciando sesión normalmente.
-* Post-autenticación: podría asignar un pseudo-terminal.
-  * No mucho daño.
-* Podría enviar spam o atacar otras cosas desde la máquina del servidor.
-  * El acceso a red no está limitado para el worker no privilegiado.
-* Podría agotar memoria, procesos, tiempo de CPU de la máquina.
-  * Quizás se podrían aplicar límites de memoria/fork al proceso worker.
+* El atacante puede probar credenciales mediante el monitor, pero no saltarse la autenticación: necesita credenciales válidas, igual que un cliente SSH normal.
+* Puede obtener una única firma de la llave del servidor (`MON_ONCE`), pero no extraer la llave privada.
+  * Esa firma podría servir para suplantar al servidor en una conexión simultánea cuidadosamente coordinada.
+  * No sirve para conexiones posteriores: cada sesión firma un hash de intercambio nuevo, ligado a los valores frescos de esa conexión.
+
+**Comprometer el worker entrega un oráculo de firma limitado, no la llave privada del servidor.**
 
 ---
 
-# ¿Por qué challenge-response requiere el monitor?
+# ¿Qué daño si se compromete el worker post-autenticación?
 
-**Pregunta:** ¿Por qué no hacer que el proceso hijo genere un challenge aleatorio y verifique la firma?
+* Puede actuar con los permisos del **usuario autenticado**, no como root.
+  * Ese usuario ya podía ejecutar sus comandos tras iniciar sesión.
+* Puede abusar de recursos accesibles a ese usuario o de conexiones de red salientes.
+* Puede intentar agotar CPU, memoria, procesos o conexiones.
+  * Privsep por sí sola no impone todas las cuotas necesarias.
 
-**Respuesta:** El monitor tiene que verificar el resultado de autenticación, que depende del challenge fresco.
-  * Si el worker genera el challenge, un worker comprometido podría falsificarlo.
-
----
-
-# Mecanismos de Aislamiento y Control
-
-El paper usa:
-  * Procesos Unix
-  * User IDs (UIDs)
-  * Permisos de archivos
-  * Paso de file descriptors (fd passing)
+**El impacto queda acotado al usuario y a la disponibilidad; no desaparece.**
 
 ---
 
-# setuid(uid)
+# Mecanismos de aislamiento y control
 
-* Un proceso puede **abandonar sus privilegios** de root a un uid ordinario.
-* Operación **irreversible** — una vez que abandonas root, no puedes volver.
-* Usado por el worker para reducir sus privilegios.
+El diseño del paper combina:
+
+* Procesos Unix como dominios de protección.
+* User IDs (UIDs) y permisos de archivos.
+* `chroot` para reducir la vista del filesystem pre-auth.
+* Paso de file descriptors para delegar recursos concretos.
+* IPC estructurada para cruzar la frontera.
+
+**El mecanismo aísla; la política la implementa la API validada del monitor.**
 
 ---
 
-# chroot(dirname)
+# `setuid(uid)`: abandonar privilegios correctamente
 
-* Causa que `/` se refiera a `dirname` para este proceso y descendientes.
-* El proceso **no puede nombrar archivos fuera** de `dirname`.
-* Crea una "jaula" del sistema de archivos.
+* Un proceso root puede cambiar a un UID/GID ordinario para reducir su autoridad.
+* El drop permanente debe limpiar IDs real, efectivo y guardado, además de grupos suplementarios.
+  * Cambiar solo el UID efectivo puede ser reversible.
+* OpenSSH crea el worker y realiza un **drop irreversible** antes de procesar la red como usuario no privilegiado.
+
+---
+
+# `chroot(dirname)`
+
+* Hace que `/` se refiera a `dirname` para el proceso y sus descendientes.
+* En el diseño del paper, restringe la vista del filesystem del **worker pre-auth no privilegiado** a un directorio vacío y de solo lectura.
+* Reduce qué rutas puede nombrar, pero conserva syscalls, file descriptors heredados y acceso de red.
+
+> **Defensa en profundidad, no sandbox absoluto:** no debe tratarse como contención segura de un proceso que conserva privilegios de root.
 
 ---
 
@@ -315,11 +378,13 @@ El paper usa:
 
 ---
 
-# FD Passing (Paso de File Descriptors)
+# FD passing: delegar un recurso, no el privilegio
 
-* Un proceso abre un file descriptor, lo pasa a otro proceso.
-* Ej., el monitor asigna un pseudo-terminal, pasa el fd al proceso worker.
-* Permite al worker acceder a recursos sin tener el privilegio de crearlos.
+* Un proceso privilegiado abre o crea un recurso y pasa su file descriptor por un socket Unix.
+* Ejemplo: el monitor crea un pseudo-terminal y entrega el fd al worker.
+* El worker puede usar **ese recurso concreto** sin obtener la capacidad general de crear otros.
+
+**El file descriptor funciona como una capacidad acotada por el objeto abierto y sus permisos.**
 
 ---
 
@@ -333,128 +398,48 @@ El paper usa:
 
 # Estado que debe transferirse (Sección 4.1)
 
-* Algoritmos y llaves de encriptación/autenticación.
+* Algoritmos y llaves de cifrado/autenticación.
 * Contadores de secuencia de mensajes de red.
-* Datos de red en buffer.
-* Estado de compresión.
+* Datos de red ya recibidos y aún en buffer.
+* Estado de compresión del stream (en el diseño histórico).
+
+**El nuevo worker debe continuar exactamente la misma sesión; perder un contador o buffer rompe el protocolo.**
 
 ---
 
-# Demo: sshd privsep en acción
+# Refactorización de OpenSSH para separar privilegios
 
-```bash
-es# cp /usr/sbin/sshd /usr/sbin/sshd-demo
-es# /usr/sbin/sshd-demo -d -p 2022
-
-es% ps aux | grep sshd-demo
-# Un proceso, corriendo como root, esperando conexiones
-
-% ssh es -p 2022
- 
-es% ps aux | grep sshd-demo
-# Un proceso monitor como root, un proceso slave como usuario sshd
-```
+## Cómo adaptar código existente
 
 ---
 
-# Demo: sshd privsep en acción (cont.)
+# Refactorización: frontera y wrappers RPC
 
-```bash
-es# cd /proc/monitor-pid; ls -ld root
-es# cd /proc/slave-pid; ls -ld root
-es# ls -la /run/sshd
+**Paso 1:** identificar la frontera y extraer las operaciones privilegiadas.
 
-# Decir "yes" para aceptar llave en cliente ssh, continuar login
+**Paso 2:** conservar la llamada lógica, pero elegir implementación local o stub RPC.
 
-es# ps aux | grep sshd-demo
-# Un proceso monitor como root, un proceso slave con nuevo PID como nickolai
-```
+### `authok = PRIVSEP(auth_password(authctxt, pwd));`
 
----
+* Sin privsep: llama `auth_password(...)` directamente.
+* Con privsep: llama `mm_auth_password(...)`, que serializa la solicitud al monitor.
+* El handler privilegiado vive al otro lado de una interfaz auditable.
 
-# Herramientas de aislamiento a nivel de proceso Unix son difíciles de usar
-
-* Muchos espacios de nombres globales: archivos, UIDs, PIDs, puertos.
-  * Cada uno puede permitir que procesos vean lo que otros están haciendo.
-  * Cada uno es una invitación para bugs o configuración descuidada.
-* No hay idea de "por defecto sin acceso".
-  * Difícil para el diseñador razonar sobre lo que un proceso puede hacer.
+Ver [`monitor_wrap.c`](https://github.com/openssh/openssh-portable/blob/master/monitor_wrap.c).
 
 ---
 
-# Limitaciones de herramientas Unix (cont.)
+# Refactorización: transferir estado explícito
 
-* No hay concesiones de privilegio de grano fino.
-  * No se puede decir "el proceso solo puede leer estos tres archivos".
-* No hay forma de limitar acceso a red.
-* `chroot()` y `setuid()` solo pueden ser usados por superusuario.
-  * Usuarios no-root no pueden reducir/limitar sus propios privilegios.
-  * Incómodo ya que la seguridad sugiere *no* correr como superusuario.
+**Paso 3:** al autenticar, exportar al monitor el estado necesario de la conexión.
 
----
+* El worker pre-auth serializa estado y termina.
+* El monitor espera su salida y hace `fork` del worker post-auth.
+* El nuevo worker adopta UID/GID del usuario y reconstruye la sesión.
 
-# Lab 2 usa Linux Containers (LXC)
+La frontera obliga a distinguir **estado transferible** de punteros o detalles internos del proceso.
 
-* No existían cuando los autores diseñaron la separación de privilegios de OpenSSH.
-* Los contenedores proveen la ilusión de máquinas virtuales sin usar VMs.
-  * Los contenedores son más eficientes que las máquinas virtuales.
-
----
-
-# ¿Qué es un contenedor?
-
-Un contenedor es un proceso Linux, pero fuertemente aislado:
-  * Acceso limitado a los espacios de nombres del kernel.
-  * Acceso limitado a system calls.
-  * Sin acceso al sistema de archivos (del host).
-
----
-
-# Los contenedores se comportan como una VM
-
-* Se inician desde una imagen de VM.
-* Tienen su propia dirección IP.
-* Tienen su propio sistema de archivos.
-
----
-
-# Contenedores no privilegiados
-
-* Lab 2 usa contenedores **no privilegiados**.
-* Estos contenedores corren como procesos de usuario no-root.
-* Si el proceso dentro del contenedor corre como root, aún tiene privilegios limitados.
-* **Más difícil escapar de un contenedor que de un proceso con chroot.**
-
----
-
-# ¿Cómo agregar separación de privilegios a código existente?
-
-**Paso 1:** Diseñar el plan de separación.
-  * Requirió algo de refactorización del código para exponer esta frontera.
-
----
-
-# Agregando separación de privilegios (cont.)
-
-**Paso 2:** Wrappers RPC para funciones en la frontera de interfaz del monitor.
-
-Ejemplo del paper:
-```c
-PRIVSEP(auth_password(authctxt, pwd))
-```
-
-* Cuando PRIVSEP está deshabilitado: simplemente `auth_password(authctxt, pwd)`.
-* Cuando PRIVSEP está habilitado: `mm_auth_password(authctxt, pwd)`.
-* `mm_auth_password()` es un stub de cliente RPC.
-  * [Ver stubs RPC del cliente en monitor_wrap.c](https://github.com/openssh/openssh-portable/blob/master/monitor_wrap.c)
-
----
-
-# Agregando separación de privilegios (cont.)
-
-**Paso 3:** Enviar estado actual al monitor cuando la autenticación tiene éxito.
-  * [Ver llamada a mm_send_keystate() en sshd-auth.c](https://github.com/openssh/openssh-portable/blob/master/sshd-auth.c)
-  * Y correspondientemente, desempaquetar este estado cuando el monitor inicia el nuevo proceso worker.
+Código histórico/moderno relacionado: [`mm_send_keystate()` en `sshd-auth.c`](https://github.com/openssh/openssh-portable/blob/master/sshd-auth.c).
 
 ---
 
@@ -498,103 +483,93 @@ PRIVSEP(auth_password(authctxt, pwd))
 
 ---
 
+# Evaluación de seguridad y rendimiento
+
+---
+
 # ¿Dónde debería buscar un atacante debilidades?
 
-* Podría haber bugs en el proceso worker — buen punto de partida.
-* Bugs en el kernel del OS.
-  * Explotar bug del kernel, volverse root, escapar del aislamiento.
-* Bugs en el código de autenticación del monitor.
-  * Buffer overflow, error de lógica, errores criptográficos.
-  * Autenticarse incorrectamente como usuario víctima.
+* **Worker:** bugs remotos aún permiten control del proceso, DoS y abuso de la API disponible.
+* **Monitor:** parser IPC, máquina de estados y decisiones de autenticación siguen siendo críticos.
+* **Listener:** conserva root y acepta conexiones, aunque ejecuta mucho menos protocolo.
+* **Kernel:** un exploit local podría escapar del aislamiento y obtener root.
+
+**Privsep desplaza el objetivo: desde mucho código expuesto hacia un TCB menor que merece auditoría intensa.**
 
 ---
 
-# ¿Qué tan seguro es el OpenSSH con separación de privilegios?
+# ¿Cuánto código se ejecutaba con privilegios? (paper, 2003)
 
-**Sección 5 del paper.**
+**Todo el código ejecutado, incluidas bibliotecas**
+* **67,70%** sin privilegios: 17.589 LOC.
+* **32,30%** con privilegios: 8.391 LOC.
 
-**Una medida de vulnerabilidades potenciales: líneas de código.**
-  * Worker no privilegiado es aproximadamente **2/3 del código**.
-  * Monitor privilegiado es aproximadamente **1/3 del código**.
-  * Menos líneas de código → menos bugs.
+**El monitor no equivale a todo el código privilegiado**
+* Monitor: ~**900 LOC**, **3,46%** del total.
+* El resto incluye OpenSSH privilegiado, OpenSSL y S/Key.
+* Solo código propio de OpenSSH: aproximadamente **75% / 25%** sin/con privilegios.
 
----
-
-# Medidas de seguridad (cont.)
-
-**Otra medida: superficie de ataque.**
-  * Worker no privilegiado: mensajes de red arbitrarios.
-  * Monitor privilegiado: interfaz bien definida, pocas operaciones, estructura fija.
-  * ¿Relativamente menos probable tener corrupción de memoria, etc.?
+> Contar LOC es una aproximación. La reducción estimada supone, de forma simplificadora, que los defectos se distribuyen aproximadamente uniformemente.
 
 ---
 
-# Estudio empírico: vulnerabilidades prevenidas
+# Estudio empírico: vulnerabilidades históricas
 
-Muchas vulnerabilidades anteriores habrían sido prevenidas:
-  * **Pre-autenticación:** integer overflow en código de procesamiento de paquetes de red.
-  * **Pre-autenticación:** bug de zlib.
-  * **Post-autenticación:** error off-by-one en código de channel.
-  * **Post-autenticación:** paso de tickets Kerberos.
+El paper revisó fallas anteriores cuyo impacto habría quedado contenido:
 
----
+* **Pre-auth:** integer overflow en procesamiento de paquetes.
+* **Pre-auth:** bug en zlib.
+* **Post-auth:** off-by-one en código de canales.
+* **Post-auth:** manejo incorrecto de tickets Kerberos.
 
-# Separación ayuda incluso con bugs post-autenticación
-
-* Solía seguir corriendo como root, debido a re-negociación de llaves (necesita firmar).
-* Con separación de privilegios, el worker ya no tiene esos privilegios.
+**“Prevenida” aquí significa prevenir la escalación de privilegios; el bug y un posible DoS pueden seguir existiendo.**
 
 ---
 
 # ¿Cuál es el overhead de rendimiento?
 
-**Diseño descrito/desplegado: ¡prácticamente sin overhead de rendimiento!**
-  * Sección 6 del paper.
+* **Diseño descrito/desplegado: ¡prácticamente sin overhead de rendimiento!**
 
-Rápido porque la separación de privilegios **no está en la ruta crítica** para transferencia de datos.
+
+* Rápido porque la separación de privilegios **no está en la ruta crítica** para transferencia de datos.
   * Después del login, todo funciona básicamente igual que sin privsep.
-
----
-
-# Rendimiento (cont.)
-
 * Overhead menor para establecer nueva conexión / login, pero no significativo.
 * **Resultado directo de elegir cuidadosamente la interfaz de separación de privilegios correcta.**
 
----
-
-# Diseño alternativo ("3 procesos") de sección 4.3
-
-Sería más lento:
-  * Evitaría la necesidad de transferencia de estado compleja.
-  * Worker existente sigue manejando encriptación/compresión en conexión de red.
-  * Nuevo worker maneja la sesión del usuario.
-  * Introduce algo de overhead en estado estable: más cambio de contexto.
 
 ---
 
-# OpenSSH hoy
 
-* OpenSSH todavía usa este diseño básico de separación de privilegios hoy.
-* Cambios relativamente menores (como eliminar la memoria compartida para zlib).
+# 6. Conclusiones
 
 ---
 
-# Aspectos únicos de OpenSSH
+# OpenSSH hoy: la descomposición siguió evolucionando
 
-OpenSSH tiene algunos aspectos únicos que influyen en su plan de separación de privilegios:
-  * Cada conexión es mayormente **independiente**.
-    * El estado compartido está en los archivos que el usuario puede acceder después de iniciar sesión.
-    * No es realmente problema de OpenSSH.
-  * Un proceso monitor privilegiado, relativamente pocos recursos privilegiados.
-    * Llave privada del servidor, base de datos de contraseñas, capacidad de setuid().
+* **9.8 (2024):** creó `sshd-session` para cada conexión; `sshd` quedó como listener mínimo sin implementar el protocolo SSH.
+* **10.0 (2025):** creó `sshd-auth` para la autenticación de usuario, separando esa superficie pre-auth del resto de la conexión.
+* Tras autenticar, el código de `sshd-auth` deja de estar presente en el proceso que continúa la sesión.
+
+**La composición cambió sustancialmente; permanece el principio de aislar código expuesto y mediar la autoridad con fronteras estrechas.**
+
+---
+
+# ¿Por qué este plan funciona bien para OpenSSH?
+
+* Cada conexión es mayormente **independiente**.
+  * Un monitor por conexión acota estado, fallas y decisiones a un cliente.
+* Hay pocos recursos privilegiados durables.
+  * Llave privada del host, autenticación, PTY y cambio de identidad.
+* La transferencia de datos post-login no necesita cruzar el monitor por cada paquete.
+
+**Independencia por conexión + pocas operaciones privilegiadas = frontera pequeña y barata.**
 
 ---
 
 # Otros sistemas son bastante diferentes
 
 Otros sistemas que veremos son bastante diferentes:
-  * **Aplicaciones web:** lab 2 y paper de Google.
+  * **Aplicaciones web y servicios distribuidos.**
   * Muchos recursos diferentes (autenticación de usuario, bases de datos, servicios, etc.).
   * Servicios con estado (ej., BD) en lugar de iniciar un worker fresco cada vez.
   * Permisos dinámicos (ej., tickets de permiso de usuario de Google).
@@ -603,19 +578,20 @@ Otros sistemas que veremos son bastante diferentes:
 
 # Resumen
 
-* **Separación de privilegios** es una técnica poderosa para limitar daño de bugs.
-* OpenSSH demuestra un diseño exitoso:
-  * Worker no privilegiado maneja datos de red no confiables.
-  * Monitor privilegiado expone operaciones limitadas y controladas.
-* Rendimiento puede ser excelente si la separación está fuera de la ruta crítica.
-* Los contenedores modernos ofrecen mejor aislamiento que las herramientas Unix tradicionales.
+* **Privsep limita el impacto de bugs; no evita los bugs.**
+* OpenSSH pone el procesamiento de red no confiable en workers con menos privilegios y deja autoridad estrecha en el monitor.
+* La API IPC y su máquina de estados hacen significativa la frontera: cada solicitud debe validarse.
+* No contiene todo: quedan posibles DoS, abuso con permisos del usuario y escapes por el kernel.
+* **TCB restante:** listener, monitor, kernel y la implementación/validación de la interfaz IPC.
+* El overhead puede ser bajo si el monitor queda fuera de la ruta crítica de datos.
 
 ---
 
 # Referencias
 
-* Paper: "Privilege Separated OpenSSH" - Niels Provos, Markus Friedl, Peter Honeyman
-* Código fuente:
-  * https://github.com/openssh/openssh-portable/blob/master/monitor.h
-  * https://github.com/openssh/openssh-portable/blob/master/monitor.c
-  * https://github.com/openssh/openssh-portable/blob/master/monitor_wrap.c
+* Niels Provos, Markus Friedl y Peter Honeyman. **“Preventing Privilege Escalation.”** 12th USENIX Security Symposium, 2003.
+* OpenSSH 9.8 release notes — separación de `sshd` y `sshd-session`:
+  * https://www.openssh.com/txt/release-9.8
+* OpenSSH 10.0 release notes — nuevo `sshd-auth`:
+  * https://www.openssh.com/txt/release-10.0
+* Código: [`monitor.h`](https://github.com/openssh/openssh-portable/blob/master/monitor.h), [`monitor.c`](https://github.com/openssh/openssh-portable/blob/master/monitor.c), [`monitor_wrap.c`](https://github.com/openssh/openssh-portable/blob/master/monitor_wrap.c).

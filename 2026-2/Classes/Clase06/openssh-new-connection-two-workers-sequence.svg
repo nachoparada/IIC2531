@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="660" viewBox="0 0 1200 660" role="img" aria-labelledby="title desc">
+  <title id="title">Secuencia histórica de una conexión OpenSSH con dos workers sucesivos</title>
+  <desc id="desc">El listener root acepta TCP y crea un monitor root por conexión. El monitor crea el worker pre-auth sin privilegios. El worker procesa red y usa IPC para pedir firmas y autenticación. Tras autenticar, exporta estado y termina. El monitor crea un worker post-auth distinto con el UID y GID del usuario, restaura el estado, inicia la sesión y continúa el canal cifrado.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .t{font-family:Arial,sans-serif;fill:#0f172a;text-anchor:middle}.actor{font-size:22px;font-weight:700}.sub{font-size:19px}.lab{font-size:21px;font-weight:600}.phase{font-size:20px;font-weight:700;letter-spacing:.8px}
+      .abox{fill:#fff;stroke:#64748b;stroke-width:2.5}.root{fill:#fff7ed;stroke:#ea580c}.worker{fill:#eff6ff;stroke:#2563eb}.user{fill:#f0fdf4;stroke:#16a34a}
+      .life{fill:none;stroke:#94a3b8;stroke-width:2;stroke-dasharray:7 7}.arrow{fill:none;stroke:#475569;stroke-width:2.8;marker-end:url(#arrow)}.ipc{fill:none;stroke:#2563eb;stroke-width:2.8;marker-end:url(#arrow-blue)}
+      .labelbg{fill:#fff;opacity:.94;rx:7}
+    </style>
+  </defs>
+
+  <!-- Phase bands -->
+  <rect x="10" y="96" width="1180" height="334" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="10" y="440" width="1180" height="205" rx="16" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+  <text x="68" y="126" class="t phase" fill="#475569">PRE-AUTH</text>
+  <text x="68" y="470" class="t phase" fill="#15803d">POST-AUTH</text>
+
+  <!-- Lifelines -->
+  <path d="M78 82 V648" class="life"/>
+  <path d="M260 82 V648" class="life"/>
+  <path d="M465 82 V648" class="life"/>
+  <path d="M690 82 V418" class="life"/>
+  <path d="M920 82 V648" class="life"/>
+  <path d="M1125 82 V648" class="life"/>
+
+  <!-- Arrows and label backgrounds -->
+  <path d="M78 146 H260" class="arrow"/>
+  <rect x="118" y="113" width="104" height="27" class="labelbg"/><text x="170" y="134" class="t lab">1 · TCP</text>
+
+  <path d="M260 194 H465" class="arrow"/>
+  <rect x="298" y="161" width="130" height="27" class="labelbg"/><text x="363" y="182" class="t lab">2 · fork monitor</text>
+
+  <path d="M465 242 H690" class="arrow"/>
+  <rect x="492" y="209" width="172" height="27" class="labelbg"/><text x="578" y="230" class="t lab">3 · fork pre-auth</text>
+  <text x="578" y="266" class="t sub">TCP heredado</text>
+
+  <path d="M78 297 H690" class="arrow"/>
+  <rect x="283" y="264" width="205" height="27" class="labelbg"/><text x="385" y="285" class="t lab">4 · KEX + parsing de red</text>
+
+  <path d="M690 339 H465" class="ipc"/>
+  <rect x="499" y="306" width="160" height="27" class="labelbg"/><text x="579" y="327" class="t lab" fill="#1d4ed8">5 · firma / auth</text>
+
+  <path d="M465 378 H690" class="ipc"/>
+  <rect x="493" y="345" width="170" height="27" class="labelbg"/><text x="578" y="366" class="t lab" fill="#1d4ed8">6 · valida / responde</text>
+
+  <path d="M690 418 H465" class="arrow"/>
+  <rect x="496" y="380" width="166" height="30" class="labelbg"/><text x="579" y="403" class="t sub">7 · exporta estado</text>
+  <line x1="680" y1="420" x2="700" y2="440" stroke="#dc2626" stroke-width="3"/>
+  <line x1="700" y1="420" x2="680" y2="440" stroke="#dc2626" stroke-width="3"/>
+  <text x="733" y="436" class="t sub" fill="#b91c1c">exit</text>
+
+  <path d="M465 500 H920" class="arrow"/>
+  <rect x="550" y="467" width="287" height="27" class="labelbg"/><text x="694" y="488" class="t lab">8 · fork worker post-auth</text>
+  <text x="694" y="524" class="t sub">UID/GID usuario · restaura estado</text>
+
+  <path d="M920 555 H1125" class="arrow"/>
+  <rect x="949" y="522" width="150" height="27" class="labelbg"/><text x="1024" y="543" class="t lab">9 · inicia sesión</text>
+
+  <path d="M78 600 H920" class="arrow"/>
+  <rect x="380" y="567" width="238" height="27" class="labelbg"/><text x="499" y="588" class="t lab">10 · canal SSH cifrado</text>
+
+  <path d="M920 638 H465" class="ipc"/>
+  <rect x="618" y="605" width="151" height="27" class="labelbg"/><text x="694" y="626" class="t lab" fill="#1d4ed8">11 · PTY / rekey</text>
+
+  <!-- Actor boxes drawn last -->
+  <rect x="12" y="16" width="132" height="66" rx="12" class="abox"/><text x="78" y="44" class="t actor">Cliente</text><text x="78" y="68" class="t sub">no confiable</text>
+  <rect x="182" y="16" width="156" height="66" rx="12" class="abox root"/><text x="260" y="44" class="t actor">Listener</text><text x="260" y="68" class="t sub">root · larga vida</text>
+  <rect x="387" y="16" width="156" height="66" rx="12" class="abox root"/><text x="465" y="44" class="t actor">Monitor</text><text x="465" y="68" class="t sub">root · por conexión</text>
+  <rect x="598" y="16" width="184" height="66" rx="12" class="abox worker"/><text x="690" y="44" class="t actor">Worker pre-auth</text><text x="690" y="68" class="t sub">sin privilegios</text>
+  <rect x="828" y="16" width="184" height="66" rx="12" class="abox user"/><text x="920" y="44" class="t actor">Worker post-auth</text><text x="920" y="68" class="t sub">UID/GID usuario</text>
+  <rect x="1060" y="16" width="130" height="66" rx="12" class="abox user"/><text x="1125" y="44" class="t actor">Shell</text><text x="1125" y="68" class="t sub">sesión</text>
+</svg>
