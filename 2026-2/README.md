@@ -94,7 +94,8 @@ Si alguno de estos requisitos no se cumple, la nota final corresponde a la nota 
 | Lab 5 | Seguridad en Sistemas de IA | 2026-11-05 |
 
 ### Proyecto Final
-- **Fecha de entrega:** 2026-11-19
+- **Fecha de entrega de la propuesta:** 2026-10-06
+- **Fecha de entrega final:** 2026-11-19
 - Puede ser orientado a ataque o defensa
 - Presentaciones al final del semestre
 - Ver [Proyecto final](FinalProject/FinalProject.md) y [Entrega final del proyecto](FinalProject/EntregaFinal.md)
