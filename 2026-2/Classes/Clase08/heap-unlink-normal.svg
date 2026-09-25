@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="500" viewBox="0 0 1200 500" role="img" aria-labelledby="title desc">
+  <title id="title">Eliminación normal de un bloque de una lista doblemente enlazada</title>
+  <desc id="desc">Antes, A, B y C están enlazados. Al retirar B, A next pasa a C y C prev pasa a A.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker>
+    <marker id="blueArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+  </defs>
+  <rect width="1200" height="500" fill="#fff"/>
+  <text x="600" y="38" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#0f172a">Unlink normal: retirar B de la lista libre</text>
+
+  <text x="110" y="92" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#475569">ANTES</text>
+  <path d="M330 150 H455" fill="none" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M455 205 H330" fill="none" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M745 150 H870" fill="none" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M870 205 H745" fill="none" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <g font-family="Arial,sans-serif" text-anchor="middle">
+    <g><rect x="110" y="115" width="220" height="125" rx="14" fill="#f8fafc" stroke="#334155" stroke-width="3"/><text x="220" y="160" font-size="26" font-weight="700" fill="#0f172a">A</text><text x="220" y="198" font-size="19" fill="#475569">next → B</text></g>
+    <g><rect x="455" y="115" width="290" height="125" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="4"/><text x="600" y="156" font-size="26" font-weight="700" fill="#0f172a">B</text><text x="600" y="190" font-size="19" fill="#2563eb">prev → A · next → C</text><text x="600" y="222" font-size="17" font-weight="700" fill="#dc2626">bloque que será retirado</text></g>
+    <g><rect x="870" y="115" width="220" height="125" rx="14" fill="#f8fafc" stroke="#334155" stroke-width="3"/><text x="980" y="160" font-size="26" font-weight="700" fill="#0f172a">C</text><text x="980" y="198" font-size="19" fill="#475569">prev → B</text></g>
+  </g>
+
+  <path d="M600 258 V306" fill="none" stroke="#64748b" stroke-width="4" marker-end="url(#arrow)"/>
+  <text x="625" y="290" font-family="Arial,sans-serif" font-size="18" fill="#475569">unlink(B)</text>
+
+  <text x="110" y="360" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#475569">DESPUÉS</text>
+  <path d="M430 407 H770" fill="none" stroke="#2563eb" stroke-width="5" marker-end="url(#blueArrow)"/>
+  <path d="M770 452 H430" fill="none" stroke="#2563eb" stroke-width="5" marker-end="url(#blueArrow)"/>
+  <g font-family="Arial,sans-serif" text-anchor="middle">
+    <g><rect x="210" y="370" width="220" height="105" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="4"/><text x="320" y="408" font-size="26" font-weight="700" fill="#0f172a">A</text><text x="320" y="446" font-size="19" fill="#2563eb">next → C</text></g>
+    <g><rect x="770" y="370" width="220" height="105" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="4"/><text x="880" y="408" font-size="26" font-weight="700" fill="#0f172a">C</text><text x="880" y="446" font-size="19" fill="#2563eb">prev → A</text></g>
+  </g>
+  <text x="600" y="352" text-anchor="middle" font-family="monospace" font-size="20" fill="#0f172a">B.next.prev = B.prev     ·     B.prev.next = B.next</text>
+</svg>

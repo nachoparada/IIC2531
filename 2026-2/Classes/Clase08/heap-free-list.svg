@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" role="img" aria-labelledby="title desc">
+  <title id="title">Lista doblemente enlazada de bloques libres del heap</title>
+  <desc id="desc">Tres bloques libres contienen datos y punteros prev y next. Flechas en ambos sentidos conectan bloques adyacentes.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="430" fill="#ffffff"/>
+  <text x="600" y="42" text-anchor="middle" font-family="Arial, sans-serif" font-size="27" font-weight="700" fill="#0f172a">Lista doblemente enlazada de bloques libres</text>
+  <text x="600" y="72" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#475569">El allocator usa los punteros prev y next para recorrer y actualizar la lista</text>
+
+  <!-- Connectors behind nodes -->
+  <path d="M 365 176 C 405 135, 445 135, 485 176" fill="none" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M 485 275 C 445 316, 405 316, 365 275" fill="none" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M 715 176 C 755 135, 795 135, 835 176" fill="none" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M 835 275 C 795 316, 755 316, 715 275" fill="none" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <!-- Block 1 -->
+  <g font-family="Arial, sans-serif">
+    <rect x="135" y="120" width="230" height="210" rx="14" fill="#f8fafc" stroke="#334155" stroke-width="3"/>
+    <rect x="135" y="120" width="230" height="52" rx="14" fill="#e2e8f0"/>
+    <path d="M 135 158 L 365 158" stroke="#334155" stroke-width="3"/>
+    <text x="250" y="151" text-anchor="middle" font-size="21" font-weight="700" fill="#0f172a">BLOQUE LIBRE A</text>
+    <text x="250" y="220" text-anchor="middle" font-size="23" fill="#475569">espacio disponible</text>
+    <path d="M 135 254 L 365 254 M 250 254 L 250 330" stroke="#334155" stroke-width="3"/>
+    <text x="192" y="289" text-anchor="middle" font-size="20" font-weight="700" fill="#475569">prev</text>
+    <text x="307" y="289" text-anchor="middle" font-size="20" font-weight="700" fill="#2563eb">next</text>
+    <text x="192" y="315" text-anchor="middle" font-size="18" fill="#64748b">NULL</text>
+    <text x="307" y="315" text-anchor="middle" font-size="18" fill="#2563eb">→ B</text>
+  </g>
+
+  <!-- Block 2 -->
+  <g font-family="Arial, sans-serif">
+    <rect x="485" y="120" width="230" height="210" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="4"/>
+    <rect x="485" y="120" width="230" height="52" rx="14" fill="#dbeafe"/>
+    <path d="M 485 158 L 715 158" stroke="#2563eb" stroke-width="3"/>
+    <text x="600" y="151" text-anchor="middle" font-size="21" font-weight="700" fill="#0f172a">BLOQUE LIBRE B</text>
+    <text x="600" y="220" text-anchor="middle" font-size="23" fill="#475569">espacio disponible</text>
+    <path d="M 485 254 L 715 254 M 600 254 L 600 330" stroke="#2563eb" stroke-width="3"/>
+    <text x="542" y="289" text-anchor="middle" font-size="20" font-weight="700" fill="#2563eb">prev</text>
+    <text x="657" y="289" text-anchor="middle" font-size="20" font-weight="700" fill="#2563eb">next</text>
+    <text x="542" y="315" text-anchor="middle" font-size="18" fill="#2563eb">→ A</text>
+    <text x="657" y="315" text-anchor="middle" font-size="18" fill="#2563eb">→ C</text>
+  </g>
+
+  <!-- Block 3 -->
+  <g font-family="Arial, sans-serif">
+    <rect x="835" y="120" width="230" height="210" rx="14" fill="#f8fafc" stroke="#334155" stroke-width="3"/>
+    <rect x="835" y="120" width="230" height="52" rx="14" fill="#e2e8f0"/>
+    <path d="M 835 158 L 1065 158" stroke="#334155" stroke-width="3"/>
+    <text x="950" y="151" text-anchor="middle" font-size="21" font-weight="700" fill="#0f172a">BLOQUE LIBRE C</text>
+    <text x="950" y="220" text-anchor="middle" font-size="23" fill="#475569">espacio disponible</text>
+    <path d="M 835 254 L 1065 254 M 950 254 L 950 330" stroke="#334155" stroke-width="3"/>
+    <text x="892" y="289" text-anchor="middle" font-size="20" font-weight="700" fill="#2563eb">prev</text>
+    <text x="1007" y="289" text-anchor="middle" font-size="20" font-weight="700" fill="#475569">next</text>
+    <text x="892" y="315" text-anchor="middle" font-size="18" fill="#2563eb">→ B</text>
+    <text x="1007" y="315" text-anchor="middle" font-size="18" fill="#64748b">NULL</text>
+  </g>
+
+  <text x="600" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#475569">Cada bloque guarda metadatos que conectan al bloque anterior y al siguiente.</text>
+</svg>
