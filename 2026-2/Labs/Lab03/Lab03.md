@@ -22,13 +22,20 @@ Comenzando
 -----------
 
 Los archivos que necesitarás para este y laboratorios posteriores se distribuyen usando el sistema de control de versiones [Git](https://git-scm.com/). También puedes usar Git para hacer seguimiento de cualquier cambio que hagas al código fuente inicial. Aquí hay una [visión general de Git](https://missing.csail.mit.edu/2020/version-control/) y el [manual del usuario de Git](https://www.kernel.org/pub/software/scm/git/docs/user-manual.html), que puedes encontrar útil.
-El repositorio Git del curso está disponible en https://github.com/nachoparada/IIC2531-labs.git. Para obtener el código del laboratorio, inicia sesión en la VM usando la cuenta |student| y clona el código fuente para el lab 1 de la siguiente manera:
+El repositorio Git del curso está disponible en https://github.com/nachoparada/IIC2531-labs.git. Para obtener el código del laboratorio, inicia sesión en la VM usando la cuenta `student`, clona el repositorio del curso en el directorio `lab` y cámbiate a la rama `lab1`, donde vive el código de este laboratorio. Esa es la rama por defecto del repositorio, por lo que al clonar ya quedarás en ella; aun así, cámbiate a ella de forma explícita con `git checkout lab1` antes de continuar.
+
+> **Nota:** la rama correcta es `lab1`, **no** `lab3`; no es un error de tipeo. Las ramas de este repositorio conservan la numeración del material original en que se basan los laboratorios, donde el ataque de buffer overflow corresponde a `lab1`. En este curso esa actividad se presenta como Lab 3, pero el código sigue viviendo en la rama `lab1`. La rama `lab3` contiene una actividad distinta, así que no la uses para este laboratorio.
+
+Estos son los comandos de shell:
 
 ```bash
-student@6858-v22:~$ git clone https://github.com/nachoparada/IIC2531-labs.git lab
+student@6566-v26:~$ git clone https://github.com/nachoparada/IIC2531-labs.git lab
 Cloning into 'lab'...
-student@6858-v22:~$ cd lab
-student@6858-v22:~/lab$
+student@6566-v26:~$ cd lab
+student@6566-v26:~/lab$ git checkout lab1
+Already on 'lab1'
+Your branch is up to date with 'origin/lab1'.
+student@6566-v26:~/lab$
 ```
 
 Antes de que sigas con este laboratorio, asegurate de que puedas compilar `zookws`:
@@ -525,5 +532,5 @@ no modificada durante la calificación.
 >También deberías asegurarte de que tu código aún pase todas las pruebas usando `make check`, que usa los binarios de laboratorio no modificados.
 
 ¡Has terminado!
-Entrega tus respuestas a la tarea de laboratorio ejecutando prepare-submit y subiendo el archivo resultante
-lab1-handin.tar.gz al buzón de la tarea.
+Entrega tus respuestas a la tarea de laboratorio ejecutando `make prepare-submit` y subiendo el archivo resultante
+`lab1-handin.tar.gz` al buzón de la tarea.
